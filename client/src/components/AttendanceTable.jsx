@@ -10,7 +10,7 @@ export default function AttendanceTable() {
     }, []);
 
     return (
-        <div className='container'>
+        <div className='attendance-container'>
             <table>
                 <thead>
                     <tr>

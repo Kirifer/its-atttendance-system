@@ -4,11 +4,12 @@ import '../styles/AttendanceTable.css'
 
 function Timesheet() {
   return (
-
-    <div>
+  <div>
+    <div className='attendance-head'>
       <h1>Timesheet</h1>
-      <AttendanceTable />
     </div>
+    <AttendanceTable />
+  </div>
   )
 }
 
