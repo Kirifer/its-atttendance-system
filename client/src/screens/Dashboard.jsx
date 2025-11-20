@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import DashboardLayout from "../components/DashboardLayout/DashboardLayout";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -9,11 +10,13 @@ function Dashboard() {
   };
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <button onClick={() => navigate("/")}>Go to home</button>
-      <button onClick={handleSignOut}>Sign out</button>
-    </div>
+    <DashboardLayout>
+      <div>
+        <h1>Dashboard</h1>
+        <button onClick={() => navigate("/")}>Go to home</button>
+        <button onClick={handleSignOut}>Sign out</button>
+      </div>
+    </DashboardLayout>
   );
 }
 
