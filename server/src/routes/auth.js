@@ -36,19 +36,27 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await pool.query("SELECT * FROM users WHERE email = $1", [
+    const userQuery = await pool.query("SELECT * FROM users WHERE email = $1", [
       email,
     ]);
-    if (user.rows.length === 0)
+    if (userQuery.rows.length === 0)
       return res.status(400).json({ message: "User does not exist" });
 
-    const valid = await bcrypt.compare(password, user.rows[0].password);
+    const user = userQuery.rows[0];
+
+    const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(400).json({ message: "Incorrect password" });
 
-    const token = jwt.sign({ id: user.rows[0].id }, JWT_SECRET, {
-      expiresIn: "1h",
+    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
     });
-    res.json({ token });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: "Server Error" });
