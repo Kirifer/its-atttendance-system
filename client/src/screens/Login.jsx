@@ -1,40 +1,49 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../api/auth";
 import API from "../api/api";
-import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth(); 
+  const [fieldErrors, setFieldErrors] = useState({
+    email: "",
+    password: "",
+    general: "",
+  });
+
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await API.post("/auth/login", { email, password });
-      const { token, user } = response.data;
-      if (!user) throw new Error("User data missing from response");
+    setFieldErrors({
+      email: "",
+      password: "",
+      general: "",
+    });
 
+    try {
+      const { token } = await loginUser(email, password);
       localStorage.setItem("token", token);
 
-      login(user);
-
+      setFieldErrors({ ...fieldErrors, general: "Login successful!" });
       navigate("/dashboard");
     } catch (err) {
-      console.error("Login error:", err);
-      alert("Login failed. Check your credentials.");
-    } finally {
-      setLoading(false);
+      const message = err.message;
+
+      if (message.toLowerCase().includes("does not exist")) {
+        setFieldErrors({ ...fieldErrors, email: message });
+      } else if (message.toLowerCase().includes("incorrect password")) {
+        setFieldErrors({ ...fieldErrors, password: message });
+      } else {
+        setFieldErrors({ ...fieldErrors, general: message });
+      }
     }
   };
 
   return (
-    <div className="login-container">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
+      <div>
         <input
           type="email"
           placeholder="Email"
@@ -42,6 +51,12 @@ function Login() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+        {fieldErrors.email && (
+          <p style={{ color: "red" }}>{fieldErrors.email}</p>
+        )}
+      </div>
+
+      <div>
         <input
           type="password"
           placeholder="Password"
@@ -49,11 +64,26 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
-    </div>
+        {fieldErrors.password && (
+          <p style={{ color: "red" }}>{fieldErrors.password}</p>
+        )}
+      </div>
+
+      <button onClick={() => navigate("/")}>Return to home</button>
+      <button type="submit">Login</button>
+
+      {fieldErrors.general && (
+        <p
+          style={{
+            color:
+              fieldErrors.general === "Login successful!" ? "green" : "red",
+            marginTop: "10px",
+          }}
+        >
+          {fieldErrors.general}
+        </p>
+      )}
+    </form>
   );
 }
 
