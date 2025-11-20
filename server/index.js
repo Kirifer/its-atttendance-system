@@ -1,8 +1,9 @@
 import express from "express"
 import cors from "cors" 
 import dotenv from "dotenv"
-import pool from "./db.js";
-import errorHandling from "./middlewares/errorHandler.js";
+import pool from "./src/db.js";
+import errorHandling from "./src/middlewares/errorHandler.js";
+import authRoutes from "./src/routes/auth.js";
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ app.use(cors());
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
+
+app.use("/api/auth", authRoutes);
 
 //use for testing database connection
 app.get("/test-db", async (req, res) => {
