@@ -39,23 +39,22 @@ router.post("/login", async (req, res) => {
     const userQuery = await pool.query("SELECT * FROM users WHERE email = $1", [
       email,
     ]);
+
     if (userQuery.rows.length === 0)
       return res.status(400).json({ message: "User does not exist" });
 
-    const user = userQuery.rows[0];
+    const user = userQuery.rows[0]; // now we can safely use 'user'
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(400).json({ message: "Incorrect password" });
 
-    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
     res.json({
       token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-      },
+      user: { id: user.id, username: user.username, email: user.email },
     });
   } catch (err) {
     console.error(err.message);
