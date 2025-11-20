@@ -11,8 +11,8 @@
 .dashboard__sidebar {
   top: 0;
   left: 0;
-  height: 100%;
-  width: 85px;
+  height: 75%;
+  width: 84px;
   background: #ffffff;
   padding: 25px 0px;
   transition: all 0.4s ease;
@@ -106,10 +106,12 @@ ul {
     white-space: nowrap;
 }
 
+
+
 .dashboard__main {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
   box-sizing: border-box;
-  background: #F6F8FA;
+  background: #F6F8FA;  
 }
