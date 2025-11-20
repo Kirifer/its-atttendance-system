@@ -1,0 +1,15 @@
+.daterange_bar {
+    background-color: #FFF;
+    border: 2px solid #DDD;
+    border-radius: 5px;
+    box-shadow: 
+    0 2px 4px 0 rgba(0, 0, 0, 0.15), 
+    0 6px 20px 0 rgba(0, 0, 0, 0.12);
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 8px;
+    padding-left: 16px;
+    margin-left: 50px;
+    width: 270px;
+    display: flex;
+    align-items: center;
+}
