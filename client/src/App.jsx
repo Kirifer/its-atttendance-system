@@ -6,6 +6,7 @@ import "./App.css";
 // Screens
 import Home from "./screens/Home";
 import Dashboard from "./screens/Dashboard";
+import ForgotPassword from "./screens/ForgotPassword";
 import Login from "./screens/Login";
 import Logs from "./screens/Logs";
 import Reports from "./screens/Reports";
@@ -29,6 +30,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logs" element={<Logs />} />
         <Route path="/reports" element={<Reports />} />

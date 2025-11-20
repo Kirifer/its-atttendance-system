@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../api/auth";
+import "../styles/Login.css";
 import API from "../api/api";
 
 function Login() {
@@ -42,48 +43,70 @@ function Login() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        {fieldErrors.email && (
-          <p style={{ color: "red" }}>{fieldErrors.email}</p>
-        )}
-      </div>
+    <div className="background center-align-items">
+      <form onSubmit={handleSubmit} class="login-box">
+        <div className="top-box-header">
+          <p class="login-text">Log in</p>
+          <button className="close-btn" onClick={() => navigate("/")}>
+            X
+          </button>
+        </div>
 
-      <div>
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        {fieldErrors.password && (
-          <p style={{ color: "red" }}>{fieldErrors.password}</p>
-        )}
-      </div>
+        <div>
+          <input
+            class="text-box"
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          {fieldErrors.email && (
+            <p style={{ color: "red" }}>{fieldErrors.email}</p>
+          )}
+        </div>
 
-      <button onClick={() => navigate("/")}>Return to home</button>
-      <button type="submit">Login</button>
+        <div>
+          <input
+            class="text-box"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {fieldErrors.password && (
+            <p style={{ color: "red" }}>{fieldErrors.password}</p>
+          )}
+        </div>
 
-      {fieldErrors.general && (
-        <p
-          style={{
-            color:
-              fieldErrors.general === "Login successful!" ? "green" : "red",
-            marginTop: "10px",
-          }}
-        >
-          {fieldErrors.general}
+        {/* Buttons */}
+        <p onClick={() => navigate("/forgot-password")} className="link-text">
+          Forgot Password?
         </p>
-      )}
-    </form>
+        <button type="submit" className="login-button">
+          Login
+        </button>
+        <p>
+          Don't have an account?{" "}
+          <span onClick={() => navigate("/sign-up")} className="link-text">
+            Click here to sign up.
+          </span>
+        </p>
+
+        {fieldErrors.general && (
+          <p
+            style={{
+              color:
+                fieldErrors.general === "Login successful!" ? "green" : "red",
+              marginTop: "10px",
+            }}
+          >
+            {fieldErrors.general}
+          </p>
+        )}
+      </form>
+    </div>
   );
 }
 
