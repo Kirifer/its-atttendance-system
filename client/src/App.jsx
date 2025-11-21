@@ -10,6 +10,7 @@ import ForgotPassword from "./screens/ForgotPassword";
 import Login from "./screens/Login";
 import Logs from "./screens/Logs";
 import Reports from "./screens/Reports";
+import ResetPassword from "./screens/ResetPassword";
 import Settings from "./screens/Settings";
 import Signup from "./screens/Signup";
 import Timeoff from "./screens/Timeoff";
@@ -34,6 +35,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/logs" element={<Logs />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/sign-up" element={<Signup />} />
         <Route path="/time-off" element={<Timeoff />} />

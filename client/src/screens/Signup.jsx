@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signUpUser } from "../api/auth";
+import "../styles/Signup.css";
 import API from "../api/api";
 
 function Signup() {
@@ -56,67 +57,88 @@ function Signup() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <input
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        {fieldErrors.username && (
-          <p style={{ color: "red" }}>{fieldErrors.username}</p>
-        )}
-      </div>
+    <div className="background center-align-items">
+      <form onSubmit={handleSubmit} class="signup-box">
+        <div className="top-box-header">
+          <p class="signup-text">Sign Up</p>
+          <button className="close-btn" onClick={() => navigate("/")}>
+            X
+          </button>
+        </div>
 
-      <div>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        {fieldErrors.email && (
-          <p style={{ color: "red" }}>{fieldErrors.email}</p>
-        )}
-      </div>
+        <div>
+          <input
+            class="text-box"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          {fieldErrors.username && (
+            <p style={{ color: "red" }}>{fieldErrors.username}</p>
+          )}
+        </div>
 
-      <div>
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        {fieldErrors.password && (
-          <p style={{ color: "red" }}>{fieldErrors.password}</p>
-        )}
-      </div>
+        <div>
+          <input
+            class="text-box"
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          {fieldErrors.email && (
+            <p style={{ color: "red" }}>{fieldErrors.email}</p>
+          )}
+        </div>
 
-      <div>
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-        />
-        {fieldErrors.confirmPassword && (
-          <p style={{ color: "red" }}>{fieldErrors.confirmPassword}</p>
-        )}
-      </div>
+        <div>
+          <input
+            class="text-box"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {fieldErrors.password && (
+            <p style={{ color: "red" }}>{fieldErrors.password}</p>
+          )}
+        </div>
 
-      <button onClick={() => navigate("/")}>Return to home</button>
-      <button type="submit">Sign Up</button>
+        <div>
+          <input
+            class="text-box"
+            type="password"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+          {fieldErrors.confirmPassword && (
+            <p style={{ color: "red" }}>{fieldErrors.confirmPassword}</p>
+          )}
+        </div>
 
-      {fieldErrors.general && (
-        <p style={{ color: "green", marginTop: "10px" }}>
-          {fieldErrors.general}
+        {/* Buttons */}
+        <button class="signup-button" type="submit">
+          Sign Up
+        </button>
+        <p>
+          Already have an account?{" "}
+          <span onClick={() => navigate("/login")} className="link-text">
+            Click here to log in.
+          </span>
         </p>
-      )}
-    </form>
+
+        {fieldErrors.general && (
+          <p style={{ color: "green", marginTop: "10px" }}>
+            {fieldErrors.general}
+          </p>
+        )}
+      </form>
+    </div>
   );
 }
 
