@@ -1,7 +1,10 @@
 import React from "react";
 import "./DashboardLayout.css";
+import { useState } from "react";
 
 function DashboardLayout({ children }) {
+   const [open, setOpen] = useState(false);
+
   return (
     <div className="dashboard">
       
@@ -11,7 +14,7 @@ function DashboardLayout({ children }) {
         </div>
         <ul className="dashboard__sidebar-links">
           <li>
-            <a href="#">
+            <a href="dashboard">
               <span class="material-symbols-outlined">
                 home
               </span>
@@ -35,7 +38,7 @@ function DashboardLayout({ children }) {
             </a>
           </li>
           <li>
-            <a href="#">
+            <a href="timesheet">
               <span class="material-symbols-outlined">
                 calendar_month
               </span>
@@ -62,6 +65,28 @@ function DashboardLayout({ children }) {
         </div>
 
       </aside>
+
+      <nav className="navbar">
+
+        <div className="navbar__logo">
+          <img src="its-logo.png" alt="logo"/>
+        </div>
+
+        <button className="navbar__toggle" onClick={() => setOpen(!open)}>
+          <span className="navbar__toggle-bar"></span>
+          <span className="navbar__toggle-bar"></span>
+          <span className="navbar__toggle-bar"></span>
+        </button>
+
+
+        <ul className={`navbar__menu ${open ? "navbar__menu--open" : ""}`}>
+          <li className="navbar__item"><a href="dashboard">Dashboard</a></li>
+          <li className="navbar__item">Settings</li>
+          <li className="navbar__item">Reports</li>
+          <li className="navbar__item">Timesheet</li>
+          <li className="navbar__item">Time-off</li>
+        </ul>
+      </nav>
 
 
       <main className="dashboard__main">

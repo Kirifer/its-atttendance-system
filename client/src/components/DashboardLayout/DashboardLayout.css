@@ -86,19 +86,21 @@ ul {
 .dashboard__user-profile img{
     width: 42px;
     border-radius: 50%;
-    margin: 20px
+    margin: 12px;
 }
 
 .dashboard__user-profile h3{
     font-size: 15px;
     font-weight: 600;
     margin-bottom: 5px;
+    margin-left: 10px;
 }
 
 .dashboard__user-profile span{
     font-size: 12px;
     font-weight: 600;    
     color:#000000;
+    margin-left: 10px;
 }
 
 .dashboard__user-detail{
@@ -114,4 +116,149 @@ ul {
   overflow-y: auto;
   box-sizing: border-box;
   background: #F6F8FA;  
+}
+
+
+/* ===========================
+   DESKTOP VIEW (768px and up)
+   =========================== */
+@media (min-width: 768px) {
+
+  /* Sidebar visible on desktop */
+  .dashboard__sidebar {
+    display: flex;
+  }
+
+  /* Hide the hamburger button */
+  .navbar__toggle {
+    display: none;
+  }
+
+  /* Hide mobile menu */
+  .navbar__menu {
+    display: none !important;
+  }
+
+  /* Align navbar with sidebar */
+  .navbar {
+    margin-left: 84px; /* collapsed width */
+    width: calc(100% - 84px);
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+    position: fixed;
+    top: 0;
+    z-index: 2000;
+  }
+
+  /* Push content down so navbar doesn't overlap */
+  .dashboard__main {
+    padding-top: 100px;
+  }
+}
+
+.navbar {
+  display: none; /* default hidden */
+}
+
+.navbar__logo img {
+  width: 40px;
+  height: auto;
+}
+
+.navbar__toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 30px;
+}
+
+.navbar__toggle-bar {
+  width: 25px;
+  height: 3px;
+  background: black;
+  border-radius: 3px;
+}
+
+.navbar__menu {
+  display: none;
+  position: absolute;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  background: white;
+  padding: 15px 0;
+  flex-direction: column;
+  border-bottom: 1px solid #ddd;
+}
+
+.navbar__menu--open {
+  display: flex;
+}
+
+.navbar__item {
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.navbar__item a {
+  text-decoration: none;
+}
+
+/* ===========================
+   MEDIA QUERIES
+=========================== */
+
+/* Desktop view */
+@media (min-width: 768px) {
+  /* Show sidebar */
+  .dashboard__sidebar {
+    display: flex;
+  }
+
+  /* Hide mobile navbar completely */
+  .navbar {
+    display: none !important;
+  }
+
+  /* Push main content down if needed */
+  .dashboard__main {
+    padding-top: 0;
+  }
+}
+
+/* Mobile view */
+@media (max-width: 767px) {
+  /* Hide sidebar */
+  .dashboard__sidebar {
+    display: none;
+  }
+
+  /* Show mobile navbar */
+  .navbar {
+    display: flex;
+    width: 100%;
+    height: 70px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2000;
+  }
+
+  /* Push main content below navbar */
+  .dashboard__main {
+    margin-top: 70px;
+  }
 }
