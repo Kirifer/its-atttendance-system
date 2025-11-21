@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signUpUser } from "../api/auth";
 import "../styles/Signup.css";
+import PasswordInput from "../components/PasswordInput";
 import API from "../api/api";
 
 function Signup() {
@@ -20,19 +21,10 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFieldErrors({
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      general: "",
-    });
+    setFieldErrors({ general: "" });
 
     if (password !== confirmPassword) {
-      setFieldErrors({
-        ...fieldErrors,
-        confirmPassword: "Passwords do not match",
-      });
+      setFieldErrors({ general: "Passwords do not match" });
       return;
     }
 
@@ -40,19 +32,16 @@ function Signup() {
       const { token } = await signUpUser(username, email, password);
       localStorage.setItem("token", token);
 
-      setFieldErrors({
-        ...fieldErrors,
-        general: "User has been created succesfully!",
-      });
-      navigate("/login");
+      setShowSuccessPopup(true);
     } catch (err) {
-      const message = err.message;
+      const message = err.message.toLowerCase();
 
-      if (message.toLowerCase().includes("already exist")) {
-        setFieldErrors({ ...fieldErrors, email: message });
-      } else {
-        setFieldErrors({ ...fieldErrors, general: message });
+      if (message.includes("already exist")) {
+        setFieldErrors({ general: "User already exists!!!" });
+        return;
       }
+
+      setFieldErrors({ general: err.message });
     }
   };
 
@@ -66,6 +55,19 @@ function Signup() {
           </button>
         </div>
 
+        {/* Error message */}
+        {fieldErrors.general && (
+          <p
+            style={{
+              color:
+                fieldErrors.general === "Login successful!" ? "green" : "red",
+              marginTop: "10px",
+            }}
+          >
+            {fieldErrors.general}
+          </p>
+        )}
+
         <div>
           <input
             class="text-box"
@@ -74,9 +76,6 @@ function Signup() {
             onChange={(e) => setUsername(e.target.value)}
             required
           />
-          {fieldErrors.username && (
-            <p style={{ color: "red" }}>{fieldErrors.username}</p>
-          )}
         </div>
 
         <div>
@@ -88,38 +87,16 @@ function Signup() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          {fieldErrors.email && (
-            <p style={{ color: "red" }}>{fieldErrors.email}</p>
-          )}
         </div>
 
-        <div>
-          <input
-            class="text-box"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          {fieldErrors.password && (
-            <p style={{ color: "red" }}>{fieldErrors.password}</p>
-          )}
-        </div>
-
-        <div>
-          <input
-            class="text-box"
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          {fieldErrors.confirmPassword && (
-            <p style={{ color: "red" }}>{fieldErrors.confirmPassword}</p>
-          )}
-        </div>
+        {/* Password */}
+        <PasswordInput
+          password={password}
+          confirmPassword={confirmPassword}
+          onPasswordChange={(e) => setPassword(e.target.value)}
+          onConfirmChange={(e) => setConfirmPassword(e.target.value)}
+          showConfirm={true}
+        />
 
         {/* Buttons */}
         <button class="signup-button" type="submit">
@@ -131,12 +108,6 @@ function Signup() {
             Click here to log in.
           </span>
         </p>
-
-        {fieldErrors.general && (
-          <p style={{ color: "green", marginTop: "10px" }}>
-            {fieldErrors.general}
-          </p>
-        )}
       </form>
     </div>
   );

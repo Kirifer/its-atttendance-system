@@ -3,45 +3,36 @@ import "./DashboardLayout.css";
 import { useState } from "react";
 
 function DashboardLayout({ children }) {
-   const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="dashboard">
-      
       <aside className="dashboard__sidebar">
         <div className="dashboard__sidebar-header">
-          <img src="its-logo.png" alt="logo"/>
+          <img src="its-logo.png" alt="logo" />
         </div>
         <ul className="dashboard__sidebar-links">
           <li>
             <a href="dashboard">
-              <span class="material-symbols-outlined">
-                home
-              </span>
+              <span class="material-symbols-outlined">home</span>
               Dashboard
             </a>
           </li>
           <li>
             <a href="#">
-              <span class="material-symbols-outlined">
-              settings
-              </span>
+              <span class="material-symbols-outlined">settings</span>
               Settings
             </a>
           </li>
           <li>
             <a href="#">
-              <span class="material-symbols-outlined">
-                home_storage
-              </span>
+              <span class="material-symbols-outlined">home_storage</span>
               Reports
             </a>
           </li>
           <li>
             <a href="timesheet">
-              <span class="material-symbols-outlined">
-                calendar_month
-              </span>
+              <span class="material-symbols-outlined">calendar_month</span>
               Timesheet
             </a>
           </li>
@@ -56,20 +47,18 @@ function DashboardLayout({ children }) {
         </ul>
         <div className="dashboard__user-account">
           <div className="dashboard__user-profile">
-            <img src="defaultProfile.png" alt="default profile"/>
-            <div className="dashboard__user-detail"> 
+            <img src="defaultProfile.png" alt="default profile" />
+            <div className="dashboard__user-detail">
               <h3>John Doe</h3>
               <span>Web Developer</span>
             </div>
           </div>
         </div>
-
       </aside>
 
       <nav className="navbar">
-
         <div className="navbar__logo">
-          <img src="its-logo.png" alt="logo"/>
+          <img src="its-logo.png" alt="logo" />
         </div>
 
         <button className="navbar__toggle" onClick={() => setOpen(!open)}>
@@ -78,9 +67,10 @@ function DashboardLayout({ children }) {
           <span className="navbar__toggle-bar"></span>
         </button>
 
-
         <ul className={`navbar__menu ${open ? "navbar__menu--open" : ""}`}>
-          <li className="navbar__item"><a href="dashboard">Dashboard</a></li>
+          <li className="navbar__item">
+            <a href="dashboard">Dashboard</a>
+          </li>
           <li className="navbar__item">Settings</li>
           <li className="navbar__item">Reports</li>
           <li className="navbar__item">Timesheet</li>
@@ -88,10 +78,7 @@ function DashboardLayout({ children }) {
         </ul>
       </nav>
 
-
-      <main className="dashboard__main">
-        {children}
-      </main>
+      <main className="dashboard__main">{children}</main>
     </div>
   );
 }

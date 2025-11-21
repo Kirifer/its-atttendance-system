@@ -2,11 +2,10 @@
 
 .dashboard {
   display: flex;
-  height: 100vh; 
+  height: 100vh;
   background-color: #ffffff;
   font-family: Arial, sans-serif;
 }
-
 
 .dashboard__sidebar {
   top: 0;
@@ -25,105 +24,99 @@
   width: 260px;
 }
 
-
 ul {
-      list-style-type: none; 
-    }
-
-.dashboard__sidebar-header img{
-    width: 50px;
-    margin: auto;
-    display:block;
-}
-.dashboard__sidebar-header{
-    display: flex;
-    align-items: center;
+  list-style-type: none;
 }
 
-.dashboard__sidebar-links{
-    list-style: none;
-    margin-top: 20px;
-    height: 45%;
+.dashboard__sidebar-header img {
+  width: 50px;
+  margin: auto;
+  display: block;
+}
+.dashboard__sidebar-header {
+  display: flex;
+  align-items: center;
 }
 
-.dashboard__sidebar-links span{
-    margin-right: 10px;
+.dashboard__sidebar-links {
+  list-style: none;
+  margin-top: 20px;
+  height: 45%;
 }
 
-.dashboard__sidebar-links li a{
-    display: flex;
-    align-items: center;
-    gap: 0 20px;
-    color:#000000;
-    text-decoration:none;
-    font-weight: 500;
-    padding: 15px 0px;
-    margin-right: 10px;
-    margin-left: -10px;
-    white-space: nowrap;
-    margin-bottom: 15px;
-    
-}
-.dashboard__sidebar-links li a:hover{
-    background: #1A5DAC;
-    color: #ffffff;
-    border-radius: 10px;
+.dashboard__sidebar-links span {
+  margin-right: 10px;
 }
 
-.dashboard__user-account{
-    margin-top:auto;
-    padding: 12px 10px;
-    align-items: center;
-    display: flex;
+.dashboard__sidebar-links li a {
+  display: flex;
+  align-items: center;
+  gap: 0 20px;
+  color: #000000;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 15px 0px;
+  margin-right: 10px;
+  margin-left: -10px;
+  white-space: nowrap;
+  margin-bottom: 15px;
+}
+.dashboard__sidebar-links li a:hover {
+  background: #1a5dac;
+  color: #ffffff;
+  border-radius: 10px;
 }
 
-.dashboard__user-account .dashboard__user-profile{
-    display: flex;
-    align-items: center;
-    color:#1A5DAC;
+.dashboard__user-account {
+  margin-top: auto;
+  padding: 12px 10px;
+  align-items: center;
+  display: flex;
 }
 
-.dashboard__user-profile img{
-    width: 42px;
-    border-radius: 50%;
-    margin: 12px;
+.dashboard__user-account .dashboard__user-profile {
+  display: flex;
+  align-items: center;
+  color: #1a5dac;
 }
 
-.dashboard__user-profile h3{
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 5px;
-    margin-left: 10px;
+.dashboard__user-profile img {
+  width: 42px;
+  border-radius: 50%;
+  margin: 12px;
 }
 
-.dashboard__user-profile span{
-    font-size: 12px;
-    font-weight: 600;    
-    color:#000000;
-    margin-left: 10px;
+.dashboard__user-profile h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  margin-left: 10px;
 }
 
-.dashboard__user-detail{
-    margin: 0px;
-    white-space: nowrap;
+.dashboard__user-profile span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #000000;
+  margin-left: 10px;
 }
 
-
+.dashboard__user-detail {
+  margin: 0px;
+  white-space: nowrap;
+}
 
 .dashboard__main {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
   box-sizing: border-box;
-  background: #F6F8FA;  
+  background: #f6f8fa;
 }
-
 
 /* ===========================
    DESKTOP VIEW (768px and up)
    =========================== */
 @media (min-width: 768px) {
-
   /* Sidebar visible on desktop */
   .dashboard__sidebar {
     display: flex;

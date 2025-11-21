@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../api/auth";
 import "../styles/Login.css";
+import PasswordInput from "../components/PasswordInput";
 import API from "../api/api";
 
 function Login() {
@@ -31,14 +32,7 @@ function Login() {
       navigate("/dashboard");
     } catch (err) {
       const message = err.message;
-
-      if (message.toLowerCase().includes("does not exist")) {
-        setFieldErrors({ ...fieldErrors, email: message });
-      } else if (message.toLowerCase().includes("incorrect password")) {
-        setFieldErrors({ ...fieldErrors, password: message });
-      } else {
-        setFieldErrors({ ...fieldErrors, general: message });
-      }
+      setFieldErrors({ email: "", password: "", general: message });
     }
   };
 
@@ -52,6 +46,19 @@ function Login() {
           </button>
         </div>
 
+        {/* Error Message */}
+        {fieldErrors.general && (
+          <p
+            style={{
+              color:
+                fieldErrors.general === "Login successful!" ? "green" : "red",
+              marginTop: "10px",
+            }}
+          >
+            {fieldErrors.general}
+          </p>
+        )}
+
         <div>
           <input
             class="text-box"
@@ -61,24 +68,12 @@ function Login() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          {fieldErrors.email && (
-            <p style={{ color: "red" }}>{fieldErrors.email}</p>
-          )}
         </div>
 
-        <div>
-          <input
-            class="text-box"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          {fieldErrors.password && (
-            <p style={{ color: "red" }}>{fieldErrors.password}</p>
-          )}
-        </div>
+        <PasswordInput
+          value={password}
+          onPasswordChange={(e) => setPassword(e.target.value)}
+        />
 
         {/* Buttons */}
         <p onClick={() => navigate("/forgot-password")} className="link-text">
@@ -93,18 +88,6 @@ function Login() {
             Click here to sign up.
           </span>
         </p>
-
-        {fieldErrors.general && (
-          <p
-            style={{
-              color:
-                fieldErrors.general === "Login successful!" ? "green" : "red",
-              marginTop: "10px",
-            }}
-          >
-            {fieldErrors.general}
-          </p>
-        )}
       </form>
     </div>
   );
