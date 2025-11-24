@@ -6,4 +6,6 @@ const API = axios.create({
   baseURL: `http://localhost:${port}/api`,
 });
 
+console.log("API base URL:", `http://localhost:${port}/api`);
+
 export default API;
