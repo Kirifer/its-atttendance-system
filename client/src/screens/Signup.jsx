@@ -115,7 +115,7 @@ function Signup() {
 
       {showSuccessPopup && (
         <SignupSuccessPopup
-          message="Signup successful! You can now log in."
+          message="Sign up successful! You can now log in."
           onClose={() => {
             setShowSuccessPopup(false);
             navigate("/login");

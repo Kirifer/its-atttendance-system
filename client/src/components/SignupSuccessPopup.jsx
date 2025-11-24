@@ -6,7 +6,7 @@ export default function Popup({ message, onClose }) {
     <div className="popup-overlay">
       <div className="popup-box">
         <p>{message}</p>
-        <button onClick={onClose}>OK</button>
+        <button onClick={onClose}>Proceed</button>
       </div>
     </div>
   );
