@@ -9,6 +9,7 @@ function Home() {
     navigate("/dashboard");
   }
 
+  // Allows Sign out
   const handleSignOut = () => {
     localStorage.removeItem("token");
     navigate("/login");
@@ -34,10 +35,15 @@ function Home() {
 
       {token && (
         <>
-          <button onClick={() => navigate("/dashboard")}>
+          <button
+            className="go-to-dashboard-button"
+            onClick={() => navigate("/dashboard")}
+          >
             Go to dashboard
           </button>
-          <button onClick={handleSignOut}>Sign out</button>
+          <button className="signout-button" onClick={handleSignOut}>
+            Sign out
+          </button>
         </>
       )}
     </div>
