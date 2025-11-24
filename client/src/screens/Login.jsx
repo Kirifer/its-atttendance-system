@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../api/auth";
 import "../styles/Login.css";
 import PasswordInput from "../components/PasswordInput";
-import API from "../api/api";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -25,8 +24,10 @@ function Login() {
     });
 
     try {
-      const { token } = await loginUser(email, password);
+      const { token, user } = await loginUser(email, password);
       localStorage.setItem("token", token);
+      localStorage.setItem("username", user.username);
+      
 
       setFieldErrors({ ...fieldErrors, general: "Login successful!" });
       navigate("/dashboard");

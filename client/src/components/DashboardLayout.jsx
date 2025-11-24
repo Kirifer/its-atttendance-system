@@ -58,7 +58,7 @@ function DashboardLayout({ children }) {
           <div className="dashboard__user-profile">
             <img src="defaultProfile.png" alt="default profile"/>
             <div className="dashboard__user-detail"> 
-              <h3>John Doe</h3>
+               <h3>{localStorage.getItem("username") || "Guest"}</h3>
               <span>Web Developer</span>
             </div>
           </div>
