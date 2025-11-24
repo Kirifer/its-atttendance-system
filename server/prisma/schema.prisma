@@ -23,6 +23,7 @@ model User {
   reset_token_expiry DateTime? // optional
 
   leaves   Leave[]
+  attendance Attendance[]
 }
 
 enum LeaveStatus {
@@ -49,6 +50,34 @@ model Leave {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
+  attendance Attendance[]
+
   @@index([userId])
+  @@index([status])
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  ON_LEAVE
+}
+
+model Attendance {
+  id          Int              @id @default(autoincrement())
+  userId      Int
+  user        User             @relation(fields: [userId], references: [id])
+  date        DateTime         // the date of attendance
+  timeIn     DateTime?        // optional, user may not have timed in
+  timeOut    DateTime?        // optional, user may not have timed out
+  status      AttendanceStatus @default(PRESENT)
+  leaveId     Int?             // optional reference to Leave if attendance is ON_LEAVE
+  leave       Leave?           @relation(fields: [leaveId], references: [id])
+
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([userId, date])     // one attendance record per user per day
+  @@index([userId])
+  @@index([date])
   @@index([status])
 }
