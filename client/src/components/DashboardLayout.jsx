@@ -1,5 +1,5 @@
 import React from "react";
-import "./DashboardLayout.css";
+import "../styles/DashboardLayout.css";
 import { useState } from "react";
 
 function DashboardLayout({ children }) {
