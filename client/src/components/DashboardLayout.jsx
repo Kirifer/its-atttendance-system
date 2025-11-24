@@ -81,10 +81,10 @@ function DashboardLayout({ children }) {
 
         <ul className={`navbar__menu ${open ? "navbar__menu--open" : ""}`}>
           <li className="navbar__item"><a href="dashboard">Dashboard</a></li>
-          <li className="navbar__item"><a href="#">Settings</a></li>
-          <li className="navbar__item"><a href="#">Reports</a></li>
+          <li className="navbar__item"><a href="settings">Settings</a></li>
+          <li className="navbar__item"><a href="reports">Reports</a></li>
           <li className="navbar__item"><a href="timesheet">Timesheet</a></li>
-          <li className="navbar__item"><a href="#">Time-off</a></li>
+          <li className="navbar__item"><a href="time-off">Time-off</a></li>
         </ul>
       </nav>
 
