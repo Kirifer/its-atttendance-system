@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { jwtDecode } from "jwt-decode";
 import UserDropdownMenu from "./UserDropdownMenu";
 import "../styles/DashboardLayout.css";
 
@@ -10,24 +9,8 @@ function DashboardLayout({ children }) {
   const [user, setUser] = useState({ username: "", email: "" });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
-
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUser({
-          username: decoded.user?.username || "",
-          email: decoded.user?.email || "",
-        });
-      } catch (err) {
-        console.error("Invalid token", err);
-        if (storedUser) setUser(JSON.parse(storedUser));
-        else setUser({ username: "", email: "" });
-      }
-    } else if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    setUser(storedUser ? JSON.parse(storedUser) : { username: "", email: "" });
   }, []);
 
   return (

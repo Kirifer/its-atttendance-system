@@ -17,7 +17,7 @@ function Timesheet() {
           {lastDay.toLocaleDateString()}
         </div>
 
-        <div className="attendance-head">
+        <div className="attendance_head">
           <h1>Timesheet</h1>
         </div>
 

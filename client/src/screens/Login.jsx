@@ -27,6 +27,7 @@ function Login() {
     try {
       const { token, user } = await loginUser(email, password);
       localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
       setFieldErrors({ ...fieldErrors, general: "Login successful!" });
       navigate("/dashboard");
