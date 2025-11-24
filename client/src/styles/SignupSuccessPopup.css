@@ -37,4 +37,9 @@
 
 .popup-box button:hover {
   background-color: #154a8a;
+  transform: scale(1.01);
+}
+
+.popup-box button:hover:active {
+  transform: scale(0.98);
 }
