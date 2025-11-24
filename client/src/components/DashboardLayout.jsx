@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useState } from "react";
 import UserDropdownMenu from "./UserDropdownMenu";
 import "../styles/DashboardLayout.css";
@@ -7,6 +7,27 @@ function DashboardLayout({ children }) {
   const [open, setOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [user, setUser] = useState({ username: "", email: "" });
+  const [dropdownPos, setDropdownPos] = useState({ x: 0, y: 0 });
+  const userMenuRef = useRef(null);
+  const userProfileRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target) &&
+        userProfileRef.current &&
+        !userProfileRef.current.contains(event.target)
+      ) {
+        setUserMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -58,16 +79,23 @@ function DashboardLayout({ children }) {
         <div className="dashboard__user-account">
           <div
             className="dashboard__user-profile"
-            onClick={() => setUserMenuOpen(!userMenuOpen)}
+            ref={userProfileRef}
+            onClick={(e) => {
+              setUserMenuOpen(!userMenuOpen);
+              setDropdownPos({ x: e.clientX, y: e.clientY });
+            }}
             style={{ cursor: "pointer" }}
           >
             <img src="defaultProfile.png" alt="profile" />
-            <div className="dashboard__user-detail"></div>
-            <h3>{user.username || "Guest"}</h3>
-            <span>{user.email || "guest@exampple.com"}</span>
+            <div className="dashboard__user-detail">
+              <h3>{user.username || "Guest"}</h3>
+              <h4>{user.email || "guest@exampple.com"}</h4>
+            </div>
           </div>
 
-          {userMenuOpen && <UserDropdownMenu />}
+          {userMenuOpen && (
+            <UserDropdownMenu ref={userMenuRef} pos={dropdownPos} />
+          )}
         </div>
       </aside>
 
