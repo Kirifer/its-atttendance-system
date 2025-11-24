@@ -10,26 +10,28 @@ export default function AttendanceTable() {
     }, []);
 
     return (
-        <div className='attendance-container'>
-            <table>
-                <thead>
-                    <tr>
-                        {records[0] && Object.keys(records[0]).map((col, i) => (
-                            <th key={i}>{col}</th>
-                        ))}
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {records.map((record, i) => (
-                        <tr key={i}>
-                            {Object.values(record).map((val, j) => (
-                                <td key={j}>{val}</td>
+        <div className="attendance_body">
+            <div className='attendance_container'>
+                <table className='attendance_tbl'>
+                    <thead>
+                        <tr>
+                            {records[0] && Object.keys(records[0]).map((col, i) => (
+                                <th key={i}>{col}</th>
                             ))}
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                        {records.map((record, i) => (
+                            <tr key={i}>
+                                {Object.entries(record).map(([colName, val], j) => (
+                                    <td key={j} data-label={colName}>{val}</td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     )
 }
