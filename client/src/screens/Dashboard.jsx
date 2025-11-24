@@ -19,12 +19,6 @@ function Dashboard() {
             Return to home
           </button>
         </div>
-
-        <div>
-          <button className="signout-button" onClick={handleSignOut}>
-            Sign out
-          </button>
-        </div>
       </div>
     </DashboardLayout>
   );
