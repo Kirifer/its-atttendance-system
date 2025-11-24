@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { signUpUser } from "../api/auth";
 import "../styles/Signup.css";
 import PasswordInput from "../components/PasswordInput";
+import SignupSuccessPopup from "../components/SignupSuccessPopup";
 import API from "../api/api";
 
 function Signup() {
@@ -10,6 +11,7 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({
     username: "",
     email: "",
@@ -17,6 +19,7 @@ function Signup() {
     confirmPassword: "",
     general: "",
   });
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -109,6 +112,16 @@ function Signup() {
           </span>
         </p>
       </form>
+
+      {showSuccessPopup && (
+        <SignupSuccessPopup
+          message="Signup successful! You can now log in."
+          onClose={() => {
+            setShowSuccessPopup(false);
+            navigate("/login");
+          }}
+        />
+      )}
     </div>
   );
 }

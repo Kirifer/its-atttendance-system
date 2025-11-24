@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/Popup.css";
+import "../styles/SignupSuccessPopup.css";
 
 export default function Popup({ message, onClose }) {
   return (
