@@ -15,7 +15,7 @@ import Settings from "./screens/Settings";
 import Signup from "./screens/Signup";
 import Timeoff from "./screens/Timeoff";
 import Timesheet from "./screens/Timesheet";
-import Userinfo from "./screens/Userinfo";
+import UserInfo from "./screens/UserInfo";
 
 function App() {
   return (
@@ -40,7 +40,7 @@ function App() {
         <Route path="/sign-up" element={<Signup />} />
         <Route path="/time-off" element={<Timeoff />} />
         <Route path="/timesheet" element={<Timesheet />} />
-        <Route path="/user-info" element={<Userinfo />} />
+        <Route path="/user-info" element={<UserInfo />} />
       </Routes>
     </Router>
   );

@@ -1,6 +1,6 @@
-import express from "express"
-import cors from "cors" 
-import dotenv from "dotenv"
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
 import pool from "./src/db.js";
 import errorHandling from "./src/middlewares/errorHandler.js";
 import authRoutes from "./src/routes/auth.js";
@@ -8,7 +8,7 @@ import authRoutes from "./src/routes/auth.js";
 dotenv.config();
 
 const app = express();
-const port =  process.env.PORT || 3001;
+const port = process.env.PORT || 3001;
 
 //middlewares
 app.use(express.json());
@@ -36,6 +36,6 @@ app.get("/test-db", async (req, res) => {
 app.use(errorHandling);
 
 //server run
-app.listen(port, ()=> {
-    console.log(`Server is running on http://localhost:${port}`)
-})
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});

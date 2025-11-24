@@ -1,0 +1,27 @@
+.user-dropdown {
+  position: absolute;
+  top: 60px; /* adjust according to sidebar */
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 200px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.user-dropdown ul {
+  list-style: none;
+  padding: 10px 0;
+  margin: 0;
+}
+
+.user-dropdown ul li {
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.user-dropdown ul li:hover {
+  background-color: #f0f0f0;
+}
