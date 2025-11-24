@@ -1,9 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles/ForgotPassword.css";
 import API from "../api/api";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,21 +27,38 @@ function ForgotPassword() {
   };
 
   return (
-    <div>
-      <h2>Forgot Password</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email"
-          required
-        />
-        <button type="submit">Submit</button>
+    <div className="background center-align-items">
+      <form onSubmit={handleSubmit} class="forgot-password-box">
+        <div className="top-box-header">
+          <p class="forgot-password-text">Forgot Password</p>
+          <button className="close-btn" onClick={() => navigate("/login")}>
+            X
+          </button>
+        </div>
+
+        {/* JSON */}
+        {message && (
+          <p style={{ wordBreak: "break-word", marginTop: "10px" }}>
+            {message}
+          </p>
+        )}
+
+        <div>
+          <input
+            class="text-box"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            required
+          />
+        </div>
+
+        {/* Buttons */}
+        <button type="submit" className="forgot-password-button">
+          Submit
+        </button>
       </form>
-      {message && (
-        <p style={{ wordBreak: "break-word", marginTop: "10px" }}>{message}</p>
-      )}
     </div>
   );
 }
