@@ -14,8 +14,17 @@ function Dashboard() {
     <DashboardLayout>
       <div>
         <h1>Dashboard</h1>
-        <button onClick={() => navigate("/")}>Go to home</button>
-        <button onClick={handleSignOut}>Sign out</button>
+        <div>
+          <button className="return-button" onClick={() => navigate("/")}>
+            Return to home
+          </button>
+        </div>
+
+        <div>
+          <button className="signout-button" onClick={handleSignOut}>
+            Sign out
+          </button>
+        </div>
       </div>
     </DashboardLayout>
   );
