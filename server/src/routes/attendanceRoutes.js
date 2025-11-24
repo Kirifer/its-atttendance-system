@@ -6,4 +6,6 @@ const router = express.Router();
 
 router.post("/time-in", verifyToken, timeIn);
 router.post("/time-out", verifyToken, timeOut);
-router.post("/:userId", verifyToken, getUserAttendance);
+router.get("/:userId", verifyToken, getUserAttendance);
+
+export default router;

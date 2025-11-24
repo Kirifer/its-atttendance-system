@@ -5,11 +5,12 @@ import pool from "./src/db.js";
 import errorHandling from "./src/middlewares/errorHandler.js";
 import authRoutes from "./src/routes/auth.js";
 import leaveRoutes from "./src/routes/leaveRoutes.js"
+import attendanceRoutes from "./src/routes/attendanceRoutes.js"
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 5001;
 
 //middlewares
 app.use(express.json());
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/leave", leaveRoutes);
+app.use("/api/attendance", attendanceRoutes);
 
 //use for testing database connection
 app.get("/test-db", async (req, res) => {
