@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import pool from "./src/db.js";
 import errorHandling from "./src/middlewares/errorHandler.js";
 import authRoutes from "./src/routes/auth.js";
+import leaveRoutes from "./src/routes/leaveRoutes.js"
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/leave", leaveRoutes);
 
 //use for testing database connection
 app.get("/test-db", async (req, res) => {

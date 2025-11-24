@@ -21,4 +21,34 @@ model User {
   created_at         DateTime @default(now())
   reset_token        String?  // optional
   reset_token_expiry DateTime? // optional
+
+  leaves   Leave[]
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum LeaveType {
+  SICK
+  VACATION
+  PERSONAL
+}
+
+model Leave {
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id])
+  startDate   DateTime
+  endDate     DateTime
+  leaveType   LeaveType
+  status      LeaveStatus @default(PENDING)
+  reason      String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([status])
 }
