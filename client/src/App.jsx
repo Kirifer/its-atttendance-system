@@ -15,7 +15,7 @@ import Settings from "./screens/Settings";
 import Signup from "./screens/Signup";
 import Timeoff from "./screens/Timeoff";
 import Timesheet from "./screens/Timesheet";
-import UserInfo from "./screens/UserInfo";
+import UserInfo from "./screens/Userinfo";
 
 function App() {
   return (
