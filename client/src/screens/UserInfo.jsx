@@ -1,10 +1,11 @@
 import React from "react";
+import UserInfoLayout from "../components/UserInfoLayout";
 
 function UserInfo() {
   return (
-    <div>
+    <UserInfoLayout>
       <div>User Info</div>
-    </div>
+    </UserInfoLayout>
   );
 }
 

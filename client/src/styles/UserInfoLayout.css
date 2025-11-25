@@ -1,0 +1,252 @@
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
+
+.userinfo {
+  display: flex;
+  height: 100vh;
+  background-color: #ffffff;
+  font-family: Arial, sans-serif;
+}
+
+.userinfo__sidebar {
+  top: 0;
+  left: 0;
+  height: 75%;
+  width: 84px;
+  background: #ffffff;
+  padding: 25px 0px;
+  transition: all 0.4s ease;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.userinfo__sidebar:hover {
+  width: 260px;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.userinfo__sidebar-header img {
+  width: 50px;
+  margin: auto;
+  display: block;
+}
+.userinfo__sidebar-header {
+  display: flex;
+  align-items: center;
+}
+
+.userinfo__sidebar-links {
+  list-style: none;
+  margin-top: 20px;
+  height: 45%;
+}
+
+.userinfo__sidebar-links span {
+  margin-right: 10px;
+}
+
+.userinfo__sidebar-links li a {
+  display: flex;
+  align-items: center;
+  gap: 0 20px;
+  color: #000000;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 15px 0px;
+  margin-right: 10px;
+  margin-left: -10px;
+  white-space: nowrap;
+  margin-bottom: 15px;
+}
+.userinfo__sidebar-links li a:hover {
+  background: #1a5dac;
+  color: #ffffff;
+  border-radius: 10px;
+}
+
+.userinfo__user-account {
+  margin-top: auto;
+  padding: 12px 10px;
+  align-items: center;
+  display: flex;
+}
+
+.userinfo__user-account .userinfo__user-profile {
+  display: flex;
+  align-items: center;
+  color: #1a5dac;
+}
+
+.userinfo__user-profile img {
+  width: 42px;
+  border-radius: 50%;
+  margin: 12px;
+}
+
+.userinfo__user-profile h3 {
+  font-size: 16px;
+  font-weight: bolder;
+  margin-left: 10px;
+}
+
+.userinfo__user-profile h4 {
+  font-size: 12px;
+  font-weight: bold;
+  color: #000000;
+  margin-left: 10px;
+}
+
+.userinfo__user-detail {
+  margin: 0px;
+  white-space: nowrap;
+}
+
+.userinfo__main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: #f6f8fa;
+}
+
+/* DESKTOP VIEW */
+@media (min-width: 768px) {
+  /* Sidebar visible on desktop */
+  .userinfo__sidebar {
+    display: flex;
+  }
+
+  /* Hide the hamburger button */
+  .navbar__toggle {
+    display: none;
+  }
+
+  .navbar__menu {
+    display: none !important;
+  }
+
+  .navbar {
+    margin-left: 84px;
+    width: calc(100% - 84px);
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+    position: fixed;
+    top: 0;
+    z-index: 2000;
+  }
+
+  .userinfo__main {
+    padding-top: 100px;
+  }
+}
+
+.navbar {
+  display: none;
+}
+
+.navbar__logo img {
+  width: 40px;
+  height: auto;
+}
+
+.navbar__toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 30px;
+}
+
+.navbar__toggle-bar {
+  width: 25px;
+  height: 3px;
+  background: black;
+  border-radius: 3px;
+}
+
+.navbar__menu {
+  display: none;
+  position: absolute;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  background: white;
+  padding: 15px 0;
+  flex-direction: column;
+  border-bottom: 1px solid #ddd;
+}
+
+.navbar__menu--open {
+  display: flex;
+}
+
+.navbar__item {
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.navbar__item a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.navbar__item a:hover {
+  color: #1a5dac;
+}
+
+/*  MEDIA QUERIES  */
+
+/* Desktop view */
+@media (min-width: 768px) {
+  /* Show sidebar */
+  .userinfo__sidebar {
+    display: flex;
+  }
+
+  /* Hide mobile navbar completely */
+  .navbar {
+    display: none !important;
+  }
+
+  .userinfo__main {
+    padding-top: 0;
+  }
+}
+
+/* Mobile view */
+@media (max-width: 767px) {
+  /* Hide sidebar */
+  .userinfo__sidebar {
+    display: none;
+  }
+
+  .navbar {
+    display: flex;
+    width: 100%;
+    height: 70px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2000;
+  }
+
+  /* Push main content below navbar */
+  .userinfo__main {
+    margin-top: 70px;
+  }
+}

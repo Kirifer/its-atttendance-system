@@ -1,0 +1,128 @@
+import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import UserDropdownMenu from "./UserDropdownMenu";
+import "../styles/UserInfoLayout.css";
+
+function UserInfoLayout({ children }) {
+  const [open, setOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [user, setUser] = useState({ username: "", email: "" });
+  const [dropdownPos, setDropdownPos] = useState({ x: 0, y: 0 });
+  const userMenuRef = useRef(null);
+  const userProfileRef = useRef(null);
+
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target) &&
+        userProfileRef.current &&
+        !userProfileRef.current.contains(event.target)
+      ) {
+        setUserMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    setUser(storedUser ? JSON.parse(storedUser) : { username: "", email: "" });
+  }, []);
+
+  return (
+    // Desktop-View
+    <div className="userinfo">
+      <aside className="userinfo__sidebar">
+        <div className="userinfo__sidebar-header">
+          <img src="its-logo.png" alt="logo" />
+        </div>
+        <ul className="userinfo__sidebar-links">
+          <li>
+            <a href="user-info">
+              <span class="material-symbols-outlined">person</span>
+              Profile
+            </a>
+          </li>
+          <li>
+            <a href="dashboard">
+              <span class="material-symbols-outlined">dashboard</span>
+              Return to Dashboard
+            </a>
+          </li>
+          <li>
+            <a onClick={handleSignOut}>
+              <span class="material-symbols-outlined">logout</span>
+              Sign Out
+            </a>
+          </li>
+        </ul>
+
+        {/* User */}
+        <div className="userinfo__user-account">
+          <div
+            className="userinfo__user-profile"
+            ref={userProfileRef}
+            onClick={(e) => {
+              setUserMenuOpen(!userMenuOpen);
+              setDropdownPos({ x: e.clientX, y: e.clientY });
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <img src="defaultProfile.png" alt="profile" />
+            <div className="userinfo__user-detail">
+              <h3>{user.username || "Guest"}</h3>
+              <h4>{user.email || "guest@exampple.com"}</h4>
+            </div>
+          </div>
+
+          {userMenuOpen && (
+            <UserDropdownMenu ref={userMenuRef} pos={dropdownPos} />
+          )}
+        </div>
+      </aside>
+
+      {/* Mobile-View */}
+      <nav className="navbar">
+        <div className="navbar__logo">
+          <img src="its-logo.png" alt="logo" />
+        </div>
+
+        <button className="navbar__toggle" onClick={() => setOpen(!open)}>
+          <span className="navbar__toggle-bar"></span>
+          <span className="navbar__toggle-bar"></span>
+          <span className="navbar__toggle-bar"></span>
+        </button>
+
+        <ul className={`navbar__menu ${open ? "navbar__menu--open" : ""}`}>
+          <li className="navbar__item">
+            <a href="user-info">Profile</a>
+          </li>
+          <li className="navbar__item">
+            <a href="dashboard">Return to Dashboard</a>
+          </li>
+          <li className="navbar__item">
+            <a onClick={handleSignOut}>Sign Out</a>
+          </li>
+        </ul>
+      </nav>
+
+      <main className="userinfo__main">{children}</main>
+    </div>
+  );
+}
+
+export default UserInfoLayout;
