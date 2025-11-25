@@ -42,7 +42,7 @@ function Timesheet() {
           <h1>Timesheet</h1>
         </div>
 
-        <AttendanceTable />
+        <AttendanceTable firstDay={firstDay} lastDay={lastDay} />
       </DashboardLayout>
     </div>
   );

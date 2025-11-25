@@ -46,6 +46,13 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.attendance_message {
+  text-align: center;
+  font-size: 25px;
+  color: #000000;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 .attendance_tbl {
   width: 100%;
   border-collapse: collapse;
