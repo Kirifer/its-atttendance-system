@@ -22,7 +22,12 @@ function LeaveForm({ onSubmit }) {
     try {
       await onSubmit(formData);
       setSuccess("Leave submitted successfully!");
-      setFormData({ startDate: "", endDate: "", leaveType: "PERSONAL", reason: "" });
+      setFormData({
+        startDate: "",
+        endDate: "",
+        leaveType: "PERSONAL",
+        reason: "",
+      });
     } catch (err) {
       setError(err.message || "Error submitting leave");
     }
@@ -36,7 +41,11 @@ function LeaveForm({ onSubmit }) {
       <div className="row">
         <label>
           Leave Type:
-          <select name="leaveType" value={formData.leaveType} onChange={handleChange}>
+          <select
+            name="leaveType"
+            value={formData.leaveType}
+            onChange={handleChange}
+          >
             <option value="SICK">SICK</option>
             <option value="VACATION">VACATION</option>
             <option value="PERSONAL">PERSONAL</option>
@@ -45,32 +54,37 @@ function LeaveForm({ onSubmit }) {
       </div>
 
       <div className="row date-row">
-            <label>
-                Start Date:
-                <input
-                type="date"
-                name="startDate"
-                value={formData.startDate}
-                onChange={handleChange}
-                required
-                />
-            </label>
-            <label>
-                End Date:
-                <input
-                type="date"
-                name="endDate"
-                value={formData.endDate}
-                onChange={handleChange}
-                required
-                />
-            </label>
-        </div>
+        <label>
+          Start Date:
+          <input
+            type="date"
+            name="startDate"
+            value={formData.startDate}
+            onChange={handleChange}
+            required
+          />
+        </label>
+        <label>
+          End Date:
+          <input
+            type="date"
+            name="endDate"
+            value={formData.endDate}
+            onChange={handleChange}
+            required
+          />
+        </label>
+      </div>
 
       <div className="row">
         <label>
           Reason For Leave
-          <textarea name="reason" value={formData.reason} onChange={handleChange} required />
+          <textarea
+            name="reason"
+            value={formData.reason}
+            onChange={handleChange}
+            required
+          />
         </label>
       </div>
       <div className="submit-btn-container">

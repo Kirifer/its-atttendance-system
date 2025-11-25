@@ -1,12 +1,17 @@
 import API from "./api";
 
-export const createLeave = async ({ startDate, endDate, leaveType, reason }) => {
+export const createLeave = async ({
+  startDate,
+  endDate,
+  leaveType,
+  reason,
+}) => {
   try {
-    const token = localStorage.getItem("token"); 
+    const token = localStorage.getItem("token");
     const response = await API.post(
       "/leave",
       { startDate, endDate, leaveType, reason },
-      { headers: { Authorization: `Bearer ${token}` } } 
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     return response.data;
   } catch (err) {

@@ -11,19 +11,30 @@ export default function AttendanceTable({ firstDay, lastDay }) {
   const [filterWeek, setFilterWeek] = useState(1);
 
   function getWeekOfMonth(date) {
-    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1).getDay(); // 0=Sunday
+    const firstDayOfMonth = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      1
+    ).getDay(); // 0=Sunday
     return Math.ceil((date.getDate() + firstDayOfMonth) / 7);
   }
 
   function getTotalWeeksInMonth(date) {
-    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-    const lastDate = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    const firstDayOfMonth = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      1
+    ).getDay();
+    const lastDate = new Date(
+      date.getFullYear(),
+      date.getMonth() + 1,
+      0
+    ).getDate();
     return Math.ceil((lastDate + firstDayOfMonth) / 7);
   }
 
   useEffect(() => {
-
-    const filtered = dummyAttendance.users.filter(user => {
+    const filtered = dummyAttendance.users.filter((user) => {
       const recordDate = new Date(user["Date"]);
 
       if (recordDate < firstDay || recordDate > lastDay) return false;
@@ -39,7 +50,6 @@ export default function AttendanceTable({ firstDay, lastDay }) {
   }, [firstDay, lastDay, filterType, filterWeek]);
 
   const exportPDF = () => {
-
     if (records.length === 0) {
       alert("No data available to export.");
       return;
@@ -54,16 +64,14 @@ export default function AttendanceTable({ firstDay, lastDay }) {
       head: [tableColumn],
       body: tableRows,
       startY: 25,
-      styles: { fontSize: 10 }
+      styles: { fontSize: 10 },
     });
     doc.save("timesheet.pdf");
-
   };
 
   return (
     <div className="attendance_body">
       <div className="attendance_top_bar">
-
         <button className="attendance_export_btn" onClick={exportPDF}>
           Export
         </button>
@@ -89,11 +97,14 @@ export default function AttendanceTable({ firstDay, lastDay }) {
                 value={filterWeek}
                 onChange={(e) => setFilterWeek(Number(e.target.value))}
               >
-                {Array.from({ length: getTotalWeeksInMonth(firstDay) }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {i + 1}
-                  </option>
-                ))}
+                {Array.from(
+                  { length: getTotalWeeksInMonth(firstDay) },
+                  (_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {i + 1}
+                    </option>
+                  )
+                )}
               </select>
             </label>
           )}
@@ -107,7 +118,9 @@ export default function AttendanceTable({ firstDay, lastDay }) {
               <thead>
                 <tr>
                   {dummyAttendance.users[0] &&
-                    Object.keys(dummyAttendance.users[0]).map((col, i) => <th key={i}>{col}</th>)}
+                    Object.keys(dummyAttendance.users[0]).map((col, i) => (
+                      <th key={i}>{col}</th>
+                    ))}
                 </tr>
               </thead>
             </table>
@@ -120,7 +133,9 @@ export default function AttendanceTable({ firstDay, lastDay }) {
             <thead>
               <tr>
                 {records[0] &&
-                  Object.keys(records[0]).map((col, i) => <th key={i}>{col}</th>)}
+                  Object.keys(records[0]).map((col, i) => (
+                    <th key={i}>{col}</th>
+                  ))}
               </tr>
             </thead>
 

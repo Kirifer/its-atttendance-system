@@ -1,14 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import UserDropdownMenu from "./UserDropdownMenu";
 import "../styles/UserInfoLayout.css";
 
 function UserInfoLayout({ children }) {
   const [open, setOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [user, setUser] = useState({ username: "", email: "" });
-  const [dropdownPos, setDropdownPos] = useState({ x: 0, y: 0 });
   const userMenuRef = useRef(null);
   const userProfileRef = useRef(null);
 
@@ -70,29 +68,6 @@ function UserInfoLayout({ children }) {
             </a>
           </li>
         </ul>
-
-        {/* User */}
-        <div className="userinfo__user-account">
-          <div
-            className="userinfo__user-profile"
-            ref={userProfileRef}
-            onClick={(e) => {
-              setUserMenuOpen(!userMenuOpen);
-              setDropdownPos({ x: e.clientX, y: e.clientY });
-            }}
-            style={{ cursor: "pointer" }}
-          >
-            <img src="defaultProfile.png" alt="profile" />
-            <div className="userinfo__user-detail">
-              <h3>{user.username || "Guest"}</h3>
-              <h4>{user.email || "guest@exampple.com"}</h4>
-            </div>
-          </div>
-
-          {userMenuOpen && (
-            <UserDropdownMenu ref={userMenuRef} pos={dropdownPos} />
-          )}
-        </div>
       </aside>
 
       {/* Mobile-View */}

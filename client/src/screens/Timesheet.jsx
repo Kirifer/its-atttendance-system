@@ -5,39 +5,49 @@ import "../styles/AttendanceTable.css";
 import "../styles/DateRange.css";
 
 function Timesheet() {
-  
-  const [currentDate, setCurrentDate] = useState(new Date()); 
+  const [currentDate, setCurrentDate] = useState(new Date());
 
-  
-  const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+  const firstDay = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1
+  );
+  const lastDay = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+    0
+  );
 
   const handlePrevMonth = () => {
-    setCurrentDate (
+    setCurrentDate(
       new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
     );
   };
 
-   const handleNextMonth = () => {
-    setCurrentDate (
+  const handleNextMonth = () => {
+    setCurrentDate(
       new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
-    )
-   }
+    );
+  };
 
   return (
     <div>
       <DashboardLayout>
         <div className="daterange_container">
-          <button className="daterange_btn" onClick={handlePrevMonth}>&larr;</button>
+          <button className="daterange_btn" onClick={handlePrevMonth}>
+            &larr;
+          </button>
 
-        <div className="daterange_bar">
-          Date Range: {firstDay.toLocaleDateString()} -{" "}
-          {lastDay.toLocaleDateString()}
+          <div className="daterange_bar">
+            Date Range: {firstDay.toLocaleDateString()} -{" "}
+            {lastDay.toLocaleDateString()}
+          </div>
+
+          <button className="daterange_btn" onClick={handleNextMonth}>
+            &rarr;
+          </button>
         </div>
 
-          <button className="daterange_btn" onClick={handleNextMonth}>&rarr;</button>
-        </div>
-    
         <div className="attendance_head">
           <h1>Timesheet</h1>
         </div>
