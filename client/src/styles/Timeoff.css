@@ -1,5 +1,21 @@
-.timeoff__main{
-    background-color: #FFFF;
-    border: 1px solid black;
-    padding: 30px;
+.timeoff__main {
+  background-color: #fff;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 30px;
+  width: 80%;
+  max-width: 800px;   
+  margin: 50px auto; 
+  display: flex;
+  flex-direction: column; 
+  box-sizing: border-box; 
+}
+
+.timeoff_title{
+    color:#1A5DAC;
+}
+
+.timeoff__description{
+    color: #828282;
+
 }
