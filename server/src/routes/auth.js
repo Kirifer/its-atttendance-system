@@ -16,24 +16,31 @@ const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 //User sign-up
 router.post("/sign-up", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, role } = req.body;
 
-    const existing = await prisma.user.findUnique({
-      where: { email },
-    });
-
+    const existing = await prisma.user.findUnique({ where: { email } });
     if (existing)
       return res.status(400).json({ message: "User already exists" });
 
     const hashed = await bcrypt.hash(password, 10);
 
     const newUser = await prisma.user.create({
-      data: { username, email, password: hashed },
+      data: {
+        username,
+        email,
+        password: hashed,
+        role: role?.toUpperCase() || "USER", // default USER
+      },
     });
 
     res.json({
-      message: "User has been successfully created!",
-      user: { id: newUser.id, username: newUser.username, email: newUser.email },
+      message: "User created",
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        role: newUser.role,
+      },
     });
   } catch (err) {
     console.error(err);
@@ -46,21 +53,23 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
+    const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(400).json({ message: "User does not exist" });
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(400).json({ message: "Incorrect password" });
 
-    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign(
+      { id: user.id, role: user.role },     // ⬅ Add role here
+      JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
     res.json({
       token,
-      user: { id: user.id, username: user.username, email: user.email },
+      user: { id: user.id, username: user.username, email: user.email, role: user.role },
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });
@@ -70,17 +79,16 @@ router.post("/login", async (req, res) => {
 // ------------------- Middleware: Verify Token -------------------
 export const verifyToken = (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "No token, authorization denied" });
+  if (!token) return res.status(401).json({ message: "No token" });
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    req.user = decoded; // id + role now included
     next();
   } catch (err) {
-    res.status(403).json({ message: "Token is not valid" });
+    res.status(403).json({ message: "Invalid token" });
   }
 };
-
 // ------------------- Forgot Password -------------------
 router.post("/forgot-password", async (req, res) => {
   try {

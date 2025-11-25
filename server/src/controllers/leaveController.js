@@ -22,20 +22,24 @@ export const createLeave = async (req, res) => {
 // GET leaves (filter optional)
 export const getLeaves = async (req, res) => {
   try {
-    const { userId, status } = req.query;
+    const filters = {};
 
-    const where = {};
-    if (userId) where.userId = parseInt(userId);
-    if (status) where.status = status.toUpperCase();
+    if (req.user.role === "USER") {
+      filters.userId = req.user.id;
+    } else {
+      // Admin can filter by user or status
+      if (req.query.userId) filters.userId = parseInt(req.query.userId);
+      if (req.query.status) filters.status = req.query.status.toUpperCase();
+    }
 
     const leaves = await prisma.leave.findMany({
-      where,
+      where: filters,
       orderBy: { createdAt: "desc" },
     });
 
     res.json(leaves);
   } catch (error) {
-    console.error(error);
+    console.error("LEAVE GET ERROR:", error);
     res.status(500).json({ message: "Error fetching leaves" });
   }
 };
@@ -43,6 +47,10 @@ export const getLeaves = async (req, res) => {
 // UPDATE leave status (approve/reject)
 export const updateLeaveStatus = async (req, res) => {
   try {
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Access denied. Admin only." });
+    }
+
     const { id } = req.params;
     const { status } = req.body;
 
@@ -59,7 +67,6 @@ export const updateLeaveStatus = async (req, res) => {
 
     res.json(leave);
   } catch (error) {
-    console.error("Update Status Error:", error);
     res.status(500).json({ message: "Error updating leave status" });
   }
 };
@@ -67,10 +74,16 @@ export const updateLeaveStatus = async (req, res) => {
 // DELETE leave
 export const deleteLeave = async (req, res) => {
   try {
-    await prisma.leave.delete({ where: { id: parseInt(req.params.id) } });
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Access denied. Admin only." });
+    }
+
+    await prisma.leave.delete({
+      where: { id: parseInt(req.params.id) },
+    });
+
     res.json({ message: "Leave deleted successfully" });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Error deleting leave" });
   }
 };
