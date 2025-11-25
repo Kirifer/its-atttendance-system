@@ -7,17 +7,43 @@ import autoTable from "jspdf-autotable";
 export default function AttendanceTable({ firstDay, lastDay }) {
   const [records, setRecords] = useState([]);
 
+  const [filterType, setFilterType] = useState("Month");
+  const [filterWeek, setFilterWeek] = useState(1);
+
+  function getWeekOfMonth(date) {
+    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1).getDay(); // 0=Sunday
+    return Math.ceil((date.getDate() + firstDayOfMonth) / 7);
+  }
+
+  function getTotalWeeksInMonth(date) {
+    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    const lastDate = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    return Math.ceil((lastDate + firstDayOfMonth) / 7);
+  }
+
   useEffect(() => {
 
     const filtered = dummyAttendance.users.filter(user => {
       const recordDate = new Date(user["Date"]);
-      return recordDate >= firstDay && recordDate <= lastDay;
+
+      if (recordDate < firstDay || recordDate > lastDay) return false;
+
+      if (filterType === "Week") {
+        return getWeekOfMonth(recordDate) === filterWeek;
+      }
+
+      return true;
     });
 
     setRecords(filtered);
-  }, [firstDay, lastDay]);
+  }, [firstDay, lastDay, filterType, filterWeek]);
 
   const exportPDF = () => {
+
+    if (records.length === 0) {
+      alert("No data available to export.");
+      return;
+    }
 
     const doc = new jsPDF();
     const tableColumn = Object.keys(records[0]);
@@ -31,14 +57,47 @@ export default function AttendanceTable({ firstDay, lastDay }) {
       styles: { fontSize: 10 }
     });
     doc.save("timesheet.pdf");
+
   };
 
   return (
     <div className="attendance_body">
-      <div className="attendance_export_bar">
+      <div className="attendance_top_bar">
+
         <button className="attendance_export_btn" onClick={exportPDF}>
           Export
         </button>
+
+        <div className="attendance_filter_bar" style={{ marginBottom: "10px" }}>
+          <label>
+            Filter Type:{" "}
+            <select
+              className="attendance_filter_btn"
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+            >
+              <option value="Month">Month</option>
+              <option value="Week">Week</option>
+            </select>
+          </label>
+
+          {filterType === "Week" && (
+            <label style={{ marginLeft: "10px" }}>
+              Week:{" "}
+              <select
+                className="attendance_filter_btn"
+                value={filterWeek}
+                onChange={(e) => setFilterWeek(Number(e.target.value))}
+              >
+                {Array.from({ length: getTotalWeeksInMonth(firstDay) }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+        </div>
       </div>
 
       {records.length === 0 ? (

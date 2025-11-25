@@ -4,12 +4,44 @@
   margin: 0 auto;
 }
 
-.attendance_export_bar {
-  width: 100%;
-  max-width: 1440px;
-  margin: 0 auto 10px auto;
+.attendance_top_bar {
   display: flex;
-  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap; 
+  gap: 10px;
+}
+
+.attendance_filter_bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: auto;
+  margin: 0;
+}
+
+.attendance_filter_btn,
+.attendance_filter_bar select {
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #f7f7f7;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-size: 16px;
+}
+
+.attendance_filter_btn:hover,
+.attendance_filter_bar select:hover {
+  background-color: #e0e0e0;
+  border-color: #999;
+}
+
+.attendance_filter_btn:focus,
+.attendance_filter_bar select:focus {
+  outline: none;
+  border-color: #1a5dac;
+  box-shadow: 0 0 0 2px rgba(26, 93, 172, 0.3);
 }
 
 .attendance_export_btn {
@@ -86,6 +118,12 @@ td {
 }
 
 @media (max-width: 768px) {
+
+  .attendance_top_bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
 
   .attendance_export_bar {
     width: 100%;
