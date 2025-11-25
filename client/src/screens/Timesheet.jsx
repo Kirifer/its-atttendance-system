@@ -5,11 +5,10 @@ import "../styles/AttendanceTable.css";
 import "../styles/DateRange.css";
 
 function Timesheet() {
-
+  
   const [currentDate, setCurrentDate] = useState(new Date()); 
 
-  // const date = new Date();
-
+  
   const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
   const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
@@ -21,7 +20,7 @@ function Timesheet() {
 
    const handleNextMonth = () => {
     setCurrentDate (
-      new Date(currentDate.getFullYear(), currentDate.getMonth() +1, 1)
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
     )
    }
 
