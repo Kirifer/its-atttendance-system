@@ -30,9 +30,10 @@ function DashboardLayout({ children }) {
   }, []);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    setUser(storedUser ? JSON.parse(storedUser) : { username: "", email: "" });
-  }, []);
+  const storedUser = localStorage.getItem("user");
+  setUser(storedUser ? JSON.parse(storedUser) : { username: "", email: "", role: "" });
+}, []);
+  
 
   return (
     <div className="dashboard">
@@ -43,36 +44,44 @@ function DashboardLayout({ children }) {
         <ul className="dashboard__sidebar-links">
           <li>
             <a href="dashboard">
-              <span class="material-symbols-outlined">home</span>
+              <span className="material-symbols-outlined">home</span>
               Dashboard
             </a>
           </li>
           <li>
             <a href="settings">
-              <span class="material-symbols-outlined">settings</span>
+              <span className="material-symbols-outlined">settings</span>
               Settings
             </a>
           </li>
           <li>
             <a href="reports">
-              <span class="material-symbols-outlined">home_storage</span>
+              <span className="material-symbols-outlined">home_storage</span>
               Reports
             </a>
           </li>
           <li>
             <a href="timesheet">
-              <span class="material-symbols-outlined">calendar_month</span>
+              <span className="material-symbols-outlined">calendar_month</span>
               Timesheet
             </a>
           </li>
           <li>
             <a href="time-off">
-              <span class="material-symbols-outlined">
+              <span className="material-symbols-outlined">
                 nest_clock_farsight_analog
               </span>
               Time-off
             </a>
           </li>
+          {user.role === "ADMIN" && (
+            <li>
+              <a href="time-off-admin">
+                <span className="material-symbols-outlined">manage_accounts</span>
+                Time-off Admin
+              </a>
+            </li>
+          )}
         </ul>
 
         {/* User */}

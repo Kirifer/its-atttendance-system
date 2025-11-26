@@ -43,8 +43,12 @@ function TimeoffAdmin() {
   return (
     <DashboardLayout>
       <div className="admin__main">
-        <h2 className="admin__title">Manage Leave Requests</h2>
-
+        <h1 className="admin__title">Time-off Requests</h1>
+        <p className="admin__description">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo
+          diam, interdum nec placerat in, venenatis egestas justo. Nam eu
+          gravida ante, vel egestas turpis.
+        </p>
         <LeaveTable
           leaves={leaves}
           onStatusChange={handleStatusUpdate}
