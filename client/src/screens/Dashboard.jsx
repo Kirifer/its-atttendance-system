@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import "../styles/Dashboard.css";
+import TimeInOut from "../components/TimeInOutBtn.jsx"
 import DashboardLayout from "../components/DashboardLayout";
 
 function Dashboard() {
@@ -18,6 +19,7 @@ function Dashboard() {
           <button className="return-button" onClick={() => navigate("/")}>
             Return to home
           </button>
+          <TimeInOut />
         </div>
       </div>
     </DashboardLayout>
