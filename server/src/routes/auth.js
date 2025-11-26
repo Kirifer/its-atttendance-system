@@ -5,6 +5,10 @@ import pool from "../db.js";
 // Forgot password
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+// Profile pic
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 //prisma
 import { PrismaClient } from "@prisma/client";
@@ -60,16 +64,20 @@ router.post("/login", async (req, res) => {
     if (!valid) return res.status(400).json({ message: "Incorrect password" });
 
     const token = jwt.sign(
-      { id: user.id, role: user.role },     // ⬅ Add role here
+      { id: user.id, role: user.role }, // ⬅ Add role here
       JWT_SECRET,
       { expiresIn: "1h" }
     );
 
     res.json({
       token,
-      user: { id: user.id, username: user.username, email: user.email, role: user.role },
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });
@@ -101,7 +109,10 @@ router.post("/forgot-password", async (req, res) => {
 
     await prisma.user.update({
       where: { email },
-      data: { reset_token: token, reset_token_expiry: new Date(Date.now() + 3600 * 1000) },
+      data: {
+        reset_token: token,
+        reset_token_expiry: new Date(Date.now() + 3600 * 1000),
+      },
     });
 
     const resetUrl = `http://localhost:3000/reset-password/${token}`;
@@ -121,7 +132,8 @@ router.post("/reset-password", async (req, res) => {
       where: { reset_token: token, reset_token_expiry: { gt: new Date() } },
     });
 
-    if (!user) return res.status(400).json({ message: "Invalid or expired token" });
+    if (!user)
+      return res.status(400).json({ message: "Invalid or expired token" });
 
     const hashed = await bcrypt.hash(password, 10);
 
@@ -138,3 +150,59 @@ router.post("/reset-password", async (req, res) => {
 });
 
 export default router;
+
+// Profile pic multer config
+const uploadsDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadsDir),
+  filename: (req, file, cb) => {
+    const ext = path.extreme(file.originalname);
+    const name = "${Date.now()}-${Math.random().toString(36).slice(2,8)}";
+    cb(null, name + ext);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10 MB limit to allow higher res pics
+  },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/"))
+      return cb(new Error("Only image files are allowed!"), false);
+    cb(null, true);
+  },
+});
+
+// Profile pic config
+router.post(
+  "/upload-profile",
+  verifyToken,
+  upload.single("profilePic"),
+  async (req, res) => {
+    try {
+      const userId = req.user?.id || Number(req.body.userId);
+
+      if (!userId)
+        return res.status(400).json({ messaage: "No User ID provided" });
+      if (!req.file)
+        return res.status(400).json({ messaage: "No file uploaded" });
+
+      const imagePath = "/uploads/${req.file.filename}";
+
+      await prisma.user.update({
+        where: { id: Number(userId) },
+        data: { profilePic: imagePath },
+      });
+
+      return res.json({ success: true, url: imagePath });
+    } catch (err) {
+      console.error("Upload error:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: err.message || "Server error" });
+    }
+  }
+);

@@ -4,8 +4,10 @@ import dotenv from "dotenv";
 import pool from "./src/db.js";
 import errorHandling from "./src/middlewares/errorHandler.js";
 import authRoutes from "./src/routes/auth.js";
-import leaveRoutes from "./src/routes/leaveRoutes.js"
-import attendanceRoutes from "./src/routes/attendanceRoutes.js"
+import leaveRoutes from "./src/routes/leaveRoutes.js";
+import attendanceRoutes from "./src/routes/attendanceRoutes.js";
+import path from "path";
+import fs from "fs";
 
 dotenv.config();
 
@@ -43,3 +45,9 @@ app.use(errorHandling);
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+// Profile pic
+const uploadsDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recusrive: true });
+
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
