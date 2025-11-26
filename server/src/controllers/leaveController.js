@@ -27,15 +27,20 @@ export const getLeaves = async (req, res) => {
     if (req.user.role === "USER") {
       filters.userId = req.user.id;
     } else {
-      // Admin can filter by user or status
       if (req.query.userId) filters.userId = parseInt(req.query.userId);
       if (req.query.status) filters.status = req.query.status.toUpperCase();
     }
 
-    const leaves = await prisma.leave.findMany({
+    let leaves = await prisma.leave.findMany({
       where: filters,
       orderBy: { createdAt: "desc" },
     });
+
+    leaves = leaves.map(leave => ({
+      ...leave,
+      startDate: leave.startDate.toISOString().split("T")[0],
+      endDate: leave.endDate.toISOString().split("T")[0],
+    }));
 
     res.json(leaves);
   } catch (error) {
