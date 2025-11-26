@@ -43,6 +43,15 @@
     background-color: #ff7979;
 }
 
+.tinout_in_btn:disabled {
+    background-color: gray;
+    cursor: not-allowed;
+}
+
+.tinout_out_btn:disabled {
+    background-color: gray;
+    cursor: not-allowed;
+}
 @media (max-width: 767px) {
   
     .tinout_container { 
