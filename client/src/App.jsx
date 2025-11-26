@@ -16,6 +16,7 @@ import Signup from "./screens/Signup";
 import Timeoff from "./screens/Timeoff";
 import Timesheet from "./screens/Timesheet";
 import UserInfo from "./screens/UserInfo";
+import TimeoffAdmin from "./screens/TimeoffAdmin";
 
 function App() {
   return (
@@ -41,6 +42,14 @@ function App() {
         <Route path="/time-off" element={<Timeoff />} />
         <Route path="/timesheet" element={<Timesheet />} />
         <Route path="/user-info" element={<UserInfo />} />
+        <Route
+          path="/time-off-admin"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <TimeoffAdmin />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

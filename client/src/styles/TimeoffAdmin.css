@@ -1,0 +1,164 @@
+/* Container */
+.admin {
+  padding: 25px;
+}
+
+.admin__title {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.admin__loading {
+  font-size: 18px;
+  text-align: center;
+}
+
+/* Table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-table__row {
+  border-bottom: 1px solid #ddd;
+}
+
+.admin-table__row--head {
+  background-color: #f5f5f5;
+}
+
+.admin-table__header {
+  padding: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.admin-table__cell {
+  padding: 12px;
+  vertical-align: top;
+}
+
+/* Status */
+.admin-table__status {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.admin-table__status--pending {
+  color: #d49b00;
+}
+
+/* Actions */
+.admin-table__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-table__btn {
+  padding: 6px 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.admin-table__btn--approve {
+  background: #4caf50;
+  color: white;
+}
+
+.admin-table__btn--reject {
+  background: #d9534f;
+  color: white;
+}
+
+.admin-table__btn--delete {
+  background: #555;
+  color: white;
+}
+/* Container */
+.admin {
+  padding: 25px;
+}
+
+.admin__title {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.admin__loading {
+  font-size: 18px;
+  text-align: center;
+}
+
+/* Table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-table__row {
+  border-bottom: 1px solid #ddd;
+}
+
+.admin-table__row--head {
+  background-color: #f5f5f5;
+}
+
+.admin-table__header {
+  padding: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.admin-table__cell {
+  padding: 12px;
+  vertical-align: top;
+}
+
+/* Status */
+.admin-table__status {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.admin-table__status--pending {
+  color: #d49b00;
+}
+
+/* Actions */
+.admin-table__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-table__btn {
+  padding: 6px 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.admin-table__btn--approve {
+  background: #4caf50;
+  color: white;
+}
+
+.admin-table__btn--reject {
+  background: #d9534f;
+  color: white;
+}
+
+.admin-table__btn--delete {
+  background: #555;
+  color: white;
+}
