@@ -3,6 +3,20 @@ import UserInfoLayout from "../components/UserInfoLayout";
 import styles from "../styles/UserInfo.css";
 import Cropper from "react-easy-crop";
 import PasswordInput from "../components/PasswordInput";
+import API from "../api/api";
+
+function dataURLtoFile(dataUrl, filename) {
+  const arr = dataUrl.split(",");
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) u8arr[n] = bstr.charCodeAt(n);
+  return new File([u8arr], filename, { type: mime });
+}
+
+const token = localStorage.getItem("token");
+const authHeader = `Bearer ${token}`;
 
 function UserInfo() {
   const [user, setUser] = useState({
@@ -54,6 +68,37 @@ function UserInfo() {
       setOriginalUser(storedUser);
     }
   }, []);
+
+  // Cropping
+  const handleCropSave = async () => {
+    if (!croppingImage || !croppedAreaPixels) return;
+
+    const croppedImg = await getCroppedImage();
+    const croppedFile = dataURLtoFile(croppedImg, "profile.jpg");
+
+    const form = new FormData();
+    form.append("profilePic", croppedFile);
+
+    try {
+      const res = await API.post("/upload-profile", form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      setUser((prev) => ({ ...prev, profilePic: res.data.url }));
+      setEdit((prev) => ({ ...prev, profilePic: res.data.url }));
+
+      setTempImage(null);
+      setCroppingImage(null);
+      setZoom(1);
+      setCrop({ x: 0, y: 0 });
+    } catch (err) {
+      console.error("Upload failed:", err);
+      alert("Failed to upload profile picture!");
+    }
+  };
 
   const isEdited = () => {
     if (!originalUser) return false;
@@ -121,49 +166,63 @@ function UserInfo() {
     e.target.value = null;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const storedUser = JSON.parse(localStorage.getItem("user")) || {};
 
-    const passwordFieldFilled =
-      edit.password || edit.newPassword || edit.confirmPassword;
+    try {
+      if (edit.profilePic instanceof File) {
+        const form = new FormData();
+        form.append("profilePic", edit.profilePic);
 
-    if (passwordFieldFilled) {
-      if (!edit.password || !edit.newPassword || !edit.confirmPassword) {
-        alert("Please fill out all password fields to change password!");
-        return;
+        const res = await API.post("/upload-profile", form, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        edit.profilePic = res.data.url;
       }
 
-      if (edit.password !== (storedUser.password || "")) {
-        alert("Old password is incorrect!");
-        return;
+      if (edit.password || edit.newPassword || edit.confirmPassword) {
+        if (!edit.password || !edit.newPassword || !edit.confirmPassword) {
+          alert("Please fill out all password fields!");
+          return;
+        }
+        if (edit.password !== (storedUser.password || "")) {
+          alert("Old password incorrect!");
+          return;
+        }
+        if (edit.newPassword !== edit.confirmPassword) {
+          alert("Passwords do not match!");
+          return;
+        }
       }
 
-      if (edit.newPassword !== edit.confirmPassword) {
-        alert("Passwords do not match!");
-        return;
-      }
+      const updatedUser = {
+        ...storedUser,
+        username: edit.username,
+        email: edit.email,
+        profilePic: edit.profilePic,
+        password: edit.newPassword || storedUser.password,
+      };
+
+      setUser(updatedUser);
+      setEdit({
+        username: updatedUser.username,
+        email: updatedUser.email,
+        profilePic: updatedUser.profilePic,
+        password: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      alert("Changes saved successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save changes!");
     }
-
-    const updatedUser = {
-      ...storedUser,
-      username: edit.username,
-      email: edit.email,
-      profilePic: edit.profilePic,
-      password: passwordFieldFilled ? edit.newPassword : storedUser.password,
-    };
-
-    setUser(updatedUser);
-    setEdit({
-      username: updatedUser.username,
-      email: updatedUser.email,
-      profilePic: updatedUser.profilePic,
-      password: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    alert("Changes saved successfully!");
   };
 
   const handleDeletePhoto = () => {
@@ -430,8 +489,35 @@ function UserInfo() {
               <button
                 onClick={async () => {
                   const croppedImg = await getCroppedImage();
-                  setUser((prev) => ({ ...prev, profilePic: croppedImg }));
-                  setEdit((prev) => ({ ...prev, profilePic: croppedImg }));
+                  if (!croppedImg) return;
+
+                  const croppedFile = dataURLtoFile(croppedImg, "profile.jpg");
+
+                  const form = new FormData();
+                  form.append("profilePic", croppedFile);
+
+                  const uploadRes = await API.post(
+                    "http://localhost:5000/upload-profile",
+                    form,
+                    {
+                      headers: {
+                        "Content-Type": "multipart/form-data",
+                        Authorization: `Bearer ${localStorage.getItem(
+                          "token"
+                        )}`,
+                      },
+                    }
+                  );
+
+                  setUser((prev) => ({
+                    ...prev,
+                    profilePic: uploadRes.data.url,
+                  }));
+                  setEdit((prev) => ({
+                    ...prev,
+                    profilePic: uploadRes.data.url,
+                  }));
+
                   setTempImage(null);
                   setCroppingImage(null);
                   setZoom(1);
@@ -440,6 +526,7 @@ function UserInfo() {
               >
                 Save Crop
               </button>
+
               <button
                 onClick={() => {
                   setTempImage(null);
@@ -487,6 +574,7 @@ function UserInfo() {
               setZoom(1);
               setCrop({ x: 0, y: 0 });
               setCropBox({ width: 200, height: 200, x: 100, y: 100 });
+
               document.getElementById("picInput").value = null;
             }}
           >

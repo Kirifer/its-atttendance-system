@@ -1,63 +1,62 @@
-.tinout_body { 
-    display: flex; 
-    align-items: center;  
-    justify-content: center;
-    max-width: 1440px;
-    width: 100%;
+.tinout_body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 1440px;
+  width: 100%;
 }
 
-.tinout_container { 
-    display: flex; 
-    flex-wrap: wrap;
-    flex-direction: column;
-    align-content: space-between;
-    gap: 30px;
-    margin-top: 10px;
+.tinout_container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-content: space-between;
+  gap: 30px;
+  margin-top: 10px;
 }
 
 .tinout_in_btn {
-    background-color: #54CC58; 
-    border: 0.5px solid;
-    border-style: none;
-    border-radius: 5px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: large;
-    padding: 16px 24px; 
-} 
+  background-color: #54cc58;
+  border: 0.5px solid;
+  border-style: none;
+  border-radius: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+  padding: 16px 24px;
+}
 
 .tinout_out_btn {
-    background-color: #E86E6E; 
-    border: 0.5px solid;
-    border-style: none;
-    border-radius: 5px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: large;
-    padding: 16px 24px; 
+  background-color: #e86e6e;
+  border: 0.5px solid;
+  border-style: none;
+  border-radius: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+  padding: 16px 24px;
 }
 
 .tinout_in_btn:hover {
-    background-color: #60e664;
+  background-color: #60e664;
 }
 
 .tinout_out_btn:hover {
-    background-color: #ff7979;
+  background-color: #ff7979;
 }
 
 .tinout_in_btn:disabled {
-    background-color: gray;
-    cursor: not-allowed;
+  background-color: gray;
+  cursor: not-allowed;
 }
 
 .tinout_out_btn:disabled {
-    background-color: gray;
-    cursor: not-allowed;
+  background-color: gray;
+  cursor: not-allowed;
 }
 @media (max-width: 767px) {
-  
-    .tinout_container { 
-        display: flex; 
-        flex-direction: row;
-        gap: 30px;
-        margin-top: 40px;
-    }
+  .tinout_container {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    margin-top: 40px;
+  }
 }

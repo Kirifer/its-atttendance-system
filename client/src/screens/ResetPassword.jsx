@@ -1,33 +1,42 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { resetPassword } from "../api/auth";
+import PasswordInput from "../components/PasswordInput";
+import SuccessPopup from "../components/SuccessPopup";
 import "../styles/ResetPassword.css";
 import API from "../api/api";
 
 function ResetPassword() {
   const { token } = useParams();
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const navigate = useNavigate();
 
   const handleReset = async (e) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
+    if (newPassword !== confirmNewPassword) {
       setMessage("Passwords do not match");
+      setIsError(true);
       return;
     }
 
     try {
-      const res = await API.post("/auth/reset-password", { token, password });
-      setMessage(res.data.message);
+      const res = await resetPassword(token, newPassword);
+      setMessage(res.message);
+      setIsError(false);
+      setNewPassword("");
+      setConfirmNewPassword("");
+      setShowSuccessPopup(true);
     } catch (err) {
       console.error(err);
-      setMessage(
-        err.response?.data?.message || "An error occurred. Please try again."
-      );
+      setMessage(err.message || "An error occurred. Please try again.");
+      setIsError(true);
     }
   };
 
@@ -37,6 +46,7 @@ function ResetPassword() {
         <div className="top-box-header">
           <p className="reset-password-text">Reset Password</p>
           <button
+            type="button"
             className="close-btn"
             onClick={() => navigate("/forgot-password")}
           >
@@ -44,36 +54,38 @@ function ResetPassword() {
           </button>
         </div>
 
-        {/* Message */}
-        {message && <p>{message}</p>}
+        {/* Show error if passwords don't match */}
+        {isError && (
+          <p style={{ color: "red", marginTop: "10px" }}>
+            Passwords do not match or an error occurred.
+          </p>
+        )}
 
-        <div>
-          <input
-            className="text-box"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter new password"
-            required
-          />
-        </div>
+        {/* Password input */}
+        <PasswordInput
+          newPassword={newPassword}
+          confirmNewPassword={confirmNewPassword}
+          onNewChange={(e) => setNewPassword(e.target.value)}
+          onConfirmNewChange={(e) => setConfirmNewPassword(e.target.value)}
+          showNew={true}
+        />
 
-        <div>
-          <input
-            className="text-box"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm new password"
-            required
-          />
-        </div>
-
-        {/* Buttons */}
+        {/* Submit button */}
         <button type="submit" className="reset-password-button">
           Reset Password
         </button>
       </form>
+
+      {/* Success popup */}
+      {showSuccessPopup && (
+        <SuccessPopup
+          message="Reset password successful! You can now proceed to log in."
+          onClose={() => {
+            setShowSuccessPopup(false);
+            navigate("/login");
+          }}
+        />
+      )}
     </div>
   );
 }

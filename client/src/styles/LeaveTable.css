@@ -1,17 +1,16 @@
-
 .leave-table-container {
   width: 100%;
-  overflow-x: auto; 
-  -webkit-overflow-scrolling: touch; 
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .leave-table {
-  min-width: 800px;       /* ensures table stays wide */
+  min-width: 800px; /* ensures table stays wide */
   border-collapse: collapse;
   background: white;
   border-radius: 8px;
-  table-layout: fixed;    
-  white-space: nowrap;    
+  table-layout: fixed;
+  white-space: nowrap;
   margin: auto;
 }
 
@@ -25,9 +24,9 @@
 
 .leave-table td {
   padding: 12px;
-  border-bottom: 1px solid #8B8B8B;
+  border-bottom: 1px solid #8b8b8b;
   white-space: nowrap;
-  display: table-cell; 
+  display: table-cell;
 }
 
 .leave-table__actions .material-symbols-outlined {
@@ -54,22 +53,21 @@
   color: #d9534f;
 }
 
-
 .leave-table__status {
   font-weight: bold;
   text-transform: uppercase;
 }
 
 .leave-table__status--pending {
-  color: #D2A516;
+  color: #d2a516;
 }
 
 .leave-table__status--approved {
-  color: #54CC58;
+  color: #54cc58;
 }
 
 .leave-table__status--rejected {
-  color: #D40707;
+  color: #d40707;
 }
 
 /* Responsive adjustments for mobile */

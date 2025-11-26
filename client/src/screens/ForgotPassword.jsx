@@ -1,51 +1,66 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { forgotPassword } from "../api/auth";
 import "../styles/ForgotPassword.css";
 import API from "../api/api";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await API.post("/auth/forgot-password", { email });
-      // show reset link if in DEV mode
-      setMessage(res.data.resetUrl || res.data.message);
-      if (res.data.resetUrl) {
-        console.log("Password reset link:", res.data.resetUrl);
+      const res = await forgotPassword(email); // use service function
+      setMessage(res.resetUrl || res.message); // DEV mode shows reset link
+      setIsError(false);
+      if (res.resetUrl) {
+        console.log("Password reset link:", res.resetUrl);
       }
     } catch (err) {
       console.error(err);
-      setMessage(
-        err.response?.data?.message || "An error occurred. Please try again."
-      );
+      setMessage(err.message || "An error occurred. Please try again.");
+      setIsError(true);
     }
   };
 
   return (
     <div className="background center-align-items">
-      <form onSubmit={handleSubmit} class="forgot-password-box">
+      <form onSubmit={handleSubmit} className="forgot-password-box">
         <div className="top-box-header">
-          <p class="forgot-password-text">Forgot Password</p>
-          <button className="close-btn" onClick={() => navigate("/login")}>
+          <p className="forgot-password-text">Forgot Password</p>
+          <button
+            type="button"
+            className="close-btn"
+            onClick={() => navigate("/login")}
+          >
             X
           </button>
         </div>
 
         {/* JSON */}
         {message && (
-          <p style={{ wordBreak: "break-word", marginTop: "10px" }}>
-            {message}
+          <p
+            style={{
+              wordBreak: "break-word",
+              marginTop: "10px",
+              color: isError ? "red" : "green",
+            }}
+          >
+            {message.includes("reset-password") ? (
+              <a href={message}>{message}</a>
+            ) : (
+              message
+            )}
           </p>
         )}
 
         <div>
           <input
-            class="text-box"
+            className="text-box"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}

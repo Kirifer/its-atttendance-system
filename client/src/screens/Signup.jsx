@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { signUpUser } from "../api/auth";
 import "../styles/Signup.css";
 import PasswordInput from "../components/PasswordInput";
-import SignupSuccessPopup from "../components/SignupSuccessPopup";
+import SuccessPopup from "../components/SuccessPopup";
 import API from "../api/api";
 
 function Signup() {
@@ -114,7 +114,7 @@ function Signup() {
       </form>
 
       {showSuccessPopup && (
-        <SignupSuccessPopup
+        <SuccessPopup
           message="Sign up successful! You can now log in."
           onClose={() => {
             setShowSuccessPopup(false);

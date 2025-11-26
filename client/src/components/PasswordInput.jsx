@@ -2,16 +2,19 @@ import { useState } from "react";
 import "../styles/PasswordInput.css";
 
 export default function PasswordInput({
+  // Old password (login/sign-up)
   password,
   confirmPassword,
   onPasswordChange,
   onConfirmChange,
+  showConfirm = false,
+  error,
+
+  // New password (reset)
   newPassword,
   confirmNewPassword,
   onNewChange,
   onConfirmNewChange,
-  error,
-  showConfirm = false,
   showNew = false,
 }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,27 +24,28 @@ export default function PasswordInput({
 
   return (
     <div className="password-wrapper">
-      {/* Password */}
-      <div className="input-group">
-        <input
-          type={showPassword ? "text" : "password"}
-          placeholder="Password"
-          className="text-box password-input"
-          value={password}
-          onChange={onPasswordChange}
-          required
-        />
-        <span
-          className="material-symbols-outlined eye-icon"
-          onClick={() => setShowPassword(!showPassword)}
-        >
-          {showPassword ? "visibility" : "visibility_off"}
-        </span>
-      </div>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {/* Old password */}
+      {password !== undefined && (
+        <div className="input-group">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            className="text-box password-input"
+            value={password}
+            onChange={onPasswordChange}
+            required
+          />
+          <span
+            className="material-symbols-outlined eye-icon"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? "visibility" : "visibility_off"}
+          </span>
+        </div>
+      )}
 
-      {/* Confirm Password */}
-      {showConfirm && (
+      {/* Old confirm password */}
+      {showConfirm && confirmPassword !== undefined && (
         <div className="input-group">
           <input
             type={showConfirmPassword ? "text" : "password"}
@@ -60,8 +64,8 @@ export default function PasswordInput({
         </div>
       )}
 
-      {/* New Password + Confirm New Password */}
-      {showNew && (
+      {/* New password (reset) */}
+      {showNew && newPassword !== undefined && (
         <>
           <div className="input-group">
             <input
@@ -73,7 +77,7 @@ export default function PasswordInput({
               required
             />
             <span
-              className="material-symbols-outlined eye-icon"
+              className="material-symbols-outlined new-eye-icon"
               onClick={() => setShowNewPassword(!showNewPassword)}
             >
               {showNewPassword ? "visibility" : "visibility_off"}
@@ -90,7 +94,7 @@ export default function PasswordInput({
               required
             />
             <span
-              className="material-symbols-outlined eye-icon"
+              className="material-symbols-outlined new-eye-icon"
               onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
             >
               {showConfirmNewPassword ? "visibility" : "visibility_off"}
@@ -98,6 +102,8 @@ export default function PasswordInput({
           </div>
         </>
       )}
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 }

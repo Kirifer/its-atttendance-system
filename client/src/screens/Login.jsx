@@ -26,13 +26,14 @@ function Login() {
 
     try {
       const { token, user } = await loginUser(email, password);
+
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
       setFieldErrors({ ...fieldErrors, general: "Login successful!" });
       navigate("/dashboard");
     } catch (err) {
-      const message = err.message;
+      const message = err.response?.data?.message || err.message;
       setFieldErrors({ email: "", password: "", general: message });
     }
   };
@@ -72,8 +73,9 @@ function Login() {
         </div>
 
         <PasswordInput
-          value={password}
+          password={password}
           onPasswordChange={(e) => setPassword(e.target.value)}
+          showConfirm={false} // login doesn’t need confirm
         />
 
         {/* Buttons */}

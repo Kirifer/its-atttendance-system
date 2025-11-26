@@ -30,10 +30,13 @@ function DashboardLayout({ children }) {
   }, []);
 
   useEffect(() => {
-  const storedUser = localStorage.getItem("user");
-  setUser(storedUser ? JSON.parse(storedUser) : { username: "", email: "", role: "" });
-}, []);
-  
+    const storedUser = localStorage.getItem("user");
+    setUser(
+      storedUser
+        ? JSON.parse(storedUser)
+        : { username: "", email: "", role: "" }
+    );
+  }, []);
 
   return (
     <div className="dashboard">
@@ -77,7 +80,9 @@ function DashboardLayout({ children }) {
           {user.role === "ADMIN" && (
             <li>
               <a href="time-off-admin">
-                <span className="material-symbols-outlined">manage_accounts</span>
+                <span className="material-symbols-outlined">
+                  manage_accounts
+                </span>
                 Time-off Admin
               </a>
             </li>

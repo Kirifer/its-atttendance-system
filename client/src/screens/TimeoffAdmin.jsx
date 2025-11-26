@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
-import { getAllLeaves, updateLeaveStatus, deleteLeave } from "../api/leaveAdmin";
+import {
+  getAllLeaves,
+  updateLeaveStatus,
+  deleteLeave,
+} from "../api/leaveAdmin";
 import LeaveTable from "../components/LeaveTable";
 import "../styles/TimeoffAdmin.css";
 

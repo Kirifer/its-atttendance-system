@@ -1,7 +1,9 @@
 import React from "react";
 import "../styles/LeaveTable.css";
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-
+<link
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+  rel="stylesheet"
+/>;
 
 function LeaveTable({ leaves, onStatusChange, onDelete }) {
   return (
@@ -26,11 +28,14 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
               <td>{leave.leaveType}</td>
               <td>{leave.reason}</td>
               <td>{leave.user ? leave.user.username : "N/A"}</td>
-              <td>{leave.startDate.slice(0,10)} → {leave.endDate.slice(0,10)}</td>
-              <td className={`leave-table__status leave-table__status--${leave.status.toLowerCase()}`}>
+              <td>
+                {leave.startDate.slice(0, 10)} → {leave.endDate.slice(0, 10)}
+              </td>
+              <td
+                className={`leave-table__status leave-table__status--${leave.status.toLowerCase()}`}
+              >
                 {leave.status}
               </td>
-
 
               <td className="leave-table__actions">
                 <span
@@ -57,7 +62,6 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                   delete
                 </span>
               </td>
-
             </tr>
           ))}
         </tbody>
