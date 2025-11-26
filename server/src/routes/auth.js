@@ -115,7 +115,7 @@ router.post("/forgot-password", async (req, res) => {
       },
     });
 
-    const resetUrl = `http://localhost:3000/reset-password/${token}`;
+    const resetUrl = `http://localhost:5000/reset-password/${token}`;
     res.json({ message: "DEV mode: password reset link", resetUrl });
   } catch (err) {
     console.error(err);
