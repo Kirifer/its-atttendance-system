@@ -34,6 +34,15 @@ export const getLeaves = async (req, res) => {
     let leaves = await prisma.leave.findMany({
       where: filters,
       orderBy: { createdAt: "desc" },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+      },
     });
 
     leaves = leaves.map(leave => ({
