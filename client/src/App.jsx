@@ -35,13 +35,41 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logs" element={<Logs />} />
-        <Route path="/reports" element={<Reports />} />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <Reports />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/sign-up" element={<Signup />} />
         <Route path="/time-off" element={<Timeoff />} />
-        <Route path="/timesheet" element={<Timesheet />} />
-        <Route path="/user-info" element={<UserInfo />} />
+        <Route
+          path="/timesheet"
+          element={
+            <ProtectedRoute>
+              <Timesheet />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user-info"
+          element={
+            <ProtectedRoute>
+              <UserInfo />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/time-off-admin"
           element={
