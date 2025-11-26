@@ -42,7 +42,14 @@ function App() {
         <Route path="/time-off" element={<Timeoff />} />
         <Route path="/timesheet" element={<Timesheet />} />
         <Route path="/user-info" element={<UserInfo />} />
-        <Route path="/time-off-admin" element={<TimeoffAdmin />} />
+        <Route
+          path="/time-off-admin"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <TimeoffAdmin />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

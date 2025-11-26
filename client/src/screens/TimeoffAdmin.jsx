@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { getAllLeaves, updateLeaveStatus, deleteLeave } from "../api/leaveAdmin";
+import LeaveTable from "../components/LeaveTable";
 import "../styles/TimeoffAdmin.css";
 
 function TimeoffAdmin() {
@@ -32,43 +33,23 @@ function TimeoffAdmin() {
     fetchLeaves();
   };
 
-  if (loading) return <DashboardLayout><div>Loading...</div></DashboardLayout>;
+  if (loading)
+    return (
+      <DashboardLayout>
+        <div className="admin__loading">Loading...</div>
+      </DashboardLayout>
+    );
 
   return (
     <DashboardLayout>
-      <div className="admin-container">
-        <h2>Manage Leave Requests</h2>
+      <div className="admin__main">
+        <h2 className="admin__title">Manage Leave Requests</h2>
 
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Type</th>
-              <th>Dates</th>
-              <th>Reason</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {leaves.map((leave) => (
-              <tr key={leave.id}>
-                <td>{leave.userId}</td>
-                <td>{leave.leaveType}</td>
-                <td>{leave.startDate} → {leave.endDate}</td>
-                <td>{leave.reason}</td>
-                <td>{leave.status}</td>
-
-                <td>
-                  <button onClick={() => handleStatusUpdate(leave.id, "APPROVED")}>Approve</button>
-                  <button onClick={() => handleStatusUpdate(leave.id, "REJECTED")}>Reject</button>
-                  <button onClick={() => handleDelete(leave.id)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <LeaveTable
+          leaves={leaves}
+          onStatusChange={handleStatusUpdate}
+          onDelete={handleDelete}
+        />
       </div>
     </DashboardLayout>
   );

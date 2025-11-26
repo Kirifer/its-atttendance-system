@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../styles/LeaveForm.css";
+import "../styles/LeaveForm.css"
 
 function LeaveForm({ onSubmit }) {
   const [formData, setFormData] = useState({
