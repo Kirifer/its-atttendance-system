@@ -48,6 +48,6 @@ app.listen(port, () => {
 
 // Profile pic
 const uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recusrive: true });
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
