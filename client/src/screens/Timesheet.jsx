@@ -5,6 +5,8 @@ import "../styles/AttendanceTable.css";
 import "../styles/DateRange.css";
 
 function Timesheet() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const [reload, setReload] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const firstDay = new Date(
@@ -52,7 +54,12 @@ function Timesheet() {
           <h1>Timesheet</h1>
         </div>
 
-        <AttendanceTable firstDay={firstDay} lastDay={lastDay} />
+        <AttendanceTable 
+          userId={user.id}
+          userEmail={user.email}
+          firstDay={firstDay}
+          lastDay={lastDay}
+          reload={reload} />
       </DashboardLayout>
     </div>
   );

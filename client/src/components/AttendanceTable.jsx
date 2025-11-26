@@ -1,71 +1,92 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { getUserAttendance } from "../api/attendance";
 import "../styles/AttendanceTable.css";
-import { dummyAttendance } from "../api/attendanceData.js";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export default function AttendanceTable({ firstDay, lastDay }) {
+export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, reload }) {
   const [records, setRecords] = useState([]);
-
   const [filterType, setFilterType] = useState("Month");
   const [filterWeek, setFilterWeek] = useState(1);
 
-  function getWeekOfMonth(date) {
-    const firstDayOfMonth = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      1
-    ).getDay(); // 0=Sunday
-    return Math.ceil((date.getDate() + firstDayOfMonth) / 7);
-  }
+  const options = {
+    year: "numeric",
+    month: "short", 
+    day: "numeric", 
+  };
 
-  function getTotalWeeksInMonth(date) {
-    const firstDayOfMonth = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      1
-    ).getDay();
-    const lastDate = new Date(
-      date.getFullYear(),
-      date.getMonth() + 1,
-      0
-    ).getDate();
-    return Math.ceil((lastDate + firstDayOfMonth) / 7);
-  }
+  const getWeekOfMonth = (date) => {
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    return Math.ceil((date.getDate() + firstDay) / 7);
+  };
+
+  const getTotalWeeksInMonth = (date) => {
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    const lastDate = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    return Math.ceil((lastDate + firstDay) / 7);
+  };
 
   useEffect(() => {
-    const filtered = dummyAttendance.users.filter((user) => {
-      const recordDate = new Date(user["Date"]);
+    const fetchAttendance = async () => {
+      if (!userId) return;
 
-      if (recordDate < firstDay || recordDate > lastDay) return false;
+      try {
+        const res = await getUserAttendance(userId);
 
-      if (filterType === "Week") {
-        return getWeekOfMonth(recordDate) === filterWeek;
+        // Filter by month, 30-day range
+        const monthFiltered = res.attendance.filter((r) => {
+          const d = new Date(r.date);
+          return d >= firstDay && d <= lastDay;
+        });
+
+        // Format table heading and data
+        const formatted = monthFiltered.map((r) => {
+          const ti = r.timeIn ? new Date(r.timeIn) : null;
+          const to = r.timeOut ? new Date(r.timeOut) : null;
+          const diff = ti && to ? ((to - ti) / 1000 / 60 / 60).toFixed(2) : "-";
+
+          return {
+            Intern: userEmail,
+            Date: new Date(r.date).toLocaleDateString("en-US", options),
+            Week: getWeekOfMonth(new Date(r.date)),
+            "Time In": ti ? ti.toLocaleTimeString("en-US") : "-",
+            "Time Out": to ? to.toLocaleTimeString("en-US") : "-",
+            TOTAL: diff !== "-" ? `${diff} hrs` : "-",
+          };
+        });
+
+        // If filterType is "Week", only show selected week
+        const finalRecords =
+          filterType === "Week"
+            ? formatted.filter((r) => getWeekOfMonth(new Date(r.Date)) === filterWeek)
+            : formatted;
+
+        setRecords(finalRecords);
+      } catch (err) {
+        console.error(err);
+        setRecords([]);
       }
+    };
 
-      return true;
-    });
-
-    setRecords(filtered);
-  }, [firstDay, lastDay, filterType, filterWeek]);
+    fetchAttendance();
+  }, [userId, firstDay, lastDay, reload, filterType, filterWeek, userEmail]);
 
   const exportPDF = () => {
-    if (records.length === 0) {
-      alert("No data available to export.");
+    if (!records.length) {
+      alert("No data available to export.")
       return;
     }
 
     const doc = new jsPDF();
-    const tableColumn = Object.keys(records[0]);
-    const tableRows = records.map((row) => Object.values(row));
-    doc.setFontSize(16);
-    doc.text("Timesheet Report", 14, 15);
+
     autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
+      head: [Object.keys(records[0])],
+      body: records.map(Object.values),
       startY: 25,
       styles: { fontSize: 10 },
     });
+
+    doc.text("Timesheet Report", 14, 15);
     doc.save("timesheet.pdf");
   };
 
@@ -76,9 +97,9 @@ export default function AttendanceTable({ firstDay, lastDay }) {
           Export
         </button>
 
-        <div className="attendance_filter_bar" style={{ marginBottom: "10px" }}>
+        <div className="attendance_filter_bar">
           <label>
-            Filter Type:{" "}
+            Filter Type:&nbsp;
             <select
               className="attendance_filter_btn"
               value={filterType}
@@ -97,14 +118,11 @@ export default function AttendanceTable({ firstDay, lastDay }) {
                 value={filterWeek}
                 onChange={(e) => setFilterWeek(Number(e.target.value))}
               >
-                {Array.from(
-                  { length: getTotalWeeksInMonth(firstDay) },
-                  (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  )
-                )}
+                {Array.from({ length: getTotalWeeksInMonth(firstDay) }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
               </select>
             </label>
           )}
@@ -112,39 +130,23 @@ export default function AttendanceTable({ firstDay, lastDay }) {
       </div>
 
       {records.length === 0 ? (
-        <>
-          <div className="attendance_container">
-            <table className="attendance_tbl">
-              <thead>
-                <tr>
-                  {dummyAttendance.users[0] &&
-                    Object.keys(dummyAttendance.users[0]).map((col, i) => (
-                      <th key={i}>{col}</th>
-                    ))}
-                </tr>
-              </thead>
-            </table>
-          </div>
-          <p className="attendance_message">No attendance for this month</p>
-        </>
+        <p className="attendance_message">No attendance for this {filterType === "Month" ? "month" : `week ${filterWeek}`}</p>
       ) : (
         <div className="attendance_container">
           <table className="attendance_tbl">
             <thead>
               <tr>
-                {records[0] &&
-                  Object.keys(records[0]).map((col, i) => (
-                    <th key={i}>{col}</th>
-                  ))}
+                {Object.keys(records[0]).map((col) => (
+                  <th key={col}>{col}</th>
+                ))}
               </tr>
             </thead>
-
             <tbody>
-              {records.map((record, i) => (
+              {records.map((r, i) => (
                 <tr key={i}>
-                  {Object.entries(record).map(([colName, val], j) => (
-                    <td key={j} data-label={colName}>
-                      {val}
+                  {Object.values(r).map((v, j) => (
+                    <td key={j} data-label={Object.keys(r)[j]}>
+                      {v}
                     </td>
                   ))}
                 </tr>

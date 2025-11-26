@@ -7,7 +7,7 @@ export const timeIn = async (req, res) => {
     try {
         const userId = req.user.id;
         const today = new Date();
-        today.setHours(0, 0, 0, 0)
+        today.setUTCHours(0, 0, 0, 0)
 
         let attendance = await prisma.attendance.findUnique({
             where: { userId_date: { userId, date: today } },
@@ -24,7 +24,7 @@ export const timeIn = async (req, res) => {
                 timeIn: new Date(),
                 status: AttendanceStatus.PRESENT,
             },
-        }),
+        });
 
             res.status(201).json({ message: "Time-in logged", attendance });
     } catch (error) {
@@ -38,7 +38,7 @@ export const timeOut = async (req, res) => {
     try {
         const userId = req.user.id;
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        today.setUTCHours(0, 0, 0, 0);
 
         const attendance = await prisma.attendance.findUnique({
             where: { userId_date: { userId, date: today } },
