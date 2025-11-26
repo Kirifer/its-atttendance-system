@@ -115,7 +115,10 @@ router.post("/forgot-password", async (req, res) => {
       },
     });
 
-    const resetUrl = `http://localhost:5000/reset-password/${token}`;
+    // Add this to your .env
+    // FRONTEND_URL=http://localhost:5000
+    const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5000";
+    const resetUrl = `${FRONTEND_URL}/reset-password/${token}`;
     res.json({ message: "DEV mode: password reset link", resetUrl });
   } catch (err) {
     console.error(err);
