@@ -64,3 +64,12 @@ export const resetPassword = async (token, password) => {
     throw new Error(message);
   }
 };
+
+// Change password
+export const changePassword = async (oldPassword, newPassword) => {
+  const res = await API.post("/auth/change-password", {
+    oldPassword,
+    newPassword,
+  });
+  return res.data;
+};

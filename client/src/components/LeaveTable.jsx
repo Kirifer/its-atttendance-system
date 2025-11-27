@@ -9,7 +9,7 @@ import { showToast } from "./Notification/toast";
 />;
 
 function LeaveTable({ leaves, onStatusChange, onDelete }) {
- const [filterType, setFilterType] = useState("id");
+  const [filterType, setFilterType] = useState("id");
   const [query, setQuery] = useState("");
 
   const filteredLeaves = leaves.filter((leave) => {
@@ -23,7 +23,7 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
         : filterType === "status"
         ? leave.status
         : filterType === "username"
-        ? (leave.user?.username || "")
+        ? leave.user?.username || ""
         : "";
 
     return value.toLowerCase().includes(query.toLowerCase());
@@ -86,7 +86,9 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                   <span
                     className="material-symbols-outlined leave-table__approve"
                     onClick={() => {
-                      const confirmed = window.confirm("Are you sure you want to approve this leave?");
+                      const confirmed = window.confirm(
+                        "Are you sure you want to approve this leave?"
+                      );
                       if (!confirmed) return;
 
                       onStatusChange(leave.id, "APPROVED")
@@ -113,7 +115,9 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                   <span
                     className="material-symbols-outlined leave-table__reject"
                     onClick={() => {
-                      const confirmed = window.confirm("Are you sure you want to reject this leave?");
+                      const confirmed = window.confirm(
+                        "Are you sure you want to reject this leave?"
+                      );
                       if (!confirmed) return;
 
                       onStatusChange(leave.id, "REJECTED")
@@ -140,7 +144,9 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                   <span
                     className="material-symbols-outlined leave-table__delete"
                     onClick={() => {
-                      const confirmed = window.confirm("Are you sure you want to delete this leave?");
+                      const confirmed = window.confirm(
+                        "Are you sure you want to delete this leave?"
+                      );
                       if (!confirmed) return;
 
                       onDelete(leave.id)

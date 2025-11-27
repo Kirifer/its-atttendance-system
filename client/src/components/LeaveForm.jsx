@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../styles/LeaveForm.css"
+import "../styles/LeaveForm.css";
 import { showToast } from "./Notification/toast";
 
 function LeaveForm({ onSubmit }) {
@@ -17,30 +17,30 @@ function LeaveForm({ onSubmit }) {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    await onSubmit(formData);
+    e.preventDefault();
+    try {
+      await onSubmit(formData);
 
-    showToast({
-      message: "Leave submitted successfully!",
-      color: "#ffffff", 
-      type: "success"
-    });
+      showToast({
+        message: "Leave submitted successfully!",
+        color: "#ffffff",
+        type: "success",
+      });
 
-    setFormData({
-      startDate: "",
-      endDate: "",
-      leaveType: "PERSONAL",
-      reason: "",
-    });
-  } catch (err) {
-    showToast({
-      message: err.message || "Error submitting leave",
-      color: "#ffffff", 
-      type: "error"
-    });
-  }
-};
+      setFormData({
+        startDate: "",
+        endDate: "",
+        leaveType: "PERSONAL",
+        reason: "",
+      });
+    } catch (err) {
+      showToast({
+        message: err.message || "Error submitting leave",
+        color: "#ffffff",
+        type: "error",
+      });
+    }
+  };
 
   return (
     <form className="leave-form" onSubmit={handleSubmit}>

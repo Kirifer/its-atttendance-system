@@ -1,589 +1,153 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { changePassword } from "../api/auth";
 import UserInfoLayout from "../components/UserInfoLayout";
-import styles from "../styles/UserInfo.css";
-import Cropper from "react-easy-crop";
-import PasswordInput from "../components/PasswordInput";
+import "../styles/PasswordChange.css";
 import API from "../api/api";
 
-function dataURLtoFile(dataUrl, filename) {
-  const arr = dataUrl.split(",");
-  const mime = arr[0].match(/:(.*?);/)[1];
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) u8arr[n] = bstr.charCodeAt(n);
-  return new File([u8arr], filename, { type: mime });
-}
+const UserInfo = () => {
+  const [user, setUser] = useState(null);
 
-const token = localStorage.getItem("token");
-const authHeader = `Bearer ${token}`;
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-function UserInfo() {
-  const [user, setUser] = useState({
-    username: "",
-    email: "",
-    password: "",
-    profilePic: "/defaultProfile.png",
-  });
-  const [edit, setEdit] = useState({
-    username: "",
-    email: "",
-    password: "",
-    newPassword: "",
-    confirmPassword: "",
-    profilePic: "",
-  });
-  const [isEditingUsername, setIsEditingUsername] = useState(false);
-  const [isEditingEmail, setIsEditingEmail] = useState(false);
-  const [isEditingPassword, setIsEditingPassword] = useState(false);
-  const [originalUser, setOriginalUser] = useState(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [croppingImage, setCroppingImage] = useState(null);
-  const [tempImage, setTempImage] = useState(null);
-  const [cropBox, setCropBox] = useState({
-    width: 200,
-    height: 200,
-    x: 100,
-    y: 100,
-  });
+  const [showOld, setShowOld] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser({
-        ...storedUser,
-        profilePic: storedUser.profilePic || "/defaultProfile.png",
-        password: storedUser.password || "",
-      });
-      setEdit({
-        username: storedUser.username,
-        email: storedUser.email,
-        profilePic: storedUser.profilePic,
-        password: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-      setOriginalUser(storedUser);
-    }
+    const getUser = async () => {
+      try {
+        const res = await API.get("/auth/me");
+        setUser(res.data);
+      } catch (err) {
+        console.log("ERROR LOADING USER:", err);
+      }
+    };
+    getUser();
   }, []);
 
-  // Cropping
-  const handleCropSave = async () => {
-    if (!croppingImage || !croppedAreaPixels) return;
+  const handleChange = async (e) => {
+    e.preventDefault();
+    setMsg("");
+    setError("");
 
-    const croppedImg = await getCroppedImage();
-    const croppedFile = dataURLtoFile(croppedImg, "profile.jpg");
-
-    const form = new FormData();
-    form.append("profilePic", croppedFile);
+    if (newPassword !== confirmPassword) {
+      return setError("Passwords do not match!");
+    }
 
     try {
-      const res = await API.post("/upload-profile", form, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      setUser((prev) => ({ ...prev, profilePic: res.data.url }));
-      setEdit((prev) => ({ ...prev, profilePic: res.data.url }));
-
-      setTempImage(null);
-      setCroppingImage(null);
-      setZoom(1);
-      setCrop({ x: 0, y: 0 });
+      await changePassword(oldPassword, newPassword);
+      setMsg("Password has been updated!");
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (err) {
-      console.error("Upload failed:", err);
-      alert("Failed to upload profile picture!");
+      setError(err.response?.data?.message || "Error in updating password.");
     }
   };
 
-  const isEdited = () => {
-    if (!originalUser) return false;
-    return (
-      edit.username !== originalUser.username ||
-      edit.email !== originalUser.email ||
-      edit.profilePic !== (originalUser.profilePic || "/defaultProfile.png") ||
-      edit.password ||
-      edit.newPassword ||
-      edit.confirmPassword
-    );
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEdit((prev) => ({ ...prev, [name]: value }));
-
-    if (name === "username" || name === "email") {
-      setUser((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const onCropComplete = (croppedArea, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  };
-
-  const getCroppedImage = async () => {
-    if (!croppingImage || !croppedAreaPixels) return null;
-
-    const image = new Image();
-    image.src = croppingImage;
-    await new Promise((res) => (image.onload = res));
-
-    const canvas = document.createElement("canvas");
-    canvas.width = croppedAreaPixels.width;
-    canvas.height = croppedAreaPixels.height;
-    const ctx = canvas.getContext("2d");
-
-    ctx.drawImage(
-      image,
-      croppedAreaPixels.x,
-      croppedAreaPixels.y,
-      croppedAreaPixels.width,
-      croppedAreaPixels.height,
-      0,
-      0,
-      croppedAreaPixels.width,
-      croppedAreaPixels.height
-    );
-
-    return canvas.toDataURL("image/jpeg");
-  };
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setTempImage(reader.result);
-      setCroppingImage(reader.result);
-    };
-    reader.readAsDataURL(file);
-
-    e.target.value = null;
-  };
-
-  const handleSave = async () => {
-    const storedUser = JSON.parse(localStorage.getItem("user")) || {};
-
-    try {
-      if (edit.profilePic instanceof File) {
-        const form = new FormData();
-        form.append("profilePic", edit.profilePic);
-
-        const res = await API.post("/upload-profile", form, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-
-        edit.profilePic = res.data.url;
-      }
-
-      if (edit.password || edit.newPassword || edit.confirmPassword) {
-        if (!edit.password || !edit.newPassword || !edit.confirmPassword) {
-          alert("Please fill out all password fields!");
-          return;
-        }
-        if (edit.password !== (storedUser.password || "")) {
-          alert("Old password incorrect!");
-          return;
-        }
-        if (edit.newPassword !== edit.confirmPassword) {
-          alert("Passwords do not match!");
-          return;
-        }
-      }
-
-      const updatedUser = {
-        ...storedUser,
-        username: edit.username,
-        email: edit.email,
-        profilePic: edit.profilePic,
-        password: edit.newPassword || storedUser.password,
-      };
-
-      setUser(updatedUser);
-      setEdit({
-        username: updatedUser.username,
-        email: updatedUser.email,
-        profilePic: updatedUser.profilePic,
-        password: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      alert("Changes saved successfully!");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to save changes!");
-    }
-  };
-
-  const handleDeletePhoto = () => {
-    const defaultPic = "/defaultProfile.png";
-
-    setUser((prev) => ({ ...prev, profilePic: defaultPic }));
-    setEdit((prev) => ({ ...prev, profilePic: defaultPic }));
-
-    const storedUser = JSON.parse(localStorage.getItem("user")) || {};
-    const updatedUser = { ...storedUser, profilePic: defaultPic };
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-
-    alert("Profile photo has been reset to default.");
-  };
+  if (!user) return <div>Loading...</div>;
 
   return (
     <UserInfoLayout>
       <div className="user-info-container">
-        {/* Profile Picture */}
-        <div className="profile-pic-section">
+        <h2>User Info</h2>
+
+        <p>
+          <strong>Username:</strong> {user.username}
+        </p>
+
+        <p>
+          <strong>Email:</strong> {user.email}
+        </p>
+
+        <p>
+          <strong>Role:</strong> {user.role}
+        </p>
+
+        {user.profilePic && (
           <img
-            src={croppingImage ? tempImage || croppingImage : user.profilePic}
+            src={`http://localhost:5001/uploads/${user.profilePic}`}
             alt="Profile"
+            style={{
+              width: "120px",
+              height: "120px",
+              borderRadius: "50%",
+              marginTop: "10px",
+              objectFit: "cover",
+            }}
           />
+        )}
 
-          <button onClick={() => document.getElementById("picInput").click()}>
-            Change Photo
-          </button>
+        <h3 style={{ marginTop: "30px" }}>Change Password</h3>
+        {/* Error msg */}
+        {msg && <p style={{ color: "green" }}>{msg}</p>}
+        {error && <p className="uc-error-text">{error}</p>}
 
-          <button
-            onClick={handleDeletePhoto}
-            style={{ background: "red", color: "white" }}
-          >
-            Remove Photo
-          </button>
-
-          <input
-            id="picInput"
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handleImageUpload}
-          />
-        </div>
-
-        {/* Username */}
-        <div className="user-section">
-          <label>Username:</label>
-          {!isEditingUsername ? (
-            <>
-              <span>{user.username}</span>
-              <button onClick={() => setIsEditingUsername(true)}>Edit</button>
-            </>
-          ) : (
-            <>
+        <form onSubmit={handleChange} className="change-password-form">
+          <div className="uc-password-wrapper">
+            <div className="uc-input-group">
               <input
-                type="text"
-                name="username"
-                value={edit.username}
-                onChange={handleChange}
+                type={showOld ? "text" : "password"}
+                placeholder="Old Password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                className="uc-password-input"
               />
-              <button onClick={() => setIsEditingUsername(false)}>Done</button>
-              <button
-                style={{ background: "gray", color: "white", marginLeft: 5 }}
-                onClick={() => {
-                  setEdit((prev) => ({
-                    ...prev,
-                    username: originalUser.username,
-                  }));
-                  setUser((prev) => ({
-                    ...prev,
-                    username: originalUser.username,
-                  }));
-                  setIsEditingUsername(false);
-                }}
+              <span
+                className="uc-eye-icon material-symbols-outlined"
+                onClick={() => setShowOld(!showOld)}
               >
-                Cancel
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Email */}
-        <div className="email-section">
-          <label>Email:</label>
-          {!isEditingEmail ? (
-            <>
-              <span>{user.email}</span>
-              <button onClick={() => setIsEditingEmail(true)}>Edit</button>
-            </>
-          ) : (
-            <>
-              <input
-                type="email"
-                name="email"
-                value={edit.email}
-                onChange={handleChange}
-              />
-              <button onClick={() => setIsEditingEmail(false)}>Done</button>
-              <button
-                style={{ background: "gray", color: "white", marginLeft: 5 }}
-                onClick={() => {
-                  setEdit((prev) => ({ ...prev, email: originalUser.email }));
-                  setUser((prev) => ({ ...prev, email: originalUser.email }));
-                  setIsEditingEmail(false);
-                }}
-              >
-                Cancel
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Password */}
-        <div className="password-section">
-          <label>Password:</label>
-          {!isEditingPassword ? (
-            <>
-              <span>********</span>
-              <button onClick={() => setIsEditingPassword(true)}>Edit</button>
-            </>
-          ) : (
-            <>
-              <PasswordInput
-                password={edit.password}
-                newPassword={edit.newPassword}
-                confirmNewPassword={edit.confirmPassword}
-                showNew={true}
-                onPasswordChange={(e) =>
-                  setEdit((prev) => ({ ...prev, password: e.target.value }))
-                }
-                onNewChange={(e) =>
-                  setEdit((prev) => ({ ...prev, newPassword: e.target.value }))
-                }
-                onConfirmNewChange={(e) =>
-                  setEdit((prev) => ({
-                    ...prev,
-                    confirmPassword: e.target.value,
-                  }))
-                }
-                error={
-                  edit.newPassword && edit.newPassword !== edit.confirmPassword
-                    ? "Passwords do not match"
-                    : ""
-                }
-              />
-
-              <button
-                onClick={() => {
-                  const passwordFilled =
-                    edit.password || edit.newPassword || edit.confirmPassword;
-
-                  if (passwordFilled) {
-                    if (
-                      !edit.password ||
-                      !edit.newPassword ||
-                      !edit.confirmPassword
-                    ) {
-                      alert(
-                        "Please fill out all password fields to change password!"
-                      );
-                      return;
-                    }
-
-                    const storedUser =
-                      JSON.parse(localStorage.getItem("user")) || {};
-                    if (edit.password !== storedUser.password) {
-                      alert("Old password is incorrect!");
-                      return;
-                    }
-
-                    if (edit.newPassword !== edit.confirmPassword) {
-                      alert("Passwords do not match!");
-                      return;
-                    }
-
-                    // Update password
-                    setUser((prev) => ({
-                      ...prev,
-                      password: edit.newPassword,
-                    }));
-                    setEdit((prev) => ({
-                      ...prev,
-                      password: "",
-                      newPassword: "",
-                      confirmPassword: "",
-                    }));
-                  }
-
-                  setIsEditingPassword(false);
-                }}
-              >
-                Done
-              </button>
-
-              <button
-                style={{ background: "gray", color: "white", marginLeft: 5 }}
-                onClick={() => {
-                  setEdit((prev) => ({
-                    ...prev,
-                    password: "",
-                    newPassword: "",
-                    confirmPassword: "",
-                  }));
-                  setIsEditingPassword(false);
-                }}
-              >
-                Cancel
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Crop */}
-        {croppingImage && (
-          <div className="crop-modal">
-            <div
-              style={{
-                position: "relative",
-                width: 400,
-                height: 400,
-                background: "#333",
-              }}
-            >
-              <Cropper
-                image={croppingImage}
-                crop={crop}
-                zoom={zoom}
-                aspect={1}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={onCropComplete}
-                cropShape="rect"
-                showGrid={true}
-              />
-
-              {/* Zoom controls */}
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 10,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  display: "flex",
-                  gap: 10,
-                  background: "rgba(0,0,0,0.4)",
-                  padding: "5px 10px",
-                  borderRadius: 8,
-                }}
-              >
-                <button onClick={() => setZoom((z) => Math.max(z - 0.1, 1))}>
-                  ➖
-                </button>
-                <span style={{ color: "white" }}>
-                  {(zoom * 100).toFixed(0)}%
-                </span>
-                <button onClick={() => setZoom((z) => Math.min(z + 0.1, 3))}>
-                  ➕
-                </button>
-              </div>
-            </div>
-
-            <div style={{ marginTop: 10 }}>
-              <button
-                onClick={async () => {
-                  const croppedImg = await getCroppedImage();
-                  if (!croppedImg) return;
-
-                  const croppedFile = dataURLtoFile(croppedImg, "profile.jpg");
-
-                  const form = new FormData();
-                  form.append("profilePic", croppedFile);
-
-                  const uploadRes = await API.post(
-                    "http://localhost:5000/upload-profile",
-                    form,
-                    {
-                      headers: {
-                        "Content-Type": "multipart/form-data",
-                        Authorization: `Bearer ${localStorage.getItem(
-                          "token"
-                        )}`,
-                      },
-                    }
-                  );
-
-                  setUser((prev) => ({
-                    ...prev,
-                    profilePic: uploadRes.data.url,
-                  }));
-                  setEdit((prev) => ({
-                    ...prev,
-                    profilePic: uploadRes.data.url,
-                  }));
-
-                  setTempImage(null);
-                  setCroppingImage(null);
-                  setZoom(1);
-                  setCrop({ x: 0, y: 0 });
-                }}
-              >
-                Save Crop
-              </button>
-
-              <button
-                onClick={() => {
-                  setTempImage(null);
-                  setCroppingImage(null);
-                  setZoom(1);
-                  setCrop({ x: 0, y: 0 });
-                }}
-              >
-                Cancel
-              </button>
+                {showOld ? "visibility" : "visibility_off"}
+              </span>
             </div>
           </div>
-        )}
 
-        {/* Save Button */}
-        <button onClick={handleSave}>Save</button>
+          <div className="uc-password-wrapper">
+            <div className="uc-input-group">
+              <input
+                type={showNew ? "text" : "password"}
+                placeholder="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="uc-password-input"
+              />
+              <span
+                className="uc-eye-icon material-symbols-outlined"
+                onClick={() => setShowNew(!showNew)}
+              >
+                {showNew ? "visibility" : "visibility_off"}
+              </span>
+            </div>
+          </div>
 
-        {/* Cancel Button */}
-        {isEdited() && (
-          <button
-            style={{ background: "gray", color: "white" }}
-            onClick={() => {
-              setEdit({
-                username: originalUser.username,
-                email: originalUser.email,
-                profilePic: originalUser.profilePic || "/defaultProfile.png",
-                password: "",
-                newPassword: "",
-                confirmPassword: "",
-              });
+          <div className="uc-password-wrapper">
+            <div className="uc-input-group">
+              <input
+                type={showConfirm ? "text" : "password"}
+                placeholder="Confirm New Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="uc-password-input"
+              />
+              <span
+                className="uc-new-eye-icon material-symbols-outlined"
+                onClick={() => setShowConfirm(!showConfirm)}
+              >
+                {showConfirm ? "visibility" : "visibility_off"}
+              </span>
+            </div>
+          </div>
 
-              setUser({
-                username: originalUser.username,
-                email: originalUser.email,
-                profilePic: originalUser.profilePic || "/defaultProfile.png",
-                password: originalUser.password,
-              });
-
-              setIsEditingUsername(false);
-              setIsEditingEmail(false);
-              setIsEditingPassword(false);
-
-              setTempImage(null);
-              setCroppingImage(null);
-              setZoom(1);
-              setCrop({ x: 0, y: 0 });
-              setCropBox({ width: 200, height: 200, x: 100, y: 100 });
-
-              document.getElementById("picInput").value = null;
-            }}
-          >
-            Cancel all changes
-          </button>
-        )}
+          <button type="submit">Update Password</button>
+        </form>
       </div>
     </UserInfoLayout>
   );
-}
+};
 
 export default UserInfo;

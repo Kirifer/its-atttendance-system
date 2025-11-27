@@ -5,6 +5,9 @@ import pool from "../db.js";
 // Forgot password
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+// Change password
+import { changePassword } from "../controllers/authController.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 // Profile pic
 import multer from "multer";
 import path from "path";
@@ -16,6 +19,34 @@ import { PrismaClient } from "@prisma/client";
 const router = express.Router();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
+
+// Multer (Must always be on TOP HERE!!!)
+const uploadsDir = path.join(process.cwd(), "uploads");
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadsDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    cb(null, name + ext);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10 MB limit to allow higher res pics
+  },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/"))
+      return cb(new Error("Only image files are allowed!"), false);
+    cb(null, true);
+  },
+});
 
 //User sign-up
 router.post("/sign-up", async (req, res) => {
@@ -55,6 +86,13 @@ router.post("/sign-up", async (req, res) => {
 // ------------------- Login -------------------
 router.post("/login", async (req, res) => {
   try {
+    console.log("Inside login route. Body:", req.body);
+    if (!req.body || !req.body.email) {
+      return res.status(400).json({ message: "No body sent!" });
+    }
+
+    console.log("REQ.BODY:", req.body);
+
     const { email, password } = req.body;
 
     const user = await prisma.user.findUnique({ where: { email } });
@@ -152,60 +190,50 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
-export default router;
+// Get Logged in user data
+router.get("/me", verifyToken, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        profilePic: true,
+      },
+    });
 
-// Profile pic multer config
-const uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const ext = path.extreme(file.originalname);
-    const name = "${Date.now()}-${Math.random().toString(36).slice(2,8)}";
-    cb(null, name + ext);
-  },
-});
-
-const upload = multer({
-  storage,
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10 MB limit to allow higher res pics
-  },
-  fileFilter: (req, file, cb) => {
-    if (!file.mimetype.startsWith("image/"))
-      return cb(new Error("Only image files are allowed!"), false);
-    cb(null, true);
-  },
-});
-
-// Profile pic config
-router.post(
-  "/upload-profile",
-  verifyToken,
-  upload.single("profilePic"),
-  async (req, res) => {
-    try {
-      const userId = req.user?.id || Number(req.body.userId);
-
-      if (!userId)
-        return res.status(400).json({ messaage: "No User ID provided" });
-      if (!req.file)
-        return res.status(400).json({ messaage: "No file uploaded" });
-
-      const imagePath = "/uploads/${req.file.filename}";
-
-      await prisma.user.update({
-        where: { id: Number(userId) },
-        data: { profilePic: imagePath },
-      });
-
-      return res.json({ success: true, url: imagePath });
-    } catch (err) {
-      console.error("Upload error:", err);
-      return res
-        .status(500)
-        .json({ success: false, message: err.message || "Server error" });
-    }
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Cannot fetch user" });
   }
-);
+});
+
+// Change password
+router.post("/change-password", verifyToken, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+    if (!user) return res.status(400).json({ message: "User not found" });
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch)
+      return res.status(400).json({ message: "Old password incorrect" });
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data: { password: hashed },
+    });
+
+    res.json({ message: "Password changed successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Error changing password" });
+  }
+});
+
+// Must be always below
+export default router;

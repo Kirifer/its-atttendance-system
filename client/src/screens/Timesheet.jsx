@@ -54,12 +54,13 @@ function Timesheet() {
           <h1>Timesheet</h1>
         </div>
 
-        <AttendanceTable 
+        <AttendanceTable
           userId={user.id}
           userEmail={user.email}
           firstDay={firstDay}
           lastDay={lastDay}
-          reload={reload} />
+          reload={reload}
+        />
       </DashboardLayout>
     </div>
   );

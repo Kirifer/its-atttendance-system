@@ -50,9 +50,9 @@ function Signup() {
 
   return (
     <div className="background center-align-items">
-      <form onSubmit={handleSubmit} class="signup-box">
+      <form onSubmit={handleSubmit} className="signup-box">
         <div className="top-box-header">
-          <p class="signup-text">Sign Up</p>
+          <p className="signup-text">Sign Up</p>
           <button className="close-btn" onClick={() => navigate("/")}>
             X
           </button>
@@ -73,7 +73,7 @@ function Signup() {
 
         <div>
           <input
-            class="text-box"
+            className="text-box"
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -83,7 +83,7 @@ function Signup() {
 
         <div>
           <input
-            class="text-box"
+            className="text-box"
             type="email"
             placeholder="Email"
             value={email}
@@ -102,7 +102,7 @@ function Signup() {
         />
 
         {/* Buttons */}
-        <button class="signup-button" type="submit">
+        <button className="signup-button" type="submit">
           Sign Up
         </button>
         <p>

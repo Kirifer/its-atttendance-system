@@ -6,6 +6,7 @@ import errorHandling from "./src/middlewares/errorHandler.js";
 import authRoutes from "./src/routes/auth.js";
 import leaveRoutes from "./src/routes/leaveRoutes.js";
 import attendanceRoutes from "./src/routes/attendanceRoutes.js";
+import authMiddleware from "./src/middlewares/authMiddleware.js";
 import path from "path";
 import fs from "fs";
 
@@ -15,14 +16,23 @@ const app = express();
 const port = process.env.PORT || 5001;
 
 //middlewares
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// debug logging for requests
+app.use((req, res, next) => {
+  console.log("HEADERS:", req.headers);
+  console.log("REQ.BODY:", req.body);
+  next();
+});
 
 //routes
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
+// app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/leave", leaveRoutes);
 app.use("/api/attendance", attendanceRoutes);
@@ -45,9 +55,3 @@ app.use(errorHandling);
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
-
-// Profile pic
-const uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));

@@ -29,7 +29,7 @@ function TimeInOut({ userId, onAttendanceChange }) {
       await timeIn();
       setIsTimedIn(true);
       onAttendanceChange();
-      alert("Successfully Timed In.")
+      alert("Successfully Timed In.");
     } catch (err) {
       alert(err.response?.data?.message || "Already Timed In");
     }
@@ -40,7 +40,7 @@ function TimeInOut({ userId, onAttendanceChange }) {
       await timeOut();
       setIsTimedIn(false);
       onAttendanceChange();
-      alert("Successfully Timed Out.")
+      alert("Successfully Timed Out.");
     } catch (err) {
       alert(err.response?.data?.message || "Failed to time out");
     }

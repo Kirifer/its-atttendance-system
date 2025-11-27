@@ -40,9 +40,9 @@ function Login() {
 
   return (
     <div className="background center-align-items">
-      <form onSubmit={handleSubmit} class="login-box">
+      <form onSubmit={handleSubmit} className="login-box">
         <div className="top-box-header">
-          <p class="login-text">Log in</p>
+          <p className="login-text">Log in</p>
           <button className="close-btn" onClick={() => navigate("/")}>
             X
           </button>
@@ -63,7 +63,7 @@ function Login() {
 
         <div>
           <input
-            class="text-box"
+            className="text-box"
             type="email"
             placeholder="Email"
             value={email}
