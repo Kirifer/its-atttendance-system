@@ -1,0 +1,62 @@
+.logs-card {
+  width: 100%;
+  max-width: 600px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.logs-card__header {
+  background-color: #1A5DAC; 
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  font-weight: bold;
+}
+
+
+.logs-card__body {
+  background-color: #f3f4f6; 
+  padding: 12px 16px;
+}
+
+.logs-card__title {
+  background-color: #1A5DAC;
+  color: white;
+  padding: 8px 12px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  border-radius: 4px 4px 0 0;
+}
+
+.logs-card__table-container {
+  overflow-x: auto;
+}
+
+.logs-card__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.logs-card__table th,
+.logs-card__table td {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  text-align: left;
+}
+
+.logs-card__table th {
+  background-color: #e5e7eb;
+  font-weight: bold;
+}
+
+.logs-card__table tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.logs-card__table tbody tr:nth-child(odd) {
+  background-color: #f9fafb;
+}
