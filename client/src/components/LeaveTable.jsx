@@ -1,6 +1,8 @@
 import React from "react";
 import "../styles/LeaveTable.css";
 import { useState } from "react";
+import { showToast } from "./Notification/toast";
+
 <link
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
   rel="stylesheet"
@@ -83,7 +85,26 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                 <td className="leave-table__actions">
                   <span
                     className="material-symbols-outlined leave-table__approve"
-                    onClick={() => onStatusChange(leave.id, "APPROVED")}
+                    onClick={() => {
+                      const confirmed = window.confirm("Are you sure you want to approve this leave?");
+                      if (!confirmed) return;
+
+                      onStatusChange(leave.id, "APPROVED")
+                        .then(() =>
+                          showToast({
+                            message: "Leave approved successfully!",
+                            type: "success",
+                            color: "#ffffff",
+                          })
+                        )
+                        .catch((err) =>
+                          showToast({
+                            message: err.message || "Failed to approve leave",
+                            type: "error",
+                            color: "#ffffff",
+                          })
+                        );
+                    }}
                     title="Approve"
                   >
                     check_circle
@@ -91,7 +112,26 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
 
                   <span
                     className="material-symbols-outlined leave-table__reject"
-                    onClick={() => onStatusChange(leave.id, "REJECTED")}
+                    onClick={() => {
+                      const confirmed = window.confirm("Are you sure you want to reject this leave?");
+                      if (!confirmed) return;
+
+                      onStatusChange(leave.id, "REJECTED")
+                        .then(() =>
+                          showToast({
+                            message: "Leave rejected successfully!",
+                            type: "success",
+                            color: "#ffffff",
+                          })
+                        )
+                        .catch((err) =>
+                          showToast({
+                            message: err.message || "Failed to reject leave",
+                            type: "error",
+                            color: "#ffffff",
+                          })
+                        );
+                    }}
                     title="Reject"
                   >
                     cancel
@@ -99,7 +139,26 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
 
                   <span
                     className="material-symbols-outlined leave-table__delete"
-                    onClick={() => onDelete(leave.id)}
+                    onClick={() => {
+                      const confirmed = window.confirm("Are you sure you want to delete this leave?");
+                      if (!confirmed) return;
+
+                      onDelete(leave.id)
+                        .then(() =>
+                          showToast({
+                            message: "Leave deleted successfully!",
+                            type: "success",
+                            color: "#ffffff",
+                          })
+                        )
+                        .catch((err) =>
+                          showToast({
+                            message: err.message || "Failed to delete leave",
+                            type: "error",
+                            color: "#ffffff",
+                          })
+                        );
+                    }}
                     title="Delete"
                   >
                     delete

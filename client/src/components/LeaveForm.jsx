@@ -23,8 +23,8 @@ function LeaveForm({ onSubmit }) {
 
     showToast({
       message: "Leave submitted successfully!",
-      icon: "✔️",
-      color: "#4caf50", // green
+      color: "#ffffff", 
+      type: "success"
     });
 
     setFormData({
@@ -36,8 +36,8 @@ function LeaveForm({ onSubmit }) {
   } catch (err) {
     showToast({
       message: err.message || "Error submitting leave",
-      icon: "❌",
-      color: "#d9534f", // red
+      color: "#ffffff", 
+      type: "error"
     });
   }
 };
