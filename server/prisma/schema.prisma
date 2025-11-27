@@ -31,7 +31,6 @@ model User {
 
   leaves      Leave[]
   attendance  Attendance[]
-  adjustments AttendanceAdjustment[] @relation("User_Adjustments")
 }
 
 enum LeaveStatus {
@@ -81,8 +80,6 @@ model Attendance {
   leaveId Int?
   leave   Leave?           @relation(fields: [leaveId], references: [id])
 
-  adjustments AttendanceAdjustment[] @relation("Attendance_Adjustments")
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -92,19 +89,3 @@ model Attendance {
   @@index([status])
 }
 
-model AttendanceAdjustment {
-  id           Int        @id @default(autoincrement())
-  attendanceId Int
-  attendance   Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade, name: "Attendance_Adjustments")
-  adjustedById Int
-  adjustedBy   User       @relation(fields: [adjustedById], references: [id], name: "User_Adjustments")
-  newTimeIn    DateTime?
-  newTimeOut   DateTime?
-  reason       String?
-  approved     Boolean    @default(false)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-
-  @@index([attendanceId])
-  @@index([adjustedById])
-}
