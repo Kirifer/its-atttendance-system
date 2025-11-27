@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getUserAttendance } from "../api/attendance";
 import "../styles/AttendanceTable.css";
 import jsPDF from "jspdf";
@@ -9,11 +9,18 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
   const [filterType, setFilterType] = useState("Month");
   const [filterWeek, setFilterWeek] = useState(1);
 
-  const options = {
+  const options = useMemo(() => ({
     year: "numeric",
-    month: "short", 
-    day: "numeric", 
-  };
+    month: "short",
+    day: "numeric",
+  }), []);
+
+  const timeOptions = useMemo(() => ({
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false
+  }), []);
 
   const getWeekOfMonth = (date) => {
     const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
@@ -49,8 +56,8 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
             Intern: userEmail,
             Date: new Date(r.date).toLocaleDateString("en-US", options),
             Week: getWeekOfMonth(new Date(r.date)),
-            "Time In": ti ? ti.toLocaleTimeString("en-US") : "-",
-            "Time Out": to ? to.toLocaleTimeString("en-US") : "-",
+            "Time In": ti ? ti.toLocaleTimeString("en-US", timeOptions) : "-",
+            "Time Out": to ? to.toLocaleTimeString("en-US", timeOptions) : "-",
             TOTAL: diff !== "-" ? `${diff} hrs` : "-",
           };
         });
@@ -69,7 +76,7 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
     };
 
     fetchAttendance();
-  }, [userId, firstDay, lastDay, reload, filterType, filterWeek, userEmail]);
+  }, [userId, firstDay, lastDay, reload, filterType, filterWeek, userEmail, options, timeOptions]);
 
   const exportPDF = () => {
     if (!records.length) {
