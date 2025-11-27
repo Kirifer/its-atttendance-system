@@ -83,3 +83,17 @@
     margin-right: 6px;
   }
 }
+
+
+.leave-table__search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.leave-table__dropdown,
+.leave-table__input {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
