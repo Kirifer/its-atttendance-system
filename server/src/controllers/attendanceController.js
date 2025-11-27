@@ -150,3 +150,30 @@ export const updateAttendance = async (req, res) => {
         res.status(500).json({ message: "Error updating attendance" });
     }
 };
+
+
+export const deleteAttendance = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const attendance = await prisma.attendance.findUnique({
+            where: { id: Number(id) },
+        });
+
+        if (!attendance) {
+            return res.status(404).json({ message: "Attendance not found" });
+        }
+
+        await prisma.attendance.delete({
+            where: { id: Number(id) },
+        });
+
+        res.json({
+            message: "Attendance deleted successfully",
+            deletedId: Number(id),
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error deleting attendance" });
+    }
+};
