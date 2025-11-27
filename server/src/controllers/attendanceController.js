@@ -66,17 +66,52 @@ export const timeOut = async (req, res) => {
 
 // GET user attendance
 export const getUserAttendance = async (req, res) => {
-    try {
-        const { userId } = req.params;
+  try {
+    const requestedUserId = Number(req.params.userId);
+    const loggedInUser = req.user;
 
-        const records = await prisma.attendance.findMany({
-            where: { userId: Number(userId) },
-            orderBy: { date: "desc" },
-        });
-
-        res.json({attendance: records });
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({ message: "Error fetching attendance" });
+    // USERs can only see themselves
+    if (loggedInUser.role !== "ADMIN" && loggedInUser.id !== requestedUserId) {
+      return res.status(403).json({ message: "Forbidden" });
     }
+
+    const records = await prisma.attendance.findMany({
+      where: { userId: requestedUserId },
+      orderBy: { date: "desc" },
+    });
+
+    res.json({ attendance: records });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching attendance" });
+  }
+};
+
+// GET all attendance admin UI
+export const getAllAttendance = async (req, res) => {
+  try {
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Admins only" });
+    }
+
+    const records = await prisma.attendance.findMany({
+      include: {
+        user: {
+          select: {
+            email: true,
+            username: true,
+          },
+        },
+      },
+      orderBy: [
+        { date: "desc" },
+        { userId: "asc" },
+      ],
+    });
+
+    res.json({ attendance: records });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching all attendance" });
+  }
 };

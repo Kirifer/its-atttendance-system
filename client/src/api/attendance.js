@@ -64,3 +64,13 @@ export const getUserAttendance = async (userId) => {
     throw new Error(message);
   }
 };
+
+export const getAllAttendance = async () => {
+  const token = localStorage.getItem("token");
+
+  const res = await API.get("/attendance", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  return res.data;
+};

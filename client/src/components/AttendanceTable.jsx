@@ -1,10 +1,13 @@
 import { useEffect, useState, useMemo } from "react";
-import { getUserAttendance } from "../api/attendance";
+import { getUserAttendance, getAllAttendance } from "../api/attendance";
 import "../styles/AttendanceTable.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, reload }) {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const role = user?.role;
+
   const [records, setRecords] = useState([]);
   const [filterType, setFilterType] = useState("Month");
   const [filterWeek, setFilterWeek] = useState(1);
@@ -38,7 +41,12 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
       if (!userId) return;
 
       try {
-        const res = await getUserAttendance(userId);
+        let res;
+        if (role === "ADMIN") {
+          res = await getAllAttendance(); // Fetch all users
+        } else {
+          res = await getUserAttendance(userId); // Fetch only self
+        }
 
         // Filter by month, 30-day range
         const monthFiltered = res.attendance.filter((r) => {
@@ -53,7 +61,7 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
           const diff = ti && to ? ((to - ti) / 1000 / 60 / 60).toFixed(2) : "-";
 
           return {
-            Intern: userEmail,
+            Intern: role === "ADMIN" ? r.user.email : userEmail,
             Date: new Date(r.date).toLocaleDateString("en-US", options),
             Week: getWeekOfMonth(new Date(r.date)),
             "Time In": ti ? ti.toLocaleTimeString("en-US", timeOptions) : "-",
@@ -97,9 +105,6 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
     doc.save("timesheet.pdf");
   };
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const role = user?.role;
-  
   return (
     <div className="attendance_body">
       <div className="attendance_top_bar">
