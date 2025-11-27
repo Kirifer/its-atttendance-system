@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./components/ProtectedRoute";
 // Styling
 import "./App.css";
@@ -79,6 +80,7 @@ function App() {
           }
         />
       </Routes>
+       <ToastContainer />
     </Router>
   );
 }
