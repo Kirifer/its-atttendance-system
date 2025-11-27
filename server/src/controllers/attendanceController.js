@@ -2,7 +2,13 @@ import { PrismaClient, AttendanceStatus } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// POST time in
+export const isAdmin = (req, res, next) => {
+    if (req.user.role !== "ADMIN") {
+        return res.status(403).json({ message: "Admin only" });
+    }
+    next();
+};
+
 export const timeIn = async (req, res) => {
     try {
         const userId = req.user.id;
@@ -64,13 +70,11 @@ export const timeOut = async (req, res) => {
     }
 };
 
-// GET user attendance
 export const getUserAttendance = async (req, res) => {
   try {
     const requestedUserId = Number(req.params.userId);
     const loggedInUser = req.user;
 
-    // USERs can only see themselves
     if (loggedInUser.role !== "ADMIN" && loggedInUser.id !== requestedUserId) {
       return res.status(403).json({ message: "Forbidden" });
     }
@@ -87,7 +91,6 @@ export const getUserAttendance = async (req, res) => {
   }
 };
 
-// GET all attendance admin UI
 export const getAllAttendance = async (req, res) => {
   try {
     if (req.user.role !== "ADMIN") {
@@ -114,4 +117,36 @@ export const getAllAttendance = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Error fetching all attendance" });
   }
+};
+
+export const updateAttendance = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { timeIn, timeOut } = req.body;
+
+        const attendance = await prisma.attendance.findUnique({
+            where: { id: Number(id) },
+        });
+
+        if (!attendance) {
+            return res.status(404).json({ message: "Attendance not found" });
+        }
+
+        const updated = await prisma.attendance.update({
+            where: { id: Number(id) },
+            data: {
+                timeIn: timeIn ? new Date(timeIn) : attendance.timeIn,
+                timeOut: timeOut ? new Date(timeOut) : attendance.timeOut,
+            },
+        });
+
+        res.json({
+            message: "Attendance updated by admin",
+            updated,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error updating attendance" });
+    }
 };
