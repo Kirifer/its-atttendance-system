@@ -97,12 +97,17 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
     doc.save("timesheet.pdf");
   };
 
+  const user = JSON.parse(localStorage.getItem("user"));
+  const role = user?.role;
+  
   return (
     <div className="attendance_body">
       <div className="attendance_top_bar">
-        <button className="attendance_export_btn" onClick={exportPDF}>
-          Export
-        </button>
+        {role === "ADMIN" && (
+          <button className="attendance_export_btn" onClick={exportPDF}>
+            Export
+          </button>
+        )}
 
         <div className="attendance_filter_bar">
           <label>
