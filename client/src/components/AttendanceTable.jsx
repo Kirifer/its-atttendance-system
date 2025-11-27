@@ -62,6 +62,7 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
 
           return {
             Intern: role === "ADMIN" ? r.user.email : userEmail,
+            Status: r.status,
             Date: new Date(r.date).toLocaleDateString("en-US", options),
             Week: getWeekOfMonth(new Date(r.date)),
             "Time In": ti ? ti.toLocaleTimeString("en-US", timeOptions) : "-",
@@ -163,7 +164,13 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
                 <tr key={i}>
                   {Object.values(r).map((v, j) => (
                     <td key={j} data-label={Object.keys(r)[j]}>
-                      {v}
+                      {Object.keys(r)[j] === "Status" ? (
+                        <span className={`attendance_status-${v.toLowerCase().replace("_","-")}`}>
+                          {v}
+                        </span>
+                      ) : (
+                        v
+                      )}
                     </td>
                   ))}
                 </tr>
