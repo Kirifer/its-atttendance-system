@@ -14,7 +14,11 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay }
   const [filterWeek, setFilterWeek] = useState(1);
 
   const [editingRecord, setEditingRecord] = useState(null);
-  const [reloadCounter, setReloadCounter] = useState(0); // triggers refresh
+  const [reloadCounter, setReloadCounter] = useState(0); 
+
+  const [searchField, setSearchField] = useState("Intern");
+  const [query, setQuery] = useState("");
+
 
   const options = useMemo(() => ({
     year: "numeric",
@@ -109,8 +113,34 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay }
   const openEditPopup = (record) => setEditingRecord(record);
   const closeEditPopup = () => setEditingRecord(null);
 
+   const filteredRecords = records.filter(r => {
+    if (!query) return true;
+    const fieldValue = r[searchField];
+    if (!fieldValue) return false;
+    return fieldValue.toString().toLowerCase().includes(query.toLowerCase());
+  });
+
   return (
     <div className="attendance_body">
+      <div className="leave-table__search" style={{ marginBottom: "10px" }}>
+        <select
+          value={searchField}
+          onChange={(e) => setSearchField(e.target.value)}
+          className="leave-table__dropdown"
+        >
+          <option value="id">ID</option>
+          <option value="Intern">Intern Email</option>
+          <option value="Status">Status</option>
+          <option value="Date">Date</option>
+        </select>
+        <input
+          type="text"
+          placeholder={`Search by ${searchField}...`}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="leave-table__input"
+        />
+      </div>
       <div className="attendance_top_bar">
         {role === "ADMIN" && (
           <button className="attendance_export_btn" onClick={exportPDF}>Export</button>
@@ -162,26 +192,22 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay }
               </tr>
             </thead>
             <tbody>
-              {records.map((r, i) => (
+              {filteredRecords.map((r, i) => (
                 <tr key={i}>
                   {Object.keys(r)
                     .filter(col => !["rawDate", "rawTimeIn", "rawTimeOut", "id"].includes(col))
                     .map(col => (
                       <td key={col} data-label={col}>
                         {col === "Status" ? (
-                          <span className={`attendance_status-${r[col].toLowerCase().replace("_","-")}`}>
+                          <span className={`attendance_status-${r[col].toLowerCase().replace("_", "-")}`}>
                             {r[col]}
                           </span>
-                        ) : (
-                          r[col]
-                        )}
+                        ) : r[col]}
                       </td>
                     ))}
                   <td>
                     {role === "ADMIN" && (
-                      <button className="attendance_edit_btn" onClick={() => openEditPopup(r)}>
-                        Edit
-                      </button>
+                      <button className="attendance_edit_btn" onClick={() => openEditPopup(r)}>Edit</button>
                     )}
                   </td>
                 </tr>
@@ -190,7 +216,6 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay }
           </table>
         </div>
       )}
-
       {editingRecord && (
         <EditAttendancePopup
           record={editingRecord}
