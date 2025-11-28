@@ -27,7 +27,8 @@ function Signup() {
     setFieldErrors({ general: "" });
 
     if (password !== confirmPassword) {
-      setFieldErrors({ general: "Passwords do not match" });
+      setFieldErrors({ general: "Passwords do not match!" });
+      setTimeout(() => setFieldErrors(""), 5000);
       return;
     }
 
@@ -36,11 +37,13 @@ function Signup() {
       localStorage.setItem("token", token);
 
       setShowSuccessPopup(true);
+      setTimeout(() => setFieldErrors(""), 5000);
     } catch (err) {
       const message = err.message.toLowerCase();
 
       if (message.includes("already exist")) {
-        setFieldErrors({ general: "User already exists!!!" });
+        setFieldErrors({ general: "User already exists!" });
+        setTimeout(() => setFieldErrors(""), 5000);
         return;
       }
 
