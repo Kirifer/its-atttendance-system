@@ -31,10 +31,18 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(user));
 
       setFieldErrors({ ...fieldErrors, general: "Login successful!" });
+      setTimeout(() => {
+        setFieldErrors((prev) => ({ ...prev, general: "" }));
+      }, 5000);
+
       navigate("/dashboard");
     } catch (err) {
       const message = err.response?.data?.message || err.message;
       setFieldErrors({ email: "", password: "", general: message });
+
+      setTimeout(() => {
+        setFieldErrors((prev) => ({ ...prev, general: "" }));
+      }, 5000);
     }
   };
 
