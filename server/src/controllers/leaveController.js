@@ -9,7 +9,13 @@ export const createLeave = async (req, res) => {
     const { startDate, endDate, leaveType, reason } = req.body;
 
     const leave = await prisma.leave.create({
-      data: { userId, startDate: new Date(startDate), endDate: new Date(endDate), leaveType, reason },
+      data: {
+        userId,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        leaveType,
+        reason,
+      },
     });
 
     res.status(201).json(leave);
@@ -45,7 +51,7 @@ export const getLeaves = async (req, res) => {
       },
     });
 
-    leaves = leaves.map(leave => ({
+    leaves = leaves.map((leave) => ({
       ...leave,
       startDate: leave.startDate.toISOString().split("T")[0],
       endDate: leave.endDate.toISOString().split("T")[0],
