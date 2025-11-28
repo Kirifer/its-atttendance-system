@@ -73,3 +73,16 @@ export const changePassword = async (oldPassword, newPassword) => {
   });
   return res.data;
 };
+
+// Update user info (Username and email)
+export const updateUserInfo = async (username, email) => {
+  try {
+    const response = await API.put("/auth/update", { username, email });
+    return response.data;
+  } catch (err) {
+    let message = "Error updating user information";
+    if (err.response?.data?.message) message = err.response.data.message;
+    else if (err.message) message = err.message;
+    throw new Error(message);
+  }
+};
