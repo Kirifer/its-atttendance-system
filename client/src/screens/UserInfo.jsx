@@ -4,11 +4,17 @@ import { changePassword } from "../api/auth";
 // user info update
 import { updateUserInfo } from "../api/auth";
 import UserInfoLayout from "../components/UserInfoLayout";
+import "../styles/UserInfo.css";
 import "../styles/PasswordChange.css";
 import API from "../api/api";
 
 const UserInfo = () => {
   const [user, setUser] = useState(null);
+
+  // Edit state
+  const [editUsername, setEditUsername] = useState(false);
+  const [editEmail, setEditEmail] = useState(false);
+  const [editPassword, setEditPassword] = useState(false);
 
   // change pass
   const [oldPassword, setOldPassword] = useState("");
@@ -19,8 +25,15 @@ const UserInfo = () => {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const [msg, setMsg] = useState("");
-  const [error, setError] = useState("");
+  // error messages
+  const [usernameMsg, setUsernameMsg] = useState("");
+  const [usernameErr, setUsernameErr] = useState("");
+
+  const [emailMsg, setEmailMsg] = useState("");
+  const [emailErr, setEmailErr] = useState("");
+
+  const [passMsg, setPassMsg] = useState("");
+  const [passErr, setPassErr] = useState("");
 
   useEffect(() => {
     const getUser = async () => {
@@ -34,23 +47,38 @@ const UserInfo = () => {
     getUser();
   }, []);
 
+  // change pass
   const handleChange = async (e) => {
     e.preventDefault();
-    setMsg("");
-    setError("");
+    setPassMsg("");
+    setPassErr("");
 
     if (newPassword !== confirmPassword) {
-      return setError("Passwords do not match!");
+      setPassErr("Passwords do not match!");
+      setTimeout(() => setPassErr(""), 5000);
+      return;
+    }
+
+    if (oldPassword === newPassword) {
+      setPassMsg(
+        "New password is the same with the old password. No changes were made."
+      );
+      setTimeout(() => setPassMsg(""), 5000);
+      return;
     }
 
     try {
       await changePassword(oldPassword, newPassword);
-      setMsg("Password has been updated!");
+      setPassMsg("Password has been updated!");
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
+
+      setEditPassword(false);
+      setTimeout(() => setPassMsg(""), 5000);
     } catch (err) {
-      setError(err.response?.data?.message || "Error in updating password.");
+      setPassErr(err.response?.data?.message || "Error in updating password.");
+      setTimeout(() => setPassErr(""), 5000);
     }
   };
   // change pass
@@ -73,23 +101,55 @@ const UserInfo = () => {
     getUser();
   }, []);
 
-  // username & email update
-  const handleInfoUpdate = async (e) => {
+  // username update
+  const handleUsernameUpdate = async (e) => {
     e.preventDefault();
-    setMsg("");
-    setError("");
+    setUsernameMsg("");
+    setUsernameErr("");
+
+    if (username === user.username) {
+      setUsernameMsg("Username is the same as before. No were changes made.");
+      setTimeout(() => setUsernameMsg(""), 5000);
+      return;
+    }
 
     try {
       const updated = await updateUserInfo(username, email);
       setUser(updated);
-      setMsg("User information has been updated successfully!");
+      setUsernameMsg("Username updated successfully!");
+      setEditUsername(false); // only close on success
+
+      setTimeout(() => setUsernameMsg(""), 5000);
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Error updating user information."
-      );
+      setUsernameErr(err.response?.data?.message || "Username already exists!");
+      setTimeout(() => setUsernameErr(""), 5000);
     }
   };
 
+  // email update
+  const handleEmailUpdate = async (e) => {
+    e.preventDefault();
+    setEmailMsg("");
+    setEmailErr("");
+
+    if (email === user.email) {
+      setEmailMsg("Email is the same as before. No were changes made.");
+      setTimeout(() => setEmailMsg(""), 5000);
+      return;
+    }
+
+    try {
+      const updated = await updateUserInfo(username, email);
+      setUser(updated);
+      setEmailMsg("Email updated successfully!");
+      setEditEmail(false); // only close on success
+
+      setTimeout(() => setEmailMsg(""), 5000);
+    } catch (err) {
+      setEmailErr(err.response?.data?.message || "Email already exists!");
+      setTimeout(() => setEmailErr(""), 5000);
+    }
+  };
   // user info update
 
   // fetch user
@@ -117,100 +177,194 @@ const UserInfo = () => {
 
         {/* USER INFO */}
         {/* Username/Email Update */}
-        <form onSubmit={handleInfoUpdate} className="update-user-form">
-          <div className="uc-input-group">
+
+        {/* username */}
+        {usernameMsg && <p style={{ color: "green" }}>{usernameMsg}</p>}
+        {usernameErr && <p style={{ color: "red" }}>{usernameErr}</p>}
+
+        <form onSubmit={handleUsernameUpdate} className="update-user-form">
+          <h3>Username:</h3>
+          <div className="uc-input-group ">
             <input
+              className="text-box"
               type="text"
               placeholder="Username"
               value={username}
+              disabled={!editUsername}
               onChange={(e) => setUsername(e.target.value)}
             />
+
+            {!editUsername && (
+              <span
+                className="material-symbols-outlined edit-icon"
+                onClick={() => setEditUsername(true)}
+              >
+                edit
+              </span>
+            )}
           </div>
+
+          {editUsername && (
+            <div className="password-buttons">
+              <button className="change-password-form-button" type="submit">
+                Done
+              </button>
+
+              <button
+                className="change-password-form-button"
+                type="button"
+                onClick={() => {
+                  setEditUsername(false);
+                  setUsername(user.username);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </form>
+
+        {/* email */}
+        {emailMsg && <p style={{ color: "green" }}>{emailMsg}</p>}
+        {emailErr && <p style={{ color: "red" }}>{emailErr}</p>}
+
+        <form onSubmit={handleEmailUpdate} className="update-user-form">
+          <h3>Email:</h3>
           <div className="uc-input-group">
             <input
+              className="text-box"
               type="email"
               placeholder="Email"
               value={email}
+              disabled={!editEmail}
               onChange={(e) => setEmail(e.target.value)}
             />
+
+            {!editEmail && (
+              <span
+                className="material-symbols-outlined edit-icon"
+                onClick={() => setEditEmail(true)}
+              >
+                edit
+              </span>
+            )}
           </div>
-          <button type="submit">Update Info</button>
+
+          {editEmail && (
+            <div className="password-buttons">
+              <button className="change-password-form-button" type="submit">
+                Done
+              </button>
+
+              <button
+                className="change-password-form-button"
+                type="button"
+                onClick={() => {
+                  setEditEmail(false);
+                  setEmail(user.email);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </form>
 
-        {/* <p>
-          <strong>Username:</strong> {user.username}
-        </p>
-
-        <p>
-          <strong>Email:</strong> {user.email}
-        </p>
-
-        <p>
-          <strong>Role:</strong> {user.role}
-        </p> */}
-
         {/* password */}
-        <h3 style={{ marginTop: "30px" }}>Change Password</h3>
-        {/* Error msg */}
-        {msg && <p style={{ color: "green" }}>{msg}</p>}
-        {error && <p className="uc-error-text">{error}</p>}
+        {passMsg && <p style={{ color: "green" }}>{passMsg}</p>}
+        {passErr && <p style={{ color: "red" }}>{passErr}</p>}
 
-        <form onSubmit={handleChange} className="change-password-form">
-          <div className="uc-password-wrapper">
+        <h3>Change Password:</h3>
+        <form onSubmit={handleChange}>
+          {!editPassword ? (
+            // Password placeholder
             <div className="uc-input-group">
               <input
-                type={showOld ? "text" : "password"}
-                placeholder="Old Password"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
+                type="password"
+                placeholder="***************"
+                disabled
                 className="uc-password-input"
               />
               <span
-                className="uc-eye-icon material-symbols-outlined"
-                onClick={() => setShowOld(!showOld)}
+                className="material-symbols-outlined edit-icon"
+                style={{ cursor: "pointer" }}
+                onClick={() => setEditPassword(true)}
               >
-                {showOld ? "visibility" : "visibility_off"}
+                edit
               </span>
             </div>
-          </div>
+          ) : (
+            // Actual password fields
+            <>
+              <div className="uc-input-group">
+                <input
+                  type={showOld ? "text" : "password"}
+                  placeholder="Old Password"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  className="uc-password-input"
+                />
+                <span
+                  className="uc-eye-icon material-symbols-outlined"
+                  onClick={() => setShowOld(!showOld)}
+                >
+                  {showOld ? "visibility" : "visibility_off"}
+                </span>
+              </div>
 
-          <div className="uc-password-wrapper">
-            <div className="uc-input-group">
-              <input
-                type={showNew ? "text" : "password"}
-                placeholder="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="uc-password-input"
-              />
-              <span
-                className="uc-eye-icon material-symbols-outlined"
-                onClick={() => setShowNew(!showNew)}
-              >
-                {showNew ? "visibility" : "visibility_off"}
-              </span>
-            </div>
-          </div>
+              <div className="uc-input-group">
+                <input
+                  type={showNew ? "text" : "password"}
+                  placeholder="New Password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="uc-password-input"
+                />
+                <span
+                  className="uc-eye-icon material-symbols-outlined"
+                  onClick={() => setShowNew(!showNew)}
+                >
+                  {showNew ? "visibility" : "visibility_off"}
+                </span>
+              </div>
 
-          <div className="uc-password-wrapper">
-            <div className="uc-input-group">
-              <input
-                type={showConfirm ? "text" : "password"}
-                placeholder="Confirm New Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="uc-password-input"
-              />
-              <span
-                className="uc-new-eye-icon material-symbols-outlined"
-                onClick={() => setShowConfirm(!showConfirm)}
-              >
-                {showConfirm ? "visibility" : "visibility_off"}
-              </span>
-            </div>
-          </div>
+              <div className="uc-input-group">
+                <input
+                  type={showConfirm ? "text" : "password"}
+                  placeholder="Confirm New Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="uc-password-input"
+                />
+                <span
+                  className="uc-eye-icon material-symbols-outlined"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                >
+                  {showConfirm ? "visibility" : "visibility_off"}
+                </span>
+              </div>
 
-          <button type="submit">Update Password</button>
+              <div className="password-buttons">
+                <button className="change-password-form-button" type="submit">
+                  Done
+                </button>
+                <button
+                  className="change-password-form-button"
+                  type="button"
+                  onClick={() => {
+                    setEditPassword(false);
+                    setOldPassword("");
+                    setNewPassword("");
+                    setConfirmPassword("");
+                    setPassErr("");
+                    setPassMsg("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </>
+          )}
         </form>
       </div>
     </UserInfoLayout>
