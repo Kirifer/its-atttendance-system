@@ -1,22 +1,34 @@
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast, Bounce } from "react-toastify";
 
-export const showToast = ({ message, icon, color }) => {
-  toast(message, {
-    icon: icon,
+export const showToast = ({ 
+  message, 
+  icon = "🔔",
+  color = "#333",
+  type = "default" 
+}) => {
+
+  const validTypes = ["default", "success", "info", "warning", "error"];
+
+  const toastType = validTypes.includes(type) ? type : "default";
+
+  toast[toastType](message, {
+    icon,
+    position: "top-center",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: false,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "light",
+    transition: Bounce,
     style: {
       backgroundColor: color,
-      color: "white",
-      fontWeight: "bold",
-      padding: "12px 16px",
+      color: "black",
+      padding: "14px 18px",
+      borderRadius: "8px",
     },
-    position: "top-center",
-    autoClose: 3000,
-    hideProgressBar: false,
     progressStyle: {
       background: "white",
     },
-    closeOnClick: true,
-    pauseOnHover: true,
   });
 };
