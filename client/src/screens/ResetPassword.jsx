@@ -21,7 +21,7 @@ function ResetPassword() {
     e.preventDefault();
 
     if (newPassword !== confirmNewPassword) {
-      setMessage("Passwords do not match");
+      setMessage("Passwords do not match!");
       setIsError(true);
       setTimeout(() => setIsError(""), 5000);
       return;
@@ -37,6 +37,7 @@ function ResetPassword() {
     } catch (err) {
       console.error(err);
       setMessage(err.message || "An error occurred. Please try again.");
+      setTimeout(() => setMessage(""), 5000);
       setIsError(true);
     }
   };
@@ -58,7 +59,7 @@ function ResetPassword() {
         {/* Show error if passwords don't match */}
         {isError && (
           <p style={{ color: "red", marginTop: "10px" }}>
-            Passwords do not match!.
+            Passwords do not match!
           </p>
         )}
 
