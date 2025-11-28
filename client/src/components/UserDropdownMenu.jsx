@@ -24,7 +24,7 @@ const UserDropDownMenu = forwardRef(({ pos }, ref) => {
   return (
     <div ref={ref} style={style} className="user-dropdown">
       <ul>
-        <li onClick={() => navigate("/user-info")}>Profile</li>
+        <li onClick={() => navigate("/user-info")}>View Profile</li>
         <li onClick={handleSignOut}>Sign Out</li>
       </ul>
     </div>
