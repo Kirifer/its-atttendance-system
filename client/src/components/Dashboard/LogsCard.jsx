@@ -1,7 +1,46 @@
-import React from "react";
+import React, { useEffect, useState, useMemo } from "react";
+import { getUserAttendance } from "../../api/attendance";
 import "../../styles/LogsCard.css";
 
-function LogsCard({ logs = [], userName = "User" }) {
+function LogsCard({ userName = "User" }) {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user?.id;
+
+  const [logs, setLogs] = useState([]);
+
+  const options = useMemo(() => ({
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }), []);
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      if (!userId) return;
+
+      try {
+        const res = await getUserAttendance(userId);
+        const sortedLogs = res.attendance
+          .sort((a, b) => new Date(b.date) - new Date(a.date)) // newest first
+          .slice(0, 3) // last 3 logs
+          .map(r => {
+            const ti = r.timeIn ? new Date(r.timeIn) : null;
+            const to = r.timeOut ? new Date(r.timeOut) : null;
+            return {
+              timeIn: ti ? ti.toLocaleTimeString("en-US", options) : "-",
+              timeOut: to ? to.toLocaleTimeString("en-US", options) : "-",
+            };
+          });
+        setLogs(sortedLogs);
+      } catch (err) {
+        console.error("Failed to fetch logs:", err);
+      }
+    };
+
+    fetchLogs();
+  }, [userId, options]);
+
   return (
     <div className="logs-card">
       <div className="logs-card__header">
