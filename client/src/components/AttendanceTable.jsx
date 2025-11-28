@@ -3,14 +3,18 @@ import { getUserAttendance, getAllAttendance } from "../api/attendance";
 import "../styles/AttendanceTable.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import EditAttendancePopup from "./EditAttendancePopup";
 
-export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, reload }) {
+export default function AttendanceTable({ userId, userEmail, firstDay, lastDay }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const role = user?.role;
 
   const [records, setRecords] = useState([]);
   const [filterType, setFilterType] = useState("Month");
   const [filterWeek, setFilterWeek] = useState(1);
+
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [reloadCounter, setReloadCounter] = useState(0); // triggers refresh
 
   const options = useMemo(() => ({
     year: "numeric",
@@ -36,31 +40,31 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
     return Math.ceil((lastDate + firstDay) / 7);
   };
 
+  const reload = () => setReloadCounter(prev => prev + 1); // refresh table
+
   useEffect(() => {
     const fetchAttendance = async () => {
       if (!userId) return;
-
       try {
         let res;
-        if (role === "ADMIN") {
-          res = await getAllAttendance(); // Fetch all users
-        } else {
-          res = await getUserAttendance(userId); // Fetch only self
-        }
+        if (role === "ADMIN") res = await getAllAttendance();
+        else res = await getUserAttendance(userId);
 
-        // Filter by month, 30-day range
-        const monthFiltered = res.attendance.filter((r) => {
+        const monthFiltered = res.attendance.filter(r => {
           const d = new Date(r.date);
           return d >= firstDay && d <= lastDay;
         });
 
-        // Format table heading and data
-        const formatted = monthFiltered.map((r) => {
+        const formatted = monthFiltered.map(r => {
           const ti = r.timeIn ? new Date(r.timeIn) : null;
           const to = r.timeOut ? new Date(r.timeOut) : null;
           const diff = ti && to ? ((to - ti) / 1000 / 60 / 60).toFixed(2) : "-";
 
           return {
+            id: r.id,
+            rawDate: r.date,
+            rawTimeIn: r.timeIn,
+            rawTimeOut: r.timeOut,
             Intern: role === "ADMIN" ? r.user.email : userEmail,
             Status: r.status,
             Date: new Date(r.date).toLocaleDateString("en-US", options),
@@ -71,11 +75,9 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
           };
         });
 
-        // If filterType is "Week", only show selected week
-        const finalRecords =
-          filterType === "Week"
-            ? formatted.filter((r) => getWeekOfMonth(new Date(r.Date)) === filterWeek)
-            : formatted;
+        const finalRecords = filterType === "Week"
+          ? formatted.filter(r => getWeekOfMonth(new Date(r.Date)) === filterWeek)
+          : formatted;
 
         setRecords(finalRecords);
       } catch (err) {
@@ -85,34 +87,33 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
     };
 
     fetchAttendance();
-  }, [userId, firstDay, lastDay, reload, filterType, filterWeek, userEmail, options, timeOptions]);
+  }, [userId, firstDay, lastDay, filterType, filterWeek, userEmail, reloadCounter, options, timeOptions, role]);
 
   const exportPDF = () => {
     if (!records.length) {
-      alert("No data available to export.")
+      alert("No data available to export.");
       return;
     }
 
     const doc = new jsPDF();
-
     autoTable(doc, {
       head: [Object.keys(records[0])],
       body: records.map(Object.values),
       startY: 25,
       styles: { fontSize: 10 },
     });
-
     doc.text("Timesheet Report", 14, 15);
     doc.save("timesheet.pdf");
   };
+
+  const openEditPopup = (record) => setEditingRecord(record);
+  const closeEditPopup = () => setEditingRecord(null);
 
   return (
     <div className="attendance_body">
       <div className="attendance_top_bar">
         {role === "ADMIN" && (
-          <button className="attendance_export_btn" onClick={exportPDF}>
-            Export
-          </button>
+          <button className="attendance_export_btn" onClick={exportPDF}>Export</button>
         )}
 
         <div className="attendance_filter_bar">
@@ -121,7 +122,7 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
             <select
               className="attendance_filter_btn"
               value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
+              onChange={e => setFilterType(e.target.value)}
             >
               <option value="Month">Month</option>
               <option value="Week">Week</option>
@@ -130,16 +131,14 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
 
           {filterType === "Week" && (
             <label style={{ marginLeft: "10px" }}>
-              Week:{" "}
+              Week:&nbsp;
               <select
                 className="attendance_filter_btn"
                 value={filterWeek}
-                onChange={(e) => setFilterWeek(Number(e.target.value))}
+                onChange={e => setFilterWeek(Number(e.target.value))}
               >
                 {Array.from({ length: getTotalWeeksInMonth(firstDay) }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {i + 1}
-                  </option>
+                  <option key={i + 1} value={i + 1}>{i + 1}</option>
                 ))}
               </select>
             </label>
@@ -154,30 +153,50 @@ export default function AttendanceTable({ userId, userEmail, firstDay, lastDay, 
           <table className="attendance_tbl">
             <thead>
               <tr>
-                {Object.keys(records[0]).map((col) => (
-                  <th key={col}>{col}</th>
+                {Object.keys(records[0])
+                  .filter(col => !["rawDate", "rawTimeIn", "rawTimeOut", "id"].includes(col))
+                  .map(col => (
+                    <th key={col}>{col}</th>
                 ))}
+                <th></th>
               </tr>
             </thead>
             <tbody>
               {records.map((r, i) => (
                 <tr key={i}>
-                  {Object.values(r).map((v, j) => (
-                    <td key={j} data-label={Object.keys(r)[j]}>
-                      {Object.keys(r)[j] === "Status" ? (
-                        <span className={`attendance_status-${v.toLowerCase().replace("_","-")}`}>
-                          {v}
-                        </span>
-                      ) : (
-                        v
-                      )}
-                    </td>
-                  ))}
+                  {Object.keys(r)
+                    .filter(col => !["rawDate", "rawTimeIn", "rawTimeOut", "id"].includes(col))
+                    .map(col => (
+                      <td key={col} data-label={col}>
+                        {col === "Status" ? (
+                          <span className={`attendance_status-${r[col].toLowerCase().replace("_","-")}`}>
+                            {r[col]}
+                          </span>
+                        ) : (
+                          r[col]
+                        )}
+                      </td>
+                    ))}
+                  <td>
+                    {role === "ADMIN" && (
+                      <button className="attendance_edit_btn" onClick={() => openEditPopup(r)}>
+                        Edit
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+
+      {editingRecord && (
+        <EditAttendancePopup
+          record={editingRecord}
+          onClose={closeEditPopup}
+          onSave={reload} 
+        />
       )}
     </div>
   );

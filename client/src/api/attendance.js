@@ -74,3 +74,13 @@ export const getAllAttendance = async () => {
 
   return res.data;
 };
+
+export const updateAttendance = async (id, data) => {
+  const token = localStorage.getItem("token");
+
+  const res = await API.put(`/attendance/${id}`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  return res.data;
+};
