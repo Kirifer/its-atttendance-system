@@ -8,6 +8,8 @@ import nodemailer from "nodemailer";
 // Change password
 import { changePassword } from "../controllers/authController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
+// User info update
+import { getMe, updateUserInfo } from "../controllers/authController.js";
 // Profile pic
 import multer from "multer";
 import path from "path";
@@ -234,6 +236,10 @@ router.post("/change-password", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Error changing password" });
   }
 });
+
+// Update user info
+
+router.put("/update", verifyToken, updateUserInfo);
 
 // Must be always below
 export default router;

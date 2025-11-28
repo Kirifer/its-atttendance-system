@@ -71,8 +71,14 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
           <tbody>
             {filteredLeaves.map((leave) => (
               <tr key={leave.id}>
-                <td onClick={() => setExpandedId(expandedId === leave.id ? null : leave.id)}>
-                  {expandedId === leave.id ? leave.id : leave.id.substring(0, 8) + "..."}
+                <td
+                  onClick={() =>
+                    setExpandedId(expandedId === leave.id ? null : leave.id)
+                  }
+                >
+                  {expandedId === leave.id
+                    ? leave.id
+                    : leave.id.substring(0, 8) + "..."}
                 </td>
 
                 <td>{leave.leaveType}</td>

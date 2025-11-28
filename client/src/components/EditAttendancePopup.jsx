@@ -3,8 +3,12 @@ import { updateAttendance } from "../api/attendance";
 import "../styles/EditAttendancePopup.css";
 
 export default function EditAttendancePopup({ record, onClose, onSave }) {
-  const [timeIn, setTimeIn] = useState(record["Time In"] !== "-" ? record["Time In"] : "");
-  const [timeOut, setTimeOut] = useState(record["Time Out"] !== "-" ? record["Time Out"] : "");
+  const [timeIn, setTimeIn] = useState(
+    record["Time In"] !== "-" ? record["Time In"] : ""
+  );
+  const [timeOut, setTimeOut] = useState(
+    record["Time Out"] !== "-" ? record["Time Out"] : ""
+  );
 
   const handleSave = async () => {
     try {
@@ -19,11 +23,11 @@ export default function EditAttendancePopup({ record, onClose, onSave }) {
 
       await updateAttendance(record.id, {
         timeIn: formatTime(timeIn),
-        timeOut: formatTime(timeOut)
+        timeOut: formatTime(timeOut),
       });
 
-      onSave();  
-      onClose(); 
+      onSave();
+      onClose();
     } catch (err) {
       console.error(err);
       alert("Failed to update attendance");
@@ -36,14 +40,14 @@ export default function EditAttendancePopup({ record, onClose, onSave }) {
         <h2>Edit Attendance</h2>
 
         <label>Time In:</label>
-        <input 
+        <input
           type="time"
           value={timeIn}
           onChange={(e) => setTimeIn(e.target.value)}
         />
 
         <label>Time Out:</label>
-        <input 
+        <input
           type="time"
           value={timeOut}
           onChange={(e) => setTimeOut(e.target.value)}

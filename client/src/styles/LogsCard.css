@@ -2,14 +2,14 @@
   width: 100%;
   max-width: 600px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   margin: 0 auto;
   font-family: Arial, sans-serif;
 }
 
 .logs-card__header {
-  background-color: #1A5DAC; 
+  background-color: #1a5dac;
   color: white;
   display: flex;
   justify-content: space-between;
@@ -17,14 +17,13 @@
   font-weight: bold;
 }
 
-
 .logs-card__body {
-  background-color: #f3f4f6; 
+  background-color: #f3f4f6;
   padding: 12px 16px;
 }
 
 .logs-card__title {
-  background-color: #1A5DAC;
+  background-color: #1a5dac;
   color: white;
   padding: 8px 12px;
   font-weight: bold;

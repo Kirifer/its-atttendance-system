@@ -1,6 +1,6 @@
 .dashboard__containerone {
   display: flex;
-  background-color: #EEEEEE;
+  background-color: #eeeeee;
   margin: 50px auto 0 auto; /* container centered horizontally */
   height: auto;
   gap: 300px;
@@ -64,19 +64,18 @@
   }
 }
 
-
 .dashboard__left .clock {
   width: 150px;
-  height: 150px; 
-  position: relative; 
+  height: 150px;
+  position: relative;
   top: 0;
   left: 0;
-  transform: none; 
+  transform: none;
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
 }
 
 .dashboard__left .TimeInOut {
-  flex: 1; 
+  flex: 1;
 }
 
 /* Buttons */

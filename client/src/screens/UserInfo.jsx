@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
+// change pass
 import { changePassword } from "../api/auth";
+// user info update
+import { updateUserInfo } from "../api/auth";
 import UserInfoLayout from "../components/UserInfoLayout";
 import "../styles/PasswordChange.css";
 import API from "../api/api";
@@ -7,6 +10,7 @@ import API from "../api/api";
 const UserInfo = () => {
   const [user, setUser] = useState(null);
 
+  // change pass
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -49,7 +53,46 @@ const UserInfo = () => {
       setError(err.response?.data?.message || "Error in updating password.");
     }
   };
+  // change pass
 
+  // user info update
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const res = await API.get("/auth/me");
+        setUser(res.data);
+        setUsername(res.data.username);
+        setEmail(res.data.email);
+      } catch (err) {
+        console.log("ERROR LOADING USER:", err);
+      }
+    };
+    getUser();
+  }, []);
+
+  // username & email update
+  const handleInfoUpdate = async (e) => {
+    e.preventDefault();
+    setMsg("");
+    setError("");
+
+    try {
+      const updated = await updateUserInfo(username, email);
+      setUser(updated);
+      setMsg("User information has been updated successfully!");
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Error updating user information."
+      );
+    }
+  };
+
+  // user info update
+
+  // fetch user
   if (!user) return <div>Loading...</div>;
 
   return (
@@ -57,18 +100,7 @@ const UserInfo = () => {
       <div className="user-info-container">
         <h2>User Info</h2>
 
-        <p>
-          <strong>Username:</strong> {user.username}
-        </p>
-
-        <p>
-          <strong>Email:</strong> {user.email}
-        </p>
-
-        <p>
-          <strong>Role:</strong> {user.role}
-        </p>
-
+        {/* PFP */}
         {user.profilePic && (
           <img
             src={`http://localhost:5001/uploads/${user.profilePic}`}
@@ -83,6 +115,41 @@ const UserInfo = () => {
           />
         )}
 
+        {/* USER INFO */}
+        {/* Username/Email Update */}
+        <form onSubmit={handleInfoUpdate} className="update-user-form">
+          <div className="uc-input-group">
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="uc-input-group">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <button type="submit">Update Info</button>
+        </form>
+
+        {/* <p>
+          <strong>Username:</strong> {user.username}
+        </p>
+
+        <p>
+          <strong>Email:</strong> {user.email}
+        </p>
+
+        <p>
+          <strong>Role:</strong> {user.role}
+        </p> */}
+
+        {/* password */}
         <h3 style={{ marginTop: "30px" }}>Change Password</h3>
         {/* Error msg */}
         {msg && <p style={{ color: "green" }}>{msg}</p>}
