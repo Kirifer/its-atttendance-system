@@ -222,7 +222,7 @@ router.post("/change-password", verifyToken, async (req, res) => {
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch)
-      return res.status(400).json({ message: "Old password incorrect" });
+      return res.status(400).json({ message: "Old password is incorrect!" });
 
     const hashed = await bcrypt.hash(newPassword, 10);
 
