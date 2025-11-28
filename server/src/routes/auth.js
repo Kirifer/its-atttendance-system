@@ -57,7 +57,7 @@ router.post("/sign-up", async (req, res) => {
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing)
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "User already exists!" });
 
     const hashed = await bcrypt.hash(password, 10);
 
@@ -98,10 +98,10 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(400).json({ message: "User does not exist" });
+    if (!user) return res.status(400).json({ message: "User does not exist!" });
 
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(400).json({ message: "Incorrect password" });
+    if (!valid) return res.status(400).json({ message: "Incorrect password!" });
 
     const token = jwt.sign(
       { id: user.id, role: user.role }, // ⬅ Add role here
@@ -143,7 +143,7 @@ router.post("/forgot-password", async (req, res) => {
     const { email } = req.body;
 
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(400).json({ message: "User does not exist" });
+    if (!user) return res.status(400).json({ message: "User does not exist!" });
 
     const token = crypto.randomBytes(32).toString("hex");
 
