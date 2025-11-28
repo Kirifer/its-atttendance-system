@@ -1,9 +1,19 @@
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
+
 .user-info-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  width: 400px;
-  margin: auto;
+  align-items: center;
+  justify-content: center;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.user-info-container h2,
+.user-info-container h3 {
+  text-align: center;
 }
 
 .profile-pic-section {
@@ -62,4 +72,65 @@
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 6px;
+}
+
+.text-box {
+  width: 300px;
+  height: 40px;
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.edit-icon {
+  position: absolute;
+  right: -45px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 48;
+  color: #757575;
+  transition: 0s;
+  padding: 6px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: 0.3s ease;
+}
+
+.edit-icon:hover {
+  background: rgba(0, 0, 0, 0.116);
+}
+
+.edit-icon:active:hover {
+  background: rgba(0, 0, 0, 0.192);
+}
+
+.edit-icon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.158);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+  /* Longer */
+  transition: transform 1s cubic-bezier(0.2, 0.6, 0.2, 1), opacity 0.8s ease;
+}
+
+.edit-icon:active::after {
+  transform: translate(-50%, -50%) scale(10);
+  opacity: 1;
+  /* Smoother */
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
 }
