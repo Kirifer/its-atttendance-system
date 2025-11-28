@@ -46,7 +46,7 @@ enum LeaveType {
 }
 
 model Leave {
-  id        Int         @id @default(autoincrement())
+  id        String      @id @default(uuid())
   userId    Int
   user      User        @relation(fields: [userId], references: [id])
   startDate DateTime
@@ -77,7 +77,7 @@ model Attendance {
   timeIn  DateTime?
   timeOut DateTime?
   status  AttendanceStatus @default(PRESENT)
-  leaveId Int?
+  leaveId String?
   leave   Leave?           @relation(fields: [leaveId], references: [id])
 
   createdAt DateTime @default(now())

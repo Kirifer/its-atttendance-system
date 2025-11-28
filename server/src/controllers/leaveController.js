@@ -75,7 +75,7 @@ export const updateLeaveStatus = async (req, res) => {
     }
 
     const leave = await prisma.leave.update({
-      where: { id: Number(id) },
+      where: { id },
       data: { status: upperStatus },
     });
 
@@ -93,7 +93,7 @@ export const deleteLeave = async (req, res) => {
     }
 
     await prisma.leave.delete({
-      where: { id: parseInt(req.params.id) },
+      where: { id: req.params.id },
     });
 
     res.json({ message: "Leave deleted successfully" });
