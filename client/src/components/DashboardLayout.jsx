@@ -1,15 +1,28 @@
 import React, { useEffect, useRef } from "react";
+import { useContext } from "react";
 import { useState } from "react";
+import { UserContext } from "../context/UserContext";
 import UserDropdownMenu from "./UserDropdownMenu";
 import "../styles/DashboardLayout.css";
 
 function DashboardLayout({ children }) {
+  const { user: contextUser } = useContext(UserContext);
   const [open, setOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [user, setUser] = useState({ username: "", email: "" });
   const [dropdownPos, setDropdownPos] = useState({ x: 0, y: 0 });
   const userMenuRef = useRef(null);
   const userProfileRef = useRef(null);
+
+  // Real-time user update
+  useEffect(() => {
+    if (contextUser) {
+      setUser(contextUser);
+    } else {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) setUser(JSON.parse(storedUser));
+    }
+  }, [contextUser]);
 
   useEffect(() => {
     function handleClickOutside(event) {

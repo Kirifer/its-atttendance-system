@@ -7,9 +7,15 @@ import UserInfoLayout from "../components/UserInfoLayout";
 import "../styles/UserInfo.css";
 import "../styles/PasswordChange.css";
 import API from "../api/api";
+import { UserContext } from "../context/UserContext";
+import { useContext } from "react";
 
 const UserInfo = () => {
   const [user, setUser] = useState(null);
+
+  // real-time update
+  const { user: contextUser, setUser: setContextUser } =
+    useContext(UserContext);
 
   // Edit state
   const [editUsername, setEditUsername] = useState(false);
@@ -116,6 +122,7 @@ const UserInfo = () => {
     try {
       const updated = await updateUserInfo(username, email);
       setUser(updated);
+      setContextUser(updated);
       setUsernameMsg("Username updated successfully!");
       setEditUsername(false); // only close on success
 
@@ -141,6 +148,7 @@ const UserInfo = () => {
     try {
       const updated = await updateUserInfo(username, email);
       setUser(updated);
+      setContextUser(updated);
       setEmailMsg("Email updated successfully!");
       setEditEmail(false); // only close on success
 
