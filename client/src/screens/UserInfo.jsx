@@ -114,7 +114,7 @@ const UserInfo = () => {
     setUsernameErr("");
 
     if (username === user.username) {
-      setUsernameMsg("Username is the same as before. No were changes made.");
+      setUsernameMsg("Username is the same as before. No changes were made.");
       setTimeout(() => setUsernameMsg(""), 5000);
       return;
     }
@@ -140,7 +140,7 @@ const UserInfo = () => {
     setEmailErr("");
 
     if (email === user.email) {
-      setEmailMsg("Email is the same as before. No were changes made.");
+      setEmailMsg("Email is the same as before. No changes were made.");
       setTimeout(() => setEmailMsg(""), 5000);
       return;
     }
