@@ -12,6 +12,8 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
   const [filterType, setFilterType] = useState("id");
   const [query, setQuery] = useState("");
 
+  const [expandedId, setExpandedId] = useState(null);
+
   const filteredLeaves = leaves.filter((leave) => {
     const value =
       filterType === "id"
@@ -69,7 +71,10 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
           <tbody>
             {filteredLeaves.map((leave) => (
               <tr key={leave.id}>
-                <td>{leave.id}</td>
+                <td onClick={() => setExpandedId(expandedId === leave.id ? null : leave.id)}>
+                  {expandedId === leave.id ? leave.id : leave.id.substring(0, 8) + "..."}
+                </td>
+
                 <td>{leave.leaveType}</td>
                 <td>{leave.reason}</td>
                 <td>{leave.user ? leave.user.username : "N/A"}</td>
