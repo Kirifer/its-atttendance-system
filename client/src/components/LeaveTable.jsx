@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/LeaveTable.css";
-import { useState } from "react";
 import { showToast } from "./Notification/toast";
 
 <link
@@ -11,7 +10,6 @@ import { showToast } from "./Notification/toast";
 function LeaveTable({ leaves, onStatusChange, onDelete }) {
   const [filterType, setFilterType] = useState("id");
   const [query, setQuery] = useState("");
-
   const [expandedId, setExpandedId] = useState(null);
 
   const filteredLeaves = leaves.filter((leave) => {
@@ -64,6 +62,7 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
               <th>Intern</th>
               <th>Duration</th>
               <th>Status</th>
+              <th>Attachment</th> 
               <th>Actions</th>
             </tr>
           </thead>
@@ -91,6 +90,20 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                   className={`leave-table__status leave-table__status--${leave.status.toLowerCase()}`}
                 >
                   {leave.status}
+                </td>
+
+                <td>
+                  {leave.attachment ? (
+                    <a
+                      href={`${process.env.REACT_APP_BACKEND_URL || "http://localhost:5001"}${leave.attachment}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View / Download
+                    </a>
+                  ) : (
+                    "No Attachment"
+                  )}
                 </td>
 
                 <td className="leave-table__actions">

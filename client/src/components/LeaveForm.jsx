@@ -36,16 +36,17 @@ function LeaveForm({ onSubmit }) {
     }
 
     try {
-      // Use FormData to include file
+      // Create FormData
       const submissionData = new FormData();
       submissionData.append("startDate", formData.startDate);
       submissionData.append("endDate", formData.endDate);
       submissionData.append("leaveType", formData.leaveType);
-      submissionData.append("reason", formData.reason);
+      submissionData.append("reason", formData.reason || "");
       if (formData.attachment) {
         submissionData.append("attachment", formData.attachment);
       }
 
+      // Call API
       await onSubmit(submissionData);
 
       showToast({
@@ -130,7 +131,9 @@ function LeaveForm({ onSubmit }) {
           <input
             type="file"
             name="attachment"
-            onChange={handleChange}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, attachment: e.target.files[0] }))
+            }
           />
         </label>
       </div>
