@@ -40,9 +40,10 @@ enum LeaveStatus {
 }
 
 enum LeaveType {
-  SICK
   VACATION
-  PERSONAL
+  HOLIDAY
+  SICK
+  OFFSET
 }
 
 model Leave {
