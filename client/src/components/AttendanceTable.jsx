@@ -150,20 +150,48 @@ export default function AttendanceTable({
   ]);
 
   const exportPDF = () => {
-    if (!records.length) {
-      alert("No data available to export.");
+    if (!filteredRecords.length) {
+      alert("No filtered data available to export.");
       return;
     }
 
     const doc = new jsPDF();
+
+    const columnsToInclude = Object.keys(filteredRecords[0]).filter(
+      (col) => !["rawDate", "rawTimeIn", "rawTimeOut", "id"].includes(col)
+    );
+
+    const tableBody = filteredRecords.map((record) =>
+      columnsToInclude.map((col) => record[col])
+    );
+
+    // ---- Calculate Total Hours ---
+    let totalHours = filteredRecords.reduce((sum, r) => {
+      if (!r.TOTAL || r.TOTAL === "-") return sum;
+      return sum + parseFloat(r.TOTAL.replace(" hrs", ""));
+    }, 0);
+
+    const summaryRow = columnsToInclude.map((col, index) => {
+      if (index === 0) return "TOTAL HOURS";
+      if (col === "TOTAL") return `${totalHours.toFixed(2)} hrs`;
+      return "";
+    });
+    tableBody.push(summaryRow);
+
     autoTable(doc, {
-      head: [Object.keys(records[0])],
-      body: records.map(Object.values),
+      head: [columnsToInclude],
+      body: tableBody,
       startY: 25,
       styles: { fontSize: 10 },
+      didParseCell: function (data) {
+        if (data.row.index === filteredRecords.length) {
+          data.cell.styles.fontStyle = "bold";
+        }
+      },
     });
-    doc.text("Timesheet Report", 14, 15);
-    doc.save("timesheet.pdf");
+
+    doc.text("Timesheet Report (Filtered)", 14, 15);
+    doc.save("timesheet_filtered.pdf");
   };
 
   const openEditPopup = (record) => setEditingRecord(record);
