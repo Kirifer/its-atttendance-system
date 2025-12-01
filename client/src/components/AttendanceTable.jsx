@@ -24,6 +24,9 @@ export default function AttendanceTable({
   const [searchField, setSearchField] = useState("Intern");
   const [query, setQuery] = useState("");
 
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState("");
+
   const options = useMemo(
     () => ({
       year: "numeric",
@@ -58,7 +61,7 @@ export default function AttendanceTable({
     return Math.ceil((lastDate + firstDay) / 7);
   };
 
-  const reload = () => setReloadCounter((prev) => prev + 1); // refresh table
+  const reload = () => setReloadCounter((prev) => prev + 1); 
 
   useEffect(() => {
     const fetchAttendance = async () => {
@@ -68,12 +71,42 @@ export default function AttendanceTable({
         if (role === "ADMIN") res = await getAllAttendance();
         else res = await getUserAttendance(userId);
 
-        const monthFiltered = res.attendance.filter((r) => {
-          const d = new Date(r.date);
-          return d >= firstDay && d <= lastDay;
-        });
+        let dateFiltered = res.attendance;
 
-        const formatted = monthFiltered.map((r) => {
+        if (filterType === "Month") {
+          dateFiltered = res.attendance.filter((r) => {
+            const d = new Date(r.date);
+            return d >= firstDay && d <= lastDay;
+          });
+        }
+
+        if (filterType === "Week") {
+          // Filter only by month first
+          let monthFiltered = res.attendance.filter((r) => {
+            const d = new Date(r.date);
+            return d >= firstDay && d <= lastDay;
+          });
+
+          dateFiltered = monthFiltered.filter(
+            (r) => getWeekOfMonth(new Date(r.date)) === filterWeek
+          );
+        }
+
+        // --- CUSTOM RANGE FILTER ---
+        if (filterType === "Custom") {
+          if (customStart && customEnd) {
+            const start = new Date(customStart);
+            const end = new Date(customEnd);
+            end.setHours(23, 59, 59);
+
+            dateFiltered = res.attendance.filter((r) => {
+              const d = new Date(r.date);
+              return d >= start && d <= end;
+            });
+          }
+        }
+
+        const formatted = dateFiltered.map((r) => {
           const ti = r.timeIn ? new Date(r.timeIn) : null;
           const to = r.timeOut ? new Date(r.timeOut) : null;
           const diff = ti && to ? ((to - ti) / 1000 / 60 / 60).toFixed(2) : "-";
@@ -93,14 +126,7 @@ export default function AttendanceTable({
           };
         });
 
-        const finalRecords =
-          filterType === "Week"
-            ? formatted.filter(
-                (r) => getWeekOfMonth(new Date(r.Date)) === filterWeek
-              )
-            : formatted;
-
-        setRecords(finalRecords);
+        setRecords(formatted);
       } catch (err) {
         console.error(err);
         setRecords([]);
@@ -114,6 +140,8 @@ export default function AttendanceTable({
     lastDay,
     filterType,
     filterWeek,
+    customStart,
+    customEnd,
     userEmail,
     reloadCounter,
     options,
@@ -186,6 +214,7 @@ export default function AttendanceTable({
             >
               <option value="Month">Month</option>
               <option value="Week">Week</option>
+              <option value="Custom">Custom Range</option>
             </select>
           </label>
 
@@ -208,6 +237,24 @@ export default function AttendanceTable({
               </select>
             </label>
           )}
+          {filterType === "Custom" && (
+            <div style={{ marginLeft: "10px", display: "flex", gap: "10px" }}>
+              <input
+                type="date"
+                value={customStart}
+                onChange={(e) => setCustomStart(e.target.value)}
+                className="attendance_filter_btn"
+              />
+
+              <input
+                type="date"
+                value={customEnd}
+                onChange={(e) => setCustomEnd(e.target.value)}
+                className="attendance_filter_btn"
+              />
+            </div>
+          )}
+
         </div>
       </div>
 

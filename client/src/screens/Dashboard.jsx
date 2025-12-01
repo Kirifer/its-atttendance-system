@@ -10,7 +10,7 @@ function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [reload, setReload] = useState(false);
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   return (
     <DashboardLayout>
