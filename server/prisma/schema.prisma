@@ -75,8 +75,14 @@ model Attendance {
   user    User             @relation(fields: [userId], references: [id])
   date    DateTime
   timeIn  DateTime?
+  lunchOut DateTime?
+  lunchIn DateTime?
   timeOut DateTime?
   status  AttendanceStatus @default(PRESENT)
+
+  tardinessMinutes Int @default(0)
+  totalWorkHours Float? 
+
   leaveId String?
   leave   Leave?           @relation(fields: [leaveId], references: [id])
 
