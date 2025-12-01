@@ -1,4 +1,4 @@
-.tinout_body {
+.lunchio_body {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6,17 +6,14 @@
   width: 100%;
 }
 
-.tinout_container {
+.lunchio_container {
   display: flex;
-  flex-wrap: wrap;
   flex-direction: column;
-  align-content: space-between;
   gap: 30px;
   margin-top: 10px;
-  padding: 0px 90px;
 }
 
-.tinout_in_btn {
+.lunch_out_btn {
   background-color: #54cc58;
   border: 0.5px solid;
   border-style: none;
@@ -26,7 +23,7 @@
   padding: 16px 24px;
 }
 
-.tinout_out_btn {
+.lunch_in_btn {
   background-color: #e86e6e;
   border: 0.5px solid;
   border-style: none;
@@ -36,25 +33,26 @@
   padding: 16px 24px;
 }
 
-.tinout_in_btn:hover {
+.lunch_out_btn:hover {
   background-color: #60e664;
 }
 
-.tinout_out_btn:hover {
+.lunch_in_btn:hover {
   background-color: #ff7979;
 }
 
-.tinout_in_btn:disabled {
+.lunch_out_btn:disabled {
   background-color: gray;
   cursor: not-allowed;
 }
 
-.tinout_out_btn:disabled {
+.lunch_in_btn:disabled {
   background-color: gray;
   cursor: not-allowed;
 }
+
 @media (max-width: 767px) {
-  .tinout_container {
+  .lunchio_container {
     display: flex;
     flex-direction: row;
     gap: 30px;
