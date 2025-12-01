@@ -61,7 +61,7 @@ export default function AttendanceTable({
     return Math.ceil((lastDate + firstDay) / 7);
   };
 
-  const reload = () => setReloadCounter((prev) => prev + 1); 
+  const reload = () => setReloadCounter((prev) => prev + 1);
 
   useEffect(() => {
     const fetchAttendance = async () => {
@@ -109,20 +109,36 @@ export default function AttendanceTable({
         const formatted = dateFiltered.map((r) => {
           const ti = r.timeIn ? new Date(r.timeIn) : null;
           const to = r.timeOut ? new Date(r.timeOut) : null;
-          const diff = ti && to ? ((to - ti) / 1000 / 60 / 60).toFixed(2) : "-";
+
+          const lo = r.lunchOut ? new Date(r.lunchOut) : null;
+          const li = r.lunchIn ? new Date(r.lunchIn) : null;
+
+          const workDiff =
+            ti && to ? ((to - ti) / 1000 / 60 / 60).toFixed(2) : "-";
+
+          const lunchDiff =
+            lo && li ? ((li - lo) / 1000 / 60).toFixed(0) : "-";
 
           return {
             id: r.id,
             rawDate: r.date,
             rawTimeIn: r.timeIn,
             rawTimeOut: r.timeOut,
+            rawLunchOut: r.lunchOut,
+            rawLunchIn: r.lunchIn,
+
             Intern: role === "ADMIN" ? r.user.email : userEmail,
             Status: r.status,
+
             Date: new Date(r.date).toLocaleDateString("en-US", options),
             Week: getWeekOfMonth(new Date(r.date)),
+
             "Time In": ti ? ti.toLocaleTimeString("en-US", timeOptions) : "-",
+            "Lunch Out": lo ? lo.toLocaleTimeString("en-US", timeOptions) : "-",
+            "Lunch In": li ? li.toLocaleTimeString("en-US", timeOptions) : "-",
+            "Duration": lunchDiff !== "-" ? `${lunchDiff} mins` : "-",
             "Time Out": to ? to.toLocaleTimeString("en-US", timeOptions) : "-",
-            TOTAL: diff !== "-" ? `${diff} hrs` : "-",
+            TOTAL: workDiff !== "-" ? `${workDiff} hrs` : "-",
           };
         });
 
@@ -158,7 +174,7 @@ export default function AttendanceTable({
     const doc = new jsPDF();
 
     const columnsToInclude = Object.keys(filteredRecords[0]).filter(
-      (col) => !["rawDate", "rawTimeIn", "rawTimeOut", "id"].includes(col)
+      (col) => !["rawDate", "rawTimeIn", "rawTimeOut", "rawLunchOut", "rawLunchIn", "id"].includes(col)
     );
 
     const tableBody = filteredRecords.map((record) =>
@@ -299,7 +315,7 @@ export default function AttendanceTable({
                 {Object.keys(records[0])
                   .filter(
                     (col) =>
-                      !["rawDate", "rawTimeIn", "rawTimeOut", "id"].includes(
+                      !["rawDate", "rawTimeIn", "rawTimeOut", "rawLunchOut", "rawLunchIn","id"].includes(
                         col
                       )
                   )
@@ -315,7 +331,7 @@ export default function AttendanceTable({
                   {Object.keys(r)
                     .filter(
                       (col) =>
-                        !["rawDate", "rawTimeIn", "rawTimeOut", "id"].includes(
+                        !["rawDate", "rawTimeIn", "rawTimeOut", "rawLunchOut", "rawLunchIn", "id"].includes(
                           col
                         )
                     )
