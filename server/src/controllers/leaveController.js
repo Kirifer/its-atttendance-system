@@ -22,6 +22,10 @@ export const createLeave = async (req, res) => {
     const userId = req.user.id;
     const { startDate, endDate, leaveType, reason } = req.body;
 
+    const filePath = req.file
+      ? `/uploads/${req.file.filename}` // frontend-friendly path
+      : null;
+
     const leave = await prisma.leave.create({
       data: {
         userId,
@@ -29,7 +33,7 @@ export const createLeave = async (req, res) => {
         endDate: new Date(endDate),
         leaveType,
         reason,
-        attachment: req.file ? req.file.path : null,
+        attachment: filePath,
       },
     });
 
