@@ -1,18 +1,16 @@
 import API from "./api";
 
-export const createLeave = async ({
-  startDate,
-  endDate,
-  leaveType,
-  reason,
-}) => {
+export const createLeave = async (formData) => {
   try {
     const token = localStorage.getItem("token");
-    const response = await API.post(
-      "/leave",
-      { startDate, endDate, leaveType, reason },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+
+    const response = await API.post("/leave", formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data", 
+      },
+    });
+
     return response.data;
   } catch (err) {
     let message = "Error creating leave";

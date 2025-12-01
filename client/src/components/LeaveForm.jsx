@@ -8,6 +8,7 @@ function LeaveForm({ onSubmit }) {
     endDate: "",
     leaveType: "OFFSET",
     reason: "",
+    attachment: null, // new field for file
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -15,24 +16,37 @@ function LeaveForm({ onSubmit }) {
   const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, files } = e.target;
+    if (name === "attachment") {
+      setFormData((prev) => ({ ...prev, attachment: files[0] || null }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Debug: check which type is being submitted
-    console.log("Submitting leave type:", formData.leaveType);
+    // Validate leave type
+    const validTypes = ["SICK", "VACATION", "HOLIDAY", "OFFSET"];
+    if (!validTypes.includes(formData.leaveType)) {
+      setError("Invalid leave type selected");
+      setSuccess("");
+      return;
+    }
 
     try {
-      // Ensure only valid enum values are sent
-      const validTypes = ["SICK", "VACATION", "HOLIDAY", "OFFSET"];
-      if (!validTypes.includes(formData.leaveType)) {
-        throw new Error("Invalid leave type selected");
+      // Use FormData to include file
+      const submissionData = new FormData();
+      submissionData.append("startDate", formData.startDate);
+      submissionData.append("endDate", formData.endDate);
+      submissionData.append("leaveType", formData.leaveType);
+      submissionData.append("reason", formData.reason);
+      if (formData.attachment) {
+        submissionData.append("attachment", formData.attachment);
       }
 
-      await onSubmit(formData);
+      await onSubmit(submissionData);
 
       showToast({
         message: "Leave submitted successfully!",
@@ -109,6 +123,18 @@ function LeaveForm({ onSubmit }) {
           />
         </label>
       </div>
+
+      <div className="row">
+        <label>
+          Attachment (optional):
+          <input
+            type="file"
+            name="attachment"
+            onChange={handleChange}
+          />
+        </label>
+      </div>
+
       <div className="submit-btn-container">
         <button type="submit">Submit Leave</button>
       </div>

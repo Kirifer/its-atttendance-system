@@ -1,11 +1,25 @@
 import { PrismaClient, LeaveStatus } from "@prisma/client";
+import multer from "multer";
+import path from "path";
 
 const prisma = new PrismaClient();
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/"); 
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
+export const upload = multer({ storage });
 
 // CREATE leave
 export const createLeave = async (req, res) => {
   try {
-    const userId = req.user.id; // get from JWT token
+    const userId = req.user.id;
     const { startDate, endDate, leaveType, reason } = req.body;
 
     const leave = await prisma.leave.create({
@@ -15,6 +29,7 @@ export const createLeave = async (req, res) => {
         endDate: new Date(endDate),
         leaveType,
         reason,
+        attachment: req.file ? req.file.path : null,
       },
     });
 
