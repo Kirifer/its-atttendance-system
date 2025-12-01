@@ -5,7 +5,13 @@ import "../styles/TimeInOut.css";
 function TimeInOut({ userId, onAttendanceChange }) {
   const [isTimedIn, setIsTimedIn] = useState(false);
 
+  const user = JSON.parse(localStorage.getItem("user"));
+  const role = user?.role;
+
+  // ✅ Keep hooks at top-level
   useEffect(() => {
+    if (role === "ADMIN") return; // skip logic for admin
+
     const checkToday = async () => {
       const res = await getUserAttendance(userId);
       const today = new Date().toDateString();
@@ -14,15 +20,11 @@ function TimeInOut({ userId, onAttendanceChange }) {
         (r) => new Date(r.date).toDateString() === today
       );
 
-      if (todayRecord?.timeIn && !todayRecord?.timeOut) {
-        setIsTimedIn(true);
-      } else {
-        setIsTimedIn(false);
-      }
+      setIsTimedIn(todayRecord?.timeIn && !todayRecord?.timeOut);
     };
 
     checkToday();
-  }, [userId]);
+  }, [userId, role]);
 
   const handleTimeIn = async () => {
     try {
@@ -40,11 +42,13 @@ function TimeInOut({ userId, onAttendanceChange }) {
       await timeOut();
       setIsTimedIn(false);
       onAttendanceChange();
-      alert("Successfully Timed Out.");
+      alert("Successfully Timed Out");
     } catch (err) {
       alert(err.response?.data?.message || "Failed to time out");
     }
   };
+
+  if (role === "ADMIN") return null;
 
   return (
     <div className="tinout_body">
