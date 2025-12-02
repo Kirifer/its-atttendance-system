@@ -14,6 +14,14 @@ import { getMe, updateUserInfo } from "../controllers/authController.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+// Field constraints
+import {
+  validateSignUp,
+  validateLogin,
+  validateResetPassword,
+  validateChangePassword,
+  validateUpdateUserInfo,
+} from "../middlewares/validateUser.js";
 
 //prisma
 import { PrismaClient } from "@prisma/client";
@@ -51,7 +59,7 @@ const upload = multer({
 });
 
 //User sign-up
-router.post("/sign-up", async (req, res) => {
+router.post("/sign-up", validateSignUp, async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
 
@@ -86,7 +94,7 @@ router.post("/sign-up", async (req, res) => {
 });
 
 // ------------------- Login -------------------
-router.post("/login", async (req, res) => {
+router.post("/login", validateLogin, async (req, res) => {
   try {
     console.log("Inside login route. Body:", req.body);
     if (!req.body || !req.body.email) {
@@ -167,9 +175,9 @@ router.post("/forgot-password", async (req, res) => {
 });
 
 // ------------------- Reset Password -------------------
-router.post("/reset-password", async (req, res) => {
+router.post("/reset-password", validateResetPassword, async (req, res) => {
   try {
-    const { token, password } = req.body;
+    const { token, newPassword } = req.body;
 
     const user = await prisma.user.findFirst({
       where: { reset_token: token, reset_token_expiry: { gt: new Date() } },
@@ -178,7 +186,7 @@ router.post("/reset-password", async (req, res) => {
     if (!user)
       return res.status(400).json({ message: "Invalid or expired token" });
 
-    const hashed = await bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(newPassword, 10);
 
     await prisma.user.update({
       where: { id: user.id },
@@ -213,33 +221,57 @@ router.get("/me", verifyToken, async (req, res) => {
 });
 
 // Change password
-router.post("/change-password", verifyToken, async (req, res) => {
-  try {
-    const { oldPassword, newPassword } = req.body;
+router.post(
+  "/change-password",
+  validateChangePassword,
+  verifyToken,
+  async (req, res) => {
+    try {
+      const { oldPassword, newPassword, confirmNewPassword } = req.body;
 
-    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-    if (!user) return res.status(400).json({ message: "User not found" });
+      if (!oldPassword || !newPassword || !confirmNewPassword)
+        return res.status(400).json({ message: "Please fill out all fields!" });
 
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Old password is incorrect!" });
+      if (newPassword !== confirmNewPassword)
+        return res.status(400).json({ message: "Passwords do not match!" });
 
-    const hashed = await bcrypt.hash(newPassword, 10);
+      const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+      if (!user) return res.status(400).json({ message: "User not found" });
 
-    await prisma.user.update({
-      where: { id: req.user.id },
-      data: { password: hashed },
-    });
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch)
+        return res.status(400).json({ message: "Old password is incorrect!" });
 
-    res.json({ message: "Password changed successfully" });
-  } catch (err) {
-    res.status(500).json({ message: "Error changing password" });
+      if (oldPassword === newPassword)
+        return res
+          .status(400)
+          .json({ message: "New password is the same as the old password." });
+
+      const hashed = await bcrypt.hash(newPassword, 10);
+      const updatedUser = await prisma.user.update({
+        where: { id: req.user.id },
+        data: { password: hashed },
+      });
+
+      const token = jwt.sign(
+        { id: updatedUser.id, role: updatedUser.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+
+      return res.json({
+        message: "Password changed successfully",
+        token,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Error changing password" });
+    }
   }
-});
+);
 
 // Update user info
-
-router.put("/update", verifyToken, updateUserInfo);
+router.put("/update", validateUpdateUserInfo, verifyToken, updateUserInfo);
 
 // Must be always below
 export default router;
