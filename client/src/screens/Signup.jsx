@@ -22,32 +22,52 @@ function Signup() {
 
   const navigate = useNavigate();
 
+  // Clear messages
+  const clearMessages = () => {
+    setTimeout(() => {
+      setFieldErrors({
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        general: "",
+      });
+      setShowSuccessPopup(false);
+    }, 5000);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFieldErrors({ general: "" });
 
     if (password !== confirmPassword) {
       setFieldErrors({ general: "Passwords do not match!" });
-      setTimeout(() => setFieldErrors(""), 5000);
+      clearMessages();
       return;
     }
 
     try {
-      const { token } = await signUpUser(username, email, password);
+      const { token } = await signUpUser(
+        username,
+        email,
+        password,
+        confirmPassword
+      );
       localStorage.setItem("token", token);
 
       setShowSuccessPopup(true);
-      setTimeout(() => setFieldErrors(""), 5000);
+      clearMessages();
     } catch (err) {
       const message = err.message.toLowerCase();
 
       if (message.includes("already exist")) {
         setFieldErrors({ general: "User already exists!" });
-        setTimeout(() => setFieldErrors(""), 5000);
+        clearMessages();
         return;
       }
 
       setFieldErrors({ general: err.message });
+      clearMessages();
     }
   };
 
