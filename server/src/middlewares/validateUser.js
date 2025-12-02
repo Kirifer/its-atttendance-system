@@ -48,7 +48,7 @@ export const validateLogin = (req, res, next) => {
   next();
 };
 
-// Update User Info
+// Update User Information
 export const validateUpdateUserInfo = (req, res, next) => {
   const { username, email } = req.body;
 
