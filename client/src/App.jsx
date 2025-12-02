@@ -1,4 +1,4 @@
-// user log out when server is down
+// Sser log out when server is down through pinging
 import { useEffect } from "react";
 import { pingServer } from "./api/api";
 import { useState } from "react";
