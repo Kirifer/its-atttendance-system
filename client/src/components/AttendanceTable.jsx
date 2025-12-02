@@ -113,11 +113,22 @@ export default function AttendanceTable({
           const lo = r.lunchOut ? new Date(r.lunchOut) : null;
           const li = r.lunchIn ? new Date(r.lunchIn) : null;
 
-          const workDiff =
-            ti && to ? ((to - ti) / 1000 / 60 / 60).toFixed(2) : "-";
+          const workMinutes = ti && to ? Math.floor((to - ti) / 1000 / 60) : null;
 
-          const lunchDiff =
-            lo && li ? ((li - lo) / 1000 / 60).toFixed(0) : "-";
+          const lunchMinutes = lo && li ? Math.floor((li - lo) / 1000 / 60) : 0;
+
+          const tardyMinutes = r.tardinessMinutes || 0;
+
+          const totalMinutes =
+            workMinutes !== null
+              ? workMinutes - lunchMinutes - tardyMinutes
+              : null;
+
+          const totalHours =
+            totalMinutes !== null
+              ? (totalMinutes / 60).toFixed(2)
+              : "-";
+
 
           return {
             id: r.id,
@@ -134,11 +145,12 @@ export default function AttendanceTable({
             Week: getWeekOfMonth(new Date(r.date)),
 
             "Time In": ti ? ti.toLocaleTimeString("en-US", timeOptions) : "-",
+            Tardiness: tardyMinutes > 0 ? `${tardyMinutes} mins` : "-",
             "Lunch Out": lo ? lo.toLocaleTimeString("en-US", timeOptions) : "-",
             "Lunch In": li ? li.toLocaleTimeString("en-US", timeOptions) : "-",
-            "Duration": lunchDiff !== "-" ? `${lunchDiff} mins` : "-",
+            "Duration": lo && li ? `${lunchMinutes} mins` : "-",
             "Time Out": to ? to.toLocaleTimeString("en-US", timeOptions) : "-",
-            TOTAL: workDiff !== "-" ? `${workDiff} hrs` : "-",
+            TOTAL: totalHours !== "-" ? `${totalHours} hrs` : "-",
           };
         });
 
@@ -315,7 +327,7 @@ export default function AttendanceTable({
                 {Object.keys(records[0])
                   .filter(
                     (col) =>
-                      !["rawDate", "rawTimeIn", "rawTimeOut", "rawLunchOut", "rawLunchIn","id"].includes(
+                      !["rawDate", "rawTimeIn", "rawTimeOut", "rawLunchOut", "rawLunchIn", "id"].includes(
                         col
                       )
                   )

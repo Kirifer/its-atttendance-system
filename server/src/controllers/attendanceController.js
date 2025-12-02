@@ -15,20 +15,34 @@ export const timeIn = async (req, res) => {
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0)
 
-        let attendance = await prisma.attendance.findUnique({
+        const existing = await prisma.attendance.findUnique({
             where: { userId_date: { userId, date: today } },
         });
-
-        if (attendance) {
+        
+        if (existing)   {
             return res.status(400).json({ message: "Already timed in today" });
         }
 
-        attendance = await prisma.attendance.create({
+        const now = new Date();
+        
+        const worksStart = new Date();
+        worksStart.setHours(9, 0, 0, 0);
+
+        let status = AttendanceStatus.PRESENT;
+        let tardinessMinutes = 0;
+
+        if (now > worksStart) {
+            tardinessMinutes = Math.floor((now - worksStart) / 60000);
+            status = AttendanceStatus.TARDY;
+        }
+
+        const attendance = await prisma.attendance.create({
             data: {
                 userId,
                 date: today,
-                timeIn: new Date(),
-                status: AttendanceStatus.PRESENT,
+                timeIn: now,
+                status,
+                tardinessMinutes,
             },
         });
 

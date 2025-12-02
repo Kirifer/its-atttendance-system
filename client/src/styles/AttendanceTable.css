@@ -122,6 +122,11 @@ td {
   font-weight: bold;
 }
 
+.attendance_status-tardy {
+  color: #2a44c6;
+  font-weight: bold;
+}
+
 .attendance_status-absent {
   color: #d40707;
   font-weight: bold;

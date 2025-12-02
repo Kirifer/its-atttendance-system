@@ -67,6 +67,7 @@ model Leave {
 
 enum AttendanceStatus {
   PRESENT
+  TARDY
   ABSENT
   ON_LEAVE
 }
