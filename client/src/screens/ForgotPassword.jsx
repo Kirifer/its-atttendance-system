@@ -24,6 +24,11 @@ function ForgotPassword() {
       console.error(err);
       setMessage(err.message || "An error occurred. Please try again.");
       setIsError(true);
+
+      setTimeout(() => {
+        setMessage("");
+        setIsError(false);
+      }, 5000);
     }
   };
 
