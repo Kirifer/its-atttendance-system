@@ -56,7 +56,7 @@ function Login() {
           </button>
         </div>
 
-        {/* Error Message */}
+        {/* Error Messages */}
         {fieldErrors.general && (
           <p
             style={{
