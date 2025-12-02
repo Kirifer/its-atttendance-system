@@ -14,6 +14,10 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5001;
 
+// time adjustment
+const timeAdjustmentRoutes = require("./src/routes/timeAdjustmentRoutes");
+app.use("/api/time-adjustments", timeAdjustmentRoutes);
+
 // __dirname fix for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
