@@ -117,11 +117,13 @@ export default function AttendanceTable({
 
           const lunchMinutes = lo && li ? Math.floor((li - lo) / 1000 / 60) : 0;
 
+          const lunchTardyMinutes = r.lunchTardinessMinutes || 0;
+
           const tardyMinutes = r.tardinessMinutes || 0;
 
           const totalMinutes =
             workMinutes !== null
-              ? workMinutes - lunchMinutes - tardyMinutes
+              ? workMinutes - lunchMinutes - ( tardyMinutes + lunchTardyMinutes )
               : null;
 
           const totalHours =
@@ -145,12 +147,13 @@ export default function AttendanceTable({
             Week: getWeekOfMonth(new Date(r.date)),
 
             "Time In": ti ? ti.toLocaleTimeString("en-US", timeOptions) : "-",
-            Tardiness: tardyMinutes > 0 ? `${tardyMinutes} mins` : "-",
             "Lunch Out": lo ? lo.toLocaleTimeString("en-US", timeOptions) : "-",
             "Lunch In": li ? li.toLocaleTimeString("en-US", timeOptions) : "-",
             "Duration": lo && li ? `${lunchMinutes} mins` : "-",
             "Time Out": to ? to.toLocaleTimeString("en-US", timeOptions) : "-",
             TOTAL: totalHours !== "-" ? `${totalHours} hrs` : "-",
+           "Lunch Tardy": lunchTardyMinutes > 0 ? `${lunchTardyMinutes} mins` : "-",
+            Tardiness: tardyMinutes > 0 ? `${tardyMinutes} mins` : "-",
           };
         });
 

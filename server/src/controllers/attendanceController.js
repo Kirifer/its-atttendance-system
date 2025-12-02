@@ -117,12 +117,33 @@ export const lunchIn = async (req, res) => {
             return res.status(400).json({ message: "Already timed out" });
         }
 
+        const now = new Date();
+
+        const lunchDurationMinutes = Math.floor(
+            (now - attendance.lunchOut) / 60000
+        );
+
+        const MAX_LUNCH_MINUTES = 60;
+        let extraTardy = 0;
+
+        if (lunchDurationMinutes > MAX_LUNCH_MINUTES) {
+            extraTardy = lunchDurationMinutes - MAX_LUNCH_MINUTES;
+        }
+
         const updated = await prisma.attendance.update({
             where: { id: attendance.id },
-            data: { lunchIn: new Date() },
+            data: { 
+                lunchIn: now,
+                lunchTardinessMinutes: extraTardy,
+                tardinessMinutes: attendance.tardinessMinutes + extraTardy,
+                status:
+                    extraTardy > 0
+                    ? AttendanceStatus.TARDY
+                    : attendance.status,
+            },
         });
 
-        res.json({ message: "Lunch in logged", attendance: updated });
+        res.json({ message: "Lunch in logged", extraLunchTardiness: extraTardy, attendance: updated });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error logging lunch in" });

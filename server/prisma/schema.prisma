@@ -83,7 +83,8 @@ model Attendance {
   timeOut DateTime?
   status  AttendanceStatus @default(PRESENT)
 
-  tardinessMinutes Int @default(0)
+  tardinessMinutes        Int   @default(0)
+  lunchTardinessMinutes   Int   @default(0)
   totalWorkHours Float? 
 
   leaveId String?
