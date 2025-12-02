@@ -6,6 +6,8 @@ import LunchInOutBtn from "../components/LunchInOutBtn.jsx";
 import DashboardLayout from "../components/DashboardLayout";
 import Clock from "../components/Dashboard/Clock.jsx";
 import LogsCard from "../components/Dashboard/LogsCard.jsx";
+import FiledLeavesCard from "../components/Dashboard/FiledLeavesCard.jsx";
+import Calendar from "../components/Dashboard/Calendar.jsx";
 
 function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -39,6 +41,15 @@ function Dashboard() {
                 ]}
               />
             </div>
+          </div>
+          <div className="dashboard__containertwo">
+            <div className="dashboard__left__two">
+              <FiledLeavesCard/>
+            </div>
+            <div className="dashboard__right">
+              <Calendar/>
+            </div>
+
           </div>
         </div>
       </div>

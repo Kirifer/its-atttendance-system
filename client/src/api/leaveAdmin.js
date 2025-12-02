@@ -8,6 +8,14 @@ export const getAllLeaves = async () => {
   return res.data;
 };
 
+export const getMyLeaves = async () => {
+  const token = localStorage.getItem("token");
+  const res = await API.get("/leave", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+};
+
 export const updateLeaveStatus = async (id, status) => {
   const token = localStorage.getItem("token");
   const res = await API.patch(
