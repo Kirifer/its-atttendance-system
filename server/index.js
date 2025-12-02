@@ -15,7 +15,7 @@ const app = express();
 const port = process.env.PORT || 5001;
 
 // time adjustment
-const timeAdjustmentRoutes = require("./src/routes/timeAdjustmentRoutes");
+import timeAdjustmentRoutes from "./src/routes/timeAdjustmentRoutes.js";
 app.use("/api/time-adjustments", timeAdjustmentRoutes);
 
 // __dirname fix for ES modules
