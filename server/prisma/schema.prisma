@@ -98,3 +98,12 @@ model Attendance {
   @@index([date])
   @@index([status])
 }
+
+model TimeAdjustment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  type      String
+  details   String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+}
