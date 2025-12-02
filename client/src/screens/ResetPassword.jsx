@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { resetPassword } from "../api/auth";
 import PasswordInput from "../components/PasswordInput";
 import SuccessPopup from "../components/SuccessPopup";
@@ -14,7 +13,6 @@ function ResetPassword() {
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-
   const navigate = useNavigate();
 
   const handleReset = async (e) => {
@@ -23,22 +21,28 @@ function ResetPassword() {
     if (newPassword !== confirmNewPassword) {
       setMessage("Passwords do not match!");
       setIsError(true);
-      setTimeout(() => setIsError(""), 5000);
+      setTimeout(() => setIsError(false), 5000);
       return;
     }
 
     try {
-      const res = await resetPassword(token, newPassword);
-      setMessage(res.message);
+      // Send all three fields exactly
+      const res = await API.post("/auth/reset-password", {
+        token,
+        newPassword,
+        confirmNewPassword,
+      });
+
+      setMessage(res.message || "Password reset successful!");
       setIsError(false);
       setNewPassword("");
       setConfirmNewPassword("");
       setShowSuccessPopup(true);
     } catch (err) {
       console.error(err);
-      setMessage(err.message || "An error occurred. Please try again.");
-      setTimeout(() => setMessage(""), 5000);
+      setMessage(err.response?.data?.message || err.message || "Server Error");
       setIsError(true);
+      setTimeout(() => setIsError(false), 5000);
     }
   };
 
@@ -56,11 +60,9 @@ function ResetPassword() {
           </button>
         </div>
 
-        {/* Show error if passwords don't match */}
-        {isError && (
-          <p style={{ color: "red", marginTop: "10px" }}>
-            Passwords do not match!
-          </p>
+        {/* Show message if error */}
+        {message && isError && (
+          <p style={{ color: "red", marginTop: "10px" }}>{message}</p>
         )}
 
         {/* Password input */}
