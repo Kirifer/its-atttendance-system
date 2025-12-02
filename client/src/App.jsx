@@ -1,3 +1,6 @@
+// user log out when server is down
+import { useEffect } from "react";
+import { pingServer } from "./api/api";
 import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -20,6 +23,14 @@ import UserInfo from "./screens/UserInfo";
 import TimeoffAdmin from "./screens/TimeoffAdmin";
 
 function App() {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      pingServer();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <Router>
       <Routes>
