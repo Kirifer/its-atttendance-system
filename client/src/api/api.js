@@ -4,7 +4,7 @@ const port = process.env.REACT_APP_API_PORT || 5001;
 
 const API = axios.create({
   baseURL: `http://localhost:${port}/api`,
-  timeout: 1000, // 1 second timeout when backend is down
+  timeout: 5000, // 5 second timeout when backend is down
 });
 
 // Auth
@@ -14,22 +14,11 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Automatically sign out when server is down or token expires
+// Handle token expiration globally
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Network error = backend unreachable
-    if (!error.response) {
-      if (window.location.pathname !== "/login") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/login";
-      }
-      return; // stop propagating error
-    }
-
-    // Token invalid/expired
-    if (error.response.data?.message === "Invalid or expired token") {
+    if (error.response?.data?.message === "Invalid or expired token") {
       if (window.location.pathname !== "/login") {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -37,10 +26,26 @@ API.interceptors.response.use(
       }
       return;
     }
-
-    // Let other errors pass through
+    // Other errors pass through
     return Promise.reject(error);
   }
 );
 
 export default API;
+
+// Ping
+export const pingServer = async () => {
+  try {
+    const res = await axios.get(`http://localhost:${port}/api/ping`, {
+      timeout: 3000,
+    });
+    console.log("Ping OK:", res.data.message);
+  } catch (err) {
+    // Force logout if server is unreachable
+    if (window.location.pathname !== "/login") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    }
+  }
+};
