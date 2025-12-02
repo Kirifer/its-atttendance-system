@@ -1,10 +1,11 @@
-const express = require("express");
+import express from "express";
+import authMiddleware from "../middlewares/authMiddleware.js"; // default import
+import { fileTimeAdjustment } from "../controllers/timeAdjustmentController.js";
+
 const router = express.Router();
-const { verifyToken } = require("./middlewares/authMiddleware");
-const {
-  fileTimeAdjustment,
-} = require("../controllers/timeAdjustmentController");
+
+const verifyToken = authMiddleware;
 
 router.post("/", verifyToken, fileTimeAdjustment);
 
-module.exports = router;
+export default router;
