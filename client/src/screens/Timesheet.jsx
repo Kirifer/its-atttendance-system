@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AttendanceTable from "../components/AttendanceTable";
 import DashboardLayout from "../components/DashboardLayout";
+import TimeAdjustmentModal from "../components/TimeAdjustmentModal";
 import "../styles/AttendanceTable.css";
 import "../styles/DateRange.css";
 
@@ -8,7 +9,10 @@ function Timesheet() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [reload, setReload] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
+  // Time adjustment
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Date range calculation
   const firstDay = new Date(
     currentDate.getFullYear(),
     currentDate.getMonth(),
@@ -35,6 +39,16 @@ function Timesheet() {
   return (
     <div>
       <DashboardLayout>
+        <h1>Timesheet</h1>
+        <button onClick={() => setIsModalOpen(true)}>
+          + File Time Adjustment
+        </button>
+
+        <TimeAdjustmentModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+
         <div className="daterange_container">
           <button className="daterange_btn" onClick={handlePrevMonth}>
             &larr;
