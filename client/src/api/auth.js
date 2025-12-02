@@ -50,11 +50,12 @@ export const forgotPassword = async (email) => {
 };
 
 // Reset password
-export const resetPassword = async (token, password) => {
+export const resetPassword = async (token, newPassword, confirmNewPassword) => {
   try {
     const response = await API.post("/auth/reset-password", {
       token,
-      password,
+      newPassword,
+      confirmNewPassword,
     });
     return response.data;
   } catch (err) {
@@ -66,12 +67,28 @@ export const resetPassword = async (token, password) => {
 };
 
 // Change password
-export const changePassword = async (oldPassword, newPassword) => {
-  const res = await API.post("/auth/change-password", {
-    oldPassword,
-    newPassword,
-  });
-  return res.data;
+export const changePassword = async (
+  oldPassword,
+  newPassword,
+  confirmNewPassword
+) => {
+  try {
+    const res = await API.post("/auth/change-password", {
+      oldPassword,
+      newPassword,
+      confirmNewPassword,
+    });
+
+    if (res.data.token) {
+      localStorage.setItem("token", res.data.token);
+    }
+
+    return res.data;
+  } catch (err) {
+    let message = "Error changing password";
+    if (err.response?.data?.message) message = err.response.data.message;
+    throw new Error(message);
+  }
 };
 
 // Update user info (Username and email)
