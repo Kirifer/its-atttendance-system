@@ -12,6 +12,19 @@ async function createTimeAdjustment(userId, type, details) {
   });
 }
 
+async function getTimeAdjustments(userId = null) {
+  if (userId) {
+    return await prisma.timeAdjustment.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+  return await prisma.timeAdjustment.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+}
+
 module.exports = {
   createTimeAdjustment,
+  getTimeAdjustments,
 };
