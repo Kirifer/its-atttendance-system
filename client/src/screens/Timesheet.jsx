@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AttendanceTable from "../components/AttendanceTable";
 import DashboardLayout from "../components/DashboardLayout";
 import TimeAdjustmentModal from "../components/TimeAdjustmentModal";
+import API from "../api/api";
 import "../styles/AttendanceTable.css";
 import "../styles/DateRange.css";
 
@@ -11,6 +12,21 @@ function Timesheet() {
   const [currentDate, setCurrentDate] = useState(new Date());
   // Time adjustment
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [timeAdjustments, setTimeAdjustments] = useState([]);
+
+  // fetch requests
+  const fetchRequests = async () => {
+    try {
+      const response = await API.get("/time-adjustments");
+      setTimeAdjustments(response.data.requests); // FIXED
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
 
   // Date range calculation
   const firstDay = new Date(
