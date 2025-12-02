@@ -1,4 +1,5 @@
 import { PrismaClient, AttendanceStatus } from "@prisma/client";
+import { autoLunchTardy } from "../utils/autoLunchTardy.js";
 
 const prisma = new PrismaClient();
 
@@ -18,13 +19,13 @@ export const timeIn = async (req, res) => {
         const existing = await prisma.attendance.findUnique({
             where: { userId_date: { userId, date: today } },
         });
-        
-        if (existing)   {
+
+        if (existing) {
             return res.status(400).json({ message: "Already timed in today" });
         }
 
         const now = new Date();
-        
+
         const worksStart = new Date();
         worksStart.setHours(9, 0, 0, 0);
 
@@ -132,14 +133,13 @@ export const lunchIn = async (req, res) => {
 
         const updated = await prisma.attendance.update({
             where: { id: attendance.id },
-            data: { 
+            data: {
                 lunchIn: now,
                 lunchTardinessMinutes: extraTardy,
-                tardinessMinutes: attendance.tardinessMinutes + extraTardy,
                 status:
-                    extraTardy > 0
-                    ? AttendanceStatus.TARDY
-                    : attendance.status,
+                    attendance.tardinessMinutes > 0 || extraTardy > 0
+                        ? AttendanceStatus.TARDY
+                        : AttendanceStatus.PRESENT,
             },
         });
 
@@ -194,10 +194,14 @@ export const getUserAttendance = async (req, res) => {
             return res.status(403).json({ message: "Forbidden" });
         }
 
-        const records = await prisma.attendance.findMany({
+        let records = await prisma.attendance.findMany({
             where: { userId: requestedUserId },
             orderBy: { date: "desc" },
         });
+
+        records = await Promise.all(
+            records.map((r) => autoLunchTardy(r, prisma))
+        );
 
         res.json({ attendance: records });
     } catch (error) {
@@ -212,7 +216,7 @@ export const getAllAttendance = async (req, res) => {
             return res.status(403).json({ message: "Admins only" });
         }
 
-        const records = await prisma.attendance.findMany({
+        let records = await prisma.attendance.findMany({
             include: {
                 user: {
                     select: {
@@ -226,6 +230,10 @@ export const getAllAttendance = async (req, res) => {
                 { userId: "asc" },
             ],
         });
+
+        records = await Promise.all(
+            records.map((r) => autoLunchTardy(r, prisma))
+        );
 
         res.json({ attendance: records });
     } catch (error) {
