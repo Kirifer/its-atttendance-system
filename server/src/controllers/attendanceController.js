@@ -12,6 +12,13 @@ export const isAdmin = (req, res, next) => {
 
 export const timeIn = async (req, res) => {
     try {
+
+        const user = req.user;
+
+        if (user.role === "ADMIN") {
+            return res.status(403).json({ message: "Admins cannot have attendance records" });
+        }
+
         const userId = req.user.id;
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0)
@@ -56,6 +63,13 @@ export const timeIn = async (req, res) => {
 
 export const lunchOut = async (req, res) => {
     try {
+
+        const user = req.user;
+
+        if (user.role === "ADMIN") {
+            return res.status(403).json({ message: "Admins cannot have attendance records" });
+        }
+
         const userId = req.user.id;
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0);
@@ -94,6 +108,13 @@ export const lunchOut = async (req, res) => {
 
 export const lunchIn = async (req, res) => {
     try {
+
+        const user = req.user;
+
+        if (user.role === "ADMIN") {
+            return res.status(403).json({ message: "Admins cannot have attendance records" });
+        }
+
         const userId = req.user.id;
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0);
@@ -153,6 +174,13 @@ export const lunchIn = async (req, res) => {
 
 export const timeOut = async (req, res) => {
     try {
+
+        const user = req.user;
+
+        if (user.role === "ADMIN") {
+            return res.status(403).json({ message: "Admins cannot have attendance records" });
+        }
+
         const userId = req.user.id;
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0);
@@ -195,7 +223,10 @@ export const getUserAttendance = async (req, res) => {
         }
 
         let records = await prisma.attendance.findMany({
-            where: { userId: requestedUserId },
+            where: { 
+                userId: requestedUserId,  
+                user: { role: { not: "ADMIN" } } 
+            },
             orderBy: { date: "desc" },
         });
 
