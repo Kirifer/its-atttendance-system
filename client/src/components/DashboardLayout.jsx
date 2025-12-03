@@ -151,7 +151,9 @@ function DashboardLayout({ children }) {
     </aside>
 
     <main className="dashboard__main">{children}
-      <Footer/>
+      <footer>
+        <Footer/>
+      </footer>
     </main>
   </div>
 
