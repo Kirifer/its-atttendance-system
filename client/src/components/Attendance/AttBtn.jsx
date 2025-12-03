@@ -1,5 +1,5 @@
 import React from 'react'
-import "../Attendance/AttBtn.css"
+import "../../styles/AttBtn.css"
 
 function AttBtn() {
     return (
