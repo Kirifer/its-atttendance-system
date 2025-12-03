@@ -74,9 +74,6 @@ function DashboardLayout({ children }) {
         <a href="settings">Settings</a>
       </li>
       <li className="navbar__item">
-        <a href="reports">Reports</a>
-      </li>
-      <li className="navbar__item">
         <a href="timesheet">Timesheet</a>
       </li>
       <li className="navbar__item">
@@ -105,10 +102,6 @@ function DashboardLayout({ children }) {
           </a>
         </li>
         <li>
-          <a href="reports">
-            <span className="material-symbols-outlined">home_storage</span>
-            Reports
-          </a>
         </li>
         <li>
           <a href="timesheet">

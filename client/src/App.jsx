@@ -13,7 +13,6 @@ import Dashboard from "./screens/Dashboard";
 import ForgotPassword from "./screens/ForgotPassword";
 import Login from "./screens/Login";
 import Logs from "./screens/Logs";
-import Reports from "./screens/Reports";
 import ResetPassword from "./screens/ResetPassword";
 import Settings from "./screens/Settings";
 import Signup from "./screens/Signup";
@@ -47,14 +46,6 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logs" element={<Logs />} />
-        <Route
-          path="/reports"
-          element={
-            <ProtectedRoute>
-              <Reports />
-            </ProtectedRoute>
-          }
-        />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route
           path="/settings"
