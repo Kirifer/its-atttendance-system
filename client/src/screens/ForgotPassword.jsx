@@ -40,7 +40,7 @@ function ForgotPassword() {
           <button
             type="button"
             className="close-btn"
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/")}
           >
             X
           </button>

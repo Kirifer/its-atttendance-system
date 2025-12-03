@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../styles/TimeAdjustmentModal.css";
 import API from "../api/api";
 
-const TimeAdjustmentModal = ({ isOpen, onClose }) => {
+const TimeAdjustmentModal = ({ isOpen, onClose, refreshRequests }) => {
   const [type, setType] = useState("");
   const [details, setDetails] = useState("");
 
@@ -17,11 +17,19 @@ const TimeAdjustmentModal = ({ isOpen, onClose }) => {
     }
 
     try {
-      await API.post("/time-adjustments", { type, details });
+      await API.post(
+        "/time-adjustments",
+        { type, details },
+        { headers: { "Content-Type": "application/json" } }
+      );
       alert("Request submitted successfully!");
       setType("");
       setDetails("");
       onClose();
+
+      if (refreshRequests) {
+        refreshRequests();
+      }
     } catch (err) {
       alert("Failed to submit request.");
       console.log(err);

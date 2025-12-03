@@ -72,10 +72,10 @@ function Signup() {
   };
 
   return (
-    <div className="background center-align-items">
+    <div className="center-align-items">
       <form onSubmit={handleSubmit} className="signup-box">
         <div className="top-box-header">
-          <p className="signup-text">Sign Up</p>
+          <p className="signup-text"></p>
           <button className="close-btn" onClick={() => navigate("/")}>
             X
           </button>
@@ -130,7 +130,7 @@ function Signup() {
         </button>
         <p>
           Already have an account?{" "}
-          <span onClick={() => navigate("/login")} className="link-text">
+          <span onClick={() => navigate("/")} className="link-text">
             Click here to log in.
           </span>
         </p>
@@ -141,7 +141,7 @@ function Signup() {
           message="Sign up successful! You can now log in."
           onClose={() => {
             setShowSuccessPopup(false);
-            navigate("/login");
+            navigate("/");
           }}
         />
       )}

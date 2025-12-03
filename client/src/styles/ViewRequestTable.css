@@ -1,0 +1,105 @@
+.user-requests {
+  margin-top: 20px;
+  overflow-x: auto;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-requests table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Arial", sans-serif;
+}
+
+.user-requests th,
+.user-requests td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.user-requests th {
+  background-color: #0077ff;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px 8px 0 0;
+}
+
+.user-requests tr {
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.3s;
+}
+
+.user-requests tr:nth-child(even) {
+  background-color: #f1f1f1;
+}
+
+.user-requests tr:hover {
+  background-color: #e0f0ff;
+}
+
+.user-requests td {
+  color: #333;
+  vertical-align: middle;
+}
+
+/* Status badges */
+.user-requests td.status {
+  font-weight: bold;
+  padding: 8px 12px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+}
+
+.user-requests td.status.pending {
+  background-color: #ff9800;
+}
+
+.user-requests td.status.approved {
+  background-color: #4caf50;
+}
+
+.user-requests td.status.rejected {
+  background-color: #f44336;
+}
+
+/* Responsive table for mobile */
+@media (max-width: 768px) {
+  .user-requests table,
+  .user-requests thead,
+  .user-requests tbody,
+  .user-requests th,
+  .user-requests td,
+  .user-requests tr {
+    display: block;
+  }
+
+  .user-requests thead {
+    display: none;
+  }
+
+  .user-requests tr {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 10px;
+  }
+
+  .user-requests td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  .user-requests td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 15px;
+    width: calc(50% - 30px);
+    text-align: left;
+    font-weight: bold;
+    color: #555;
+  }
+}

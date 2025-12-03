@@ -7,8 +7,6 @@ import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./components/ProtectedRoute";
 // Styling
 import "./App.css";
-// Screens
-import Home from "./screens/Home";
 import Dashboard from "./screens/Dashboard";
 import ForgotPassword from "./screens/ForgotPassword";
 import Login from "./screens/Login";
@@ -34,7 +32,7 @@ function App() {
     <Router>
       <Routes>
         {/* Default Page "/" */}
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Login />} />
         <Route
           path="/dashboard"
           element={
@@ -44,7 +42,6 @@ function App() {
           }
         />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/logs" element={<Logs />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route
