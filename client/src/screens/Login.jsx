@@ -47,14 +47,9 @@ function Login() {
   };
 
   return (
-    <div className="background center-align-items">
+    <div className="center-align-items">
       <form onSubmit={handleSubmit} className="login-box">
-        <div className="top-box-header">
-          <p className="login-text">Log in</p>
-          <button className="close-btn" onClick={() => navigate("/")}>
-            X
-          </button>
-        </div>
+        <img src="/its-logo.png" alt="ITS Logo" className="login-logo" />
 
         {/* Error Messages */}
         {fieldErrors.general && (
@@ -80,11 +75,13 @@ function Login() {
           />
         </div>
 
-        <PasswordInput
-          password={password}
-          onPasswordChange={(e) => setPassword(e.target.value)}
-          showConfirm={false} // login doesn’t need confirm
-        />
+        <div className="login-eye-wrapper">
+          <PasswordInput
+            password={password}
+            onPasswordChange={(e) => setPassword(e.target.value)}
+            showConfirm={false}
+          />
+        </div>
 
         {/* Buttons */}
         <p onClick={() => navigate("/forgot-password")} className="link-text">

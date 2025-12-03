@@ -18,7 +18,7 @@ const UserDropDownMenu = forwardRef(({ pos }, ref) => {
   const handleSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/login");
+    navigate("/");
   };
 
   return (
