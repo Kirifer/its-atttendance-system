@@ -279,7 +279,7 @@ export const updateAttendance = async (req, res) => {
         const { timeIn, timeOut } = req.body;
 
         const attendance = await prisma.attendance.findUnique({
-            where: { id: Number(id) },
+            where: { id },
         });
 
         if (!attendance) {
@@ -287,7 +287,7 @@ export const updateAttendance = async (req, res) => {
         }
 
         const updated = await prisma.attendance.update({
-            where: { id: Number(id) },
+            where: { id },
             data: {
                 timeIn: timeIn ? new Date(timeIn) : attendance.timeIn,
                 timeOut: timeOut ? new Date(timeOut) : attendance.timeOut,
@@ -310,7 +310,7 @@ export const deleteAttendance = async (req, res) => {
     try {
         const { id } = req.params;
         const attendance = await prisma.attendance.findUnique({
-            where: { id: Number(id) },
+            where: { id },
         });
 
         if (!attendance) {
@@ -318,12 +318,12 @@ export const deleteAttendance = async (req, res) => {
         }
 
         await prisma.attendance.delete({
-            where: { id: Number(id) },
+            where: { id },
         });
 
         res.json({
             message: "Attendance deleted successfully",
-            deletedId: Number(id),
+            deletedId: id,
         });
 
     } catch (error) {
