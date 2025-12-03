@@ -43,7 +43,22 @@ const fetchTimeAdjustments = async (req, res) => {
   }
 };
 
+// user logged in fetch their own requests
+const fetchMyTimeAdjustments = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const requests = await getTimeAdjustments(userId);
+    res.status(200).json({ requests });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch user's time adjustment requests",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   fileTimeAdjustment,
   fetchTimeAdjustments,
+  fetchMyTimeAdjustments,
 };
