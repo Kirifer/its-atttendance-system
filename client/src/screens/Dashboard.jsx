@@ -3,7 +3,7 @@ import { useState } from "react"
 import "../styles/Dashboard.css";
 // import TimeInOut from "../components/TimeInOutBtn.jsx"
 // import LunchInOutBtn from "../components/LunchInOutBtn.jsx";
-import AttBtn from "../components/Attendance/AttBtn.jsx";
+import AttBtn from "../components/AttBtn.jsx";
 import DashboardLayout from "../components/DashboardLayout";
 import Clock from "../components/Dashboard/Clock.jsx";
 import LogsCard from "../components/Dashboard/LogsCard.jsx";
@@ -23,7 +23,11 @@ function Dashboard() {
           <div className="dashboard__containerone">
             <div className="dashboard__left">
               <Clock format="HH:mm:ss" />
-              <AttBtn />
+              <AttBtn 
+                userId={user.id}
+                reload={reload}
+                onAttendanceChange={() => setReload((r) => !r)}
+              />
               {/* <TimeInOut
                 userId={user.id}
                 onAttendanceChange={() => setReload((r) => !r)}
