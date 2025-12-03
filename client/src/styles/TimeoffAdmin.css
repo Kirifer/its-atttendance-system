@@ -4,6 +4,7 @@
   padding: 30px;
   width: 90%;
   margin: 50px auto;
+  margin-bottom: 140px;
   display: flex;
   flex-direction: column;
 }

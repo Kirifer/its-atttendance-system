@@ -1,0 +1,93 @@
+
+.footer {
+  background-color: #000000;
+  color: white;
+  padding-top: 40px;
+  font-family: Arial, sans-serif;
+  margin-top: 200px;
+}
+
+.footer__container {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+.footer__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.footer__col {
+  flex: 1 1 150px;
+}
+
+.footer__col--wide {
+  flex: 1 1 250px;
+}
+
+.footer__title {
+  font-size: 15px;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.footer__text {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.footer__list {
+  padding: 0;
+  list-style: none;
+}
+
+.footer__link {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.footer__link:hover {
+  text-decoration: underline;
+}
+
+.footer__socials {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.footer__social {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.footer__social:hover {
+  opacity: 0.8;
+}
+
+.footer__social--facebook { background-color: #3b5998; }
+.footer__social--twitter { background-color: #55acee; }
+.footer__social--google { background-color: #dd4b39; }
+.footer__social--instagram { background-color: #ac2bac; }
+.footer__social--linkedin { background-color: #0082ca; }
+.footer__social--github { background-color: #333; }
+
+.footer__copyright {
+  text-align: center;
+  padding: 15px;
+  margin-top: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+}

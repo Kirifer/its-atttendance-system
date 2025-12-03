@@ -2,15 +2,24 @@
 
 .dashboard {
   display: flex;
+  flex-direction: column;  /* column layout: navbar, content, footer */
+  min-height: 100vh;  
   height: 100vh;
   background-color: #ffffff;
   font-family: Arial, sans-serif;
+   flex-direction: column; 
+}
+
+.dashboard__content-wrapper {
+  display: flex;        /* sidebar + main side by side */
+  flex: 1;              /* take remaining vertical space */   /* space for fixed navbar */
+  overflow: hidden;
 }
 
 .dashboard__sidebar {
   top: 0;
   left: 0;
-  height: 75%;
+  height: auto; 
   width: 84px;
   background: #ffffff;
   padding: 25px 0px;
@@ -106,20 +115,28 @@ ul {
 
 .dashboard__main {
   flex: 1;
-  padding: 20px;
   overflow-y: auto;
-  box-sizing: border-box;
   background: #f6f8fa;
+  box-sizing: border-box;
+}
+
+.dashboard__footer {
+  height: 60px;
+  flex-shrink: 0;          
+  background: #929fba;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* DESKTOP VIEW */
 @media (min-width: 768px) {
-  /* Sidebar visible on desktop */
+
   .dashboard__sidebar {
     display: flex;
   }
 
-  /* Hide the hamburger button */
   .navbar__toggle {
     display: none;
   }
@@ -245,7 +262,6 @@ ul {
     z-index: 2000;
   }
 
-  /* Push main content below navbar */
   .dashboard__main {
     margin-top: 70px;
   }
