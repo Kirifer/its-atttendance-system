@@ -11,7 +11,7 @@
   max-width: 1200px; /* prevents stretching too wide on large screens */
 }
 
-.dashboard__containertwo {
+.dashboard__container__two {
   display: flex;
   margin: 50px auto 0 auto; /* container centered horizontally */
   height: auto;
@@ -44,6 +44,15 @@
 
 /* Right section */
 .dashboard__right {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.dashboard__right__two {
   flex: 1;
   min-width: 300px;
   display: flex;

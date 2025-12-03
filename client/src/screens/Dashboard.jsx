@@ -7,8 +7,7 @@ import DashboardLayout from "../components/DashboardLayout";
 import Clock from "../components/Dashboard/Clock.jsx";
 import LogsCard from "../components/Dashboard/LogsCard.jsx";
 import FiledLeavesCard from "../components/Dashboard/FiledLeavesCard.jsx";
-import Calendar from "../components/Dashboard/Calendar.jsx";
-
+import DashboardCalendar from "../components/Dashboard/Calendar.jsx";
 function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [reload, setReload] = useState(false);
@@ -42,12 +41,12 @@ function Dashboard() {
               />
             </div>
           </div>
-          <div className="dashboard__containertwo">
+          <div className="dashboard__container__two">
             <div className="dashboard__left__two">
               <FiledLeavesCard/>
             </div>
-            <div className="dashboard__right">
-              <Calendar/>
+            <div className="dashboard__right__two">
+              <DashboardCalendar/>
             </div>
 
           </div>
