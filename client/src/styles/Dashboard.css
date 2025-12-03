@@ -1,3 +1,6 @@
+.dashboard__main{
+  margin-top: -100px;
+}
 .dashboard__containerone {
   display: flex;
   background-color: #eeeeee;
