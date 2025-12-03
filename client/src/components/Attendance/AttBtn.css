@@ -1,0 +1,154 @@
+.att__carousel-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.att__carousel {
+    max-width: 250px;
+    overflow-x: auto;
+    margin: 0 auto;
+    margin-left: 120px;
+    display: flex;
+    gap: 0;
+    scroll-behavior: smooth;
+    anchor-name: --att__carousel;
+    scroll-snap-type: x mandatory;
+}
+
+.att__carousel-card {
+    scroll-snap-align: center;
+    flex: 0 0 100%;
+    height: 12em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: .5em;
+    text-align: center;
+    align-content: center;
+}
+
+.att__carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.att__carousel::scroll-button(right), .att__carousel::scroll-button(left) {
+    content: "→";
+    border: none;
+    background-color: #fff;
+    font-size: large;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    padding-bottom: .1em;
+    cursor: pointer;
+    position: fixed;
+    position-anchor: --att__carousel;
+    position-area: right center;
+    translate: -50%;
+}
+
+.att__carousel::scroll-button(left) {
+    content: "←";
+    position-area: left center;
+    translate: 50%;
+}
+
+.att__carousel::scroll-button(right), .att__carousel::scroll-button(left):disabled {
+    cursor: auto;
+}
+
+.att__carousel::scroll-button(left):hover,
+.att__carousel::scroll-button(right):hover {
+    background-color: #1a5dac;
+    color: #fff;
+}
+
+.att__btn-ti {
+  background-color: #54cc58;
+  border: 0.5px solid;
+  border-style: none;
+  border-radius: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+  padding: 16px 24px;
+}
+
+.att__btn-to {
+  background-color: #e86e6e;
+  border: 0.5px solid;
+  border-style: none;
+  border-radius: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+  padding: 16px 24px;
+}
+
+.att__btn-ti:hover {
+  background-color: #60e664;
+}
+
+.att__btn-to:hover {
+  background-color: #ff7979;
+}
+
+.att__btn-ti:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+.att__btn-to:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+.att__btn-li {
+  background-color: #54cc58;
+  border: 0.5px solid;
+  border-style: none;
+  border-radius: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+  padding: 16px 24px;
+}
+
+.att__btn-lo {
+  background-color: #e86e6e;
+  border: 0.5px solid;
+  border-style: none;
+  border-radius: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+  padding: 16px 24px;
+}
+
+.att__btn-li:hover {
+  background-color: #60e664;
+}
+
+.att__btn-lo:hover {
+  background-color: #ff7979;
+}
+
+.att__btn-li:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+.att__btn-lo:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+
+    .att__carousel {
+      margin: 0 auto;
+    }
+
+    .att__carousel-card {
+        flex: 0 0 100%;
+        
+    }
+    
+}
