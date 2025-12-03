@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { lunchOut, lunchIn, getUserAttendance } from "../api/attendance";
+import { showToast } from "../components/Notification/toast";
 
 export function useLunchInOut(userId, reload, onAttendanceChange) {
   const [canLunchOut, setCanLunchOut] = useState(false);
@@ -46,14 +47,28 @@ export function useLunchInOut(userId, reload, onAttendanceChange) {
 
   const handleLunchOut = async () => {
     await lunchOut();
+
+    showToast({
+      message: "Successfully out for lunch",
+      color: "#ffffff",
+      type: "success",
+    });
+
     onAttendanceChange();
-    alert("Out for lunch.");
+
   };
 
   const handleLunchIn = async () => {
     await lunchIn();
+
+    showToast({
+      message: "Successfully back from lunch",
+      color: "#ffffff",
+      type: "success",
+    });
+
     onAttendanceChange();
-    alert("Back from lunch.");
+
   };
 
   return {

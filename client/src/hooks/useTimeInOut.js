@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { timeIn, timeOut, getUserAttendance } from "../api/attendance";
+import { showToast } from "../components/Notification/toast";
 
 export function useTimeInOut(userId, onAttendanceChange) {
   const [isTimedIn, setIsTimedIn] = useState(false);
@@ -25,16 +26,30 @@ export function useTimeInOut(userId, onAttendanceChange) {
 
   const handleTimeIn = async () => {
     await timeIn();
+
+    showToast({
+        message: "Successfully timed in",
+        color: "#ffffff",
+        type: "success",
+      });
+
     setIsTimedIn(true);
     onAttendanceChange();
-    alert("Successfully Timed In.");
+    
   };
 
   const handleTimeOut = async () => {
     await timeOut();
+
+    showToast({
+        message: "Successfully timed out",
+        color: "#ffffff",
+        type: "success",
+      });
+
     setIsTimedIn(false);
     onAttendanceChange();
-    alert("Successfully Timed Out");
+
   };
 
   return {
