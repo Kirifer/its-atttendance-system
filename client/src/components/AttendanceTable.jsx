@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { getUserAttendance, getAllAttendance } from "../api/attendance";
+import { formatAttStatus } from "../hooks/formatAttStatus";
 import "../styles/AttendanceTable.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -358,7 +359,7 @@ export default function AttendanceTable({
                               .toLowerCase()
                               .replace("_", "-")}`}
                           >
-                            {r[col]}
+                            {formatAttStatus(r[col])}
                           </span>
                         ) : (
                           r[col]
