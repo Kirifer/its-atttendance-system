@@ -79,6 +79,11 @@ function DashboardLayout({ children }) {
       <li className="navbar__item">
         <a href="time-off">Time-off</a>
       </li>
+      {user.role === "ADMIN" && (
+        <li className="navbar__item">
+          <a href="time-off-admin">Admin</a>
+        </li>
+        )}
     </ul>
   </nav>
 
