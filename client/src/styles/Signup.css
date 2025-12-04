@@ -1,67 +1,79 @@
-
-
-.center-align-items {
-  display: flex;
+/* Full-screen light background like login */
+.signup-background {
   background-color: #F6F8FA;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
   height: 100vh;
+  z-index: -1;
 }
 
-/* Upper Box Header */
+/* Centering container (same as login) */
+.center-align-items {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+}
+
+/* Top header (same behavior as login) */
 .top-box-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-top: -50px;
-  justify-content: space-between; /* pushes X to the right */
-  width: 100%; /* or a fixed width */
+  width: 100%;
   padding: 0 10px;
 }
 
-/* Boxes */
+/* Signup box (same style as login-box) */
 .signup-box {
-  background-color: #c4c4c4;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  padding: 35px 40px;
+  border-radius: 12px;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+  text-align: center;
 }
 
+/* Text fields (same as login) */
 .text-box {
-  width: 300px;
-  height: 40px;
-  margin: 10px 0;
+  width: 100%;
+  height: 42px;
+  margin: 12px 0;
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  background: #fafafa;
   font-size: 16px;
   box-sizing: border-box;
 }
 
-/* Texts */
-.link-text {
-  color: #1a5dac;
-  cursor: pointer;
-  /* text-decoration: underline; */
+.text-box:focus {
+  border-color: #1a5dac;
+  outline: none;
+  background: white;
 }
 
+/* Signup title (same as login-title style) */
 .signup-text {
-  /* margin-top: -20px; */
-  font-size: 34px;
-  font-weight: bolder;
-  color: #000000;
-  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 10px;
 }
 
-/* Buttons */
+/* Close Button */
 .close-btn {
-  margin-top: 10px;
   background: none;
   border: none;
   font-size: 28px;
   font-weight: bold;
-  /* margin-top: -20px; */
+  margin-top: 30px;
   cursor: pointer;
   color: #333;
   padding: 5px 10px;
@@ -78,17 +90,18 @@
   transform: scale(0.98);
 }
 
+/* Signup button (same style as login-button) */
 .signup-button {
-  width: 300px;
-  height: 40px;
-  margin-top: 20px;
+  width: 100%;
+  height: 45px;
+  margin-top: 15px;
   background-color: #1a5dac;
   color: white;
   border: none;
-  border-radius: 5px;
-  font-size: 18px;
+  border-radius: 6px;
+  font-size: 17px;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: 0.2s;
 }
 
 .signup-button:hover {
@@ -99,3 +112,18 @@
 .signup-button:hover:active {
   transform: scale(0.98);
 }
+
+/* Link text */
+.link-text {
+  color: #1a5dac;
+  cursor: pointer;
+}
+
+.link-text:hover {
+  text-decoration: underline;
+}
+
+.signup-eye-wrapper .eye-icon {
+    right: 30px !important;
+  }
+

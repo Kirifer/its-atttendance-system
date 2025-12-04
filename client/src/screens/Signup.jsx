@@ -116,13 +116,15 @@ function Signup() {
         </div>
 
         {/* Password */}
-        <PasswordInput
-          password={password}
-          confirmPassword={confirmPassword}
-          onPasswordChange={(e) => setPassword(e.target.value)}
-          onConfirmChange={(e) => setConfirmPassword(e.target.value)}
-          showConfirm={true}
-        />
+        <div className="signup-eye-wrapper">
+          <PasswordInput
+            password={password}
+            confirmPassword={confirmPassword}
+            onPasswordChange={(e) => setPassword(e.target.value)}
+            onConfirmChange={(e) => setConfirmPassword(e.target.value)}
+            showConfirm={true}
+          />
+        </div>
 
         {/* Buttons */}
         <button className="signup-button" type="submit">
