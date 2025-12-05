@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function Navbar({ user }) {
   const [open, setOpen] = useState(false);
@@ -17,24 +18,24 @@ export default function Navbar({ user }) {
 
       <ul className={`navbar__menu ${open ? "navbar__menu--open" : ""}`}>
         <li className="navbar__item">
-          <a href="/dashboard">Dashboard</a>
+          <Link to="/dashboard">Dashboard</Link>
         </li>
 
         <li className="navbar__item">
-          <a href="/settings">Settings</a>
+          <Link to="/settings">Settings</Link>
         </li>
 
         <li className="navbar__item">
-          <a href="/timesheet">Timesheet</a>
+          <Link to="/timesheet">Timesheet</Link>
         </li>
 
         <li className="navbar__item">
-          <a href="/time-off">Time-off</a>
+          <Link to="/time-off">Time-off</Link>
         </li>
 
         {user.role === "ADMIN" && (
           <li className="navbar__item">
-            <a href="/time-off-admin">Admin</a>
+            <Link to="/time-off-admin">Admin</Link>
           </li>
         )}
       </ul>

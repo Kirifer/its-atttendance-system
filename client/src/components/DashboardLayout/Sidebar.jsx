@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import UserDropDownMenu from "../UserDropdownMenu";
+import { Link } from "react-router-dom";
 
 export default function Sidebar({ user }) {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -39,9 +40,8 @@ export default function Sidebar({ user }) {
 
   return (
     <aside
-      className={`dashboard__sidebar ${
-        sidebarExpanded ? "expanded" : "collapsed"
-      }`}
+      className={`dashboard__sidebar ${sidebarExpanded ? "expanded" : "collapsed"
+        }`}
       onMouseEnter={() => setSidebarExpanded(true)}
       onMouseLeave={() => setSidebarExpanded(false)}
     >
@@ -51,43 +51,43 @@ export default function Sidebar({ user }) {
 
       <ul className="dashboard__sidebar-links">
         <li>
-          <a href="/dashboard">
+          <Link to="/dashboard">
             <span className="material-symbols-outlined">home</span>
             Dashboard
-          </a>
+          </Link>
         </li>
 
         <li>
-          <a href="/settings">
+          <Link to="/settings">
             <span className="material-symbols-outlined">settings</span>
             Settings
-          </a>
+          </Link>
         </li>
 
         <li>
-          <a href="/timesheet">
+          <Link to="/timesheet">
             <span className="material-symbols-outlined">calendar_month</span>
             Timesheet
-          </a>
+          </Link>
         </li>
 
         <li>
-          <a href="/time-off">
+          <Link to="/time-off">
             <span className="material-symbols-outlined">
               nest_clock_farsight_analog
             </span>
             Time-off
-          </a>
+          </Link>
         </li>
 
         {user.role === "ADMIN" && (
           <li>
-            <a href="/time-off-admin">
+            <Link to="/time-off-admin">
               <span className="material-symbols-outlined">
                 manage_accounts
               </span>
               Time-off Admin
-            </a>
+            </Link>
           </li>
         )}
       </ul>
@@ -110,7 +110,7 @@ export default function Sidebar({ user }) {
         </div>
 
         {userMenuOpen && (
-          <UserDropDownMenu ref={userMenuRef} pos={dropdownPos}/>
+          <UserDropDownMenu ref={userMenuRef} pos={dropdownPos} />
         )}
       </div>
     </aside>
