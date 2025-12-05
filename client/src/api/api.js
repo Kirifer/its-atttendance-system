@@ -19,10 +19,10 @@ API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.data?.message === "Invalid or expired token") {
-      if (window.location.pathname !== "/login") {
+      if (window.location.pathname !== "/") {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        window.location.href = "/login";
+        window.location.href = "/";
       }
       return;
     }
@@ -42,10 +42,10 @@ export const pingServer = async () => {
     console.log("Ping OK:", res.data.message);
   } catch (err) {
     // Force logout if server is unreachable
-    if (window.location.pathname !== "/login") {
+    if (window.location.pathname !== "/") {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+      window.location.href = "/";
     }
   }
 };
