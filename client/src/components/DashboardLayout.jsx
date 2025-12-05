@@ -15,6 +15,8 @@ function DashboardLayout({ children }) {
   const userMenuRef = useRef(null);
   const userProfileRef = useRef(null);
 
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+
   // Real-time user update
   useEffect(() => {
     if (contextUser) {
@@ -51,6 +53,16 @@ function DashboardLayout({ children }) {
         : { username: "", email: "", role: "" }
     );
   }, []);
+
+  //sidebar
+  useEffect(() => {
+    const saved = localStorage.getItem("sidebarExpanded");
+    if (saved !== null) setSidebarExpanded(saved === "true");
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("sidebarExpanded", sidebarExpanded);
+  }, [sidebarExpanded]);
 
   return (
     <div className="dashboard">
@@ -89,10 +101,15 @@ function DashboardLayout({ children }) {
 
   {/* Sidebar + Main */}
   <div className="dashboard__content-wrapper">
-    <aside className="dashboard__sidebar">
+    <aside
+      className={`dashboard__sidebar ${sidebarExpanded ? "expanded" : "collapsed"}`}
+      onMouseEnter={() => setSidebarExpanded(true)}
+      onMouseLeave={() => setSidebarExpanded(false)}
+    >
       <div className="dashboard__sidebar-header">
         <img src="its-logo.png" alt="logo" />
       </div>
+
       <ul className="dashboard__sidebar-links">
         <li>
           <a href="dashboard">

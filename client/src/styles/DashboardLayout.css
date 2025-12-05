@@ -19,7 +19,7 @@
   top: 0;
   left: 0;
   height: 100%; 
-  width: 84px;
+  width: 80px;
   background: #ffffff;
   padding: 25px 0;
   transition: all 0.4s ease;
@@ -28,9 +28,10 @@
   flex-direction: column;
 }
 
-.dashboard__sidebar:hover {
+.dashboard__sidebar.expanded {
   width: 260px;
 }
+
 
 .dashboard__sidebar-header {
   display: flex;
