@@ -2,13 +2,22 @@ import { useEffect, useState, useRef } from "react";
 import UserDropDownMenu from "../UserDropdownMenu";
 import { Link } from "react-router-dom";
 
-export default function Sidebar({ user }) {
+export default function Sidebar() {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [dropdownPos, setDropdownPos] = useState({ x: 0, y: 0 });
 
   const userMenuRef = useRef(null);
   const userProfileRef = useRef(null);
+
+   const [user, setUser] = useState(() => {
+    return JSON.parse(localStorage.getItem("user"));
+  });
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("user"));
+    setUser(stored);
+  }, []);
 
   // Load saved state
   useEffect(() => {
