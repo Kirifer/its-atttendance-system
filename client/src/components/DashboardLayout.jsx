@@ -1,187 +1,38 @@
-import React, { useEffect, useRef } from "react";
-import { useContext } from "react";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import UserDropdownMenu from "./UserDropdownMenu";
+import Navbar from "./DashboardLayout/Navbar";
+import Sidebar from "./DashboardLayout/Sidebar";
+import Footer from "./DashboardLayout/Footer";
 import "../styles/DashboardLayout.css";
-import Footer from "./Footer";
 
-function DashboardLayout({ children }) {
+export default function DashboardLayout({ children }) {
   const { user: contextUser } = useContext(UserContext);
-  const [open, setOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [user, setUser] = useState({ username: "", email: "" });
-  const [dropdownPos, setDropdownPos] = useState({ x: 0, y: 0 });
-  const userMenuRef = useRef(null);
-  const userProfileRef = useRef(null);
+  const [user, setUser] = useState({ username: "", email: "", role: "" });
 
-  const [sidebarExpanded, setSidebarExpanded] = useState(true);
-
-  // Real-time user update
+  // Sync user
   useEffect(() => {
-    if (contextUser) {
-      setUser(contextUser);
-    } else {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) setUser(JSON.parse(storedUser));
+    if (contextUser) setUser(contextUser);
+    else {
+      const stored = localStorage.getItem("user");
+      if (stored) setUser(JSON.parse(stored));
     }
   }, [contextUser]);
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        userMenuRef.current &&
-        !userMenuRef.current.contains(event.target) &&
-        userProfileRef.current &&
-        !userProfileRef.current.contains(event.target)
-      ) {
-        setUserMenuOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    setUser(
-      storedUser
-        ? JSON.parse(storedUser)
-        : { username: "", email: "", role: "" }
-    );
-  }, []);
-
-  //sidebar
-  useEffect(() => {
-    const saved = localStorage.getItem("sidebarExpanded");
-    if (saved !== null) setSidebarExpanded(saved === "true");
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("sidebarExpanded", sidebarExpanded);
-  }, [sidebarExpanded]);
-
   return (
     <div className="dashboard">
-  {/* Navbar */}
-  <nav className="navbar">
-    <div className="navbar__logo">
-      <img src="its-logo.png" alt="logo" />
+      <Navbar user={user} />
+
+      <div className="dashboard__content-wrapper">
+        <Sidebar user={user} />
+
+        <main className="dashboard__main">
+          {children}
+
+          <footer>
+            <Footer />
+          </footer>
+        </main>
+      </div>
     </div>
-
-    <button className="navbar__toggle" onClick={() => setOpen(!open)}>
-      <span className="navbar__toggle-bar"></span>
-      <span className="navbar__toggle-bar"></span>
-      <span className="navbar__toggle-bar"></span>
-    </button>
-
-    <ul className={`navbar__menu ${open ? "navbar__menu--open" : ""}`}>
-      <li className="navbar__item">
-        <a href="dashboard">Dashboard</a>
-      </li>
-      <li className="navbar__item">
-        <a href="settings">Settings</a>
-      </li>
-      <li className="navbar__item">
-        <a href="timesheet">Timesheet</a>
-      </li>
-      <li className="navbar__item">
-        <a href="time-off">Time-off</a>
-      </li>
-      {user.role === "ADMIN" && (
-        <li className="navbar__item">
-          <a href="time-off-admin">Admin</a>
-        </li>
-        )}
-    </ul>
-  </nav>
-
-  {/* Sidebar + Main */}
-  <div className="dashboard__content-wrapper">
-    <aside
-      className={`dashboard__sidebar ${sidebarExpanded ? "expanded" : "collapsed"}`}
-      onMouseEnter={() => setSidebarExpanded(true)}
-      onMouseLeave={() => setSidebarExpanded(false)}
-    >
-      <div className="dashboard__sidebar-header">
-        <img src="its-logo.png" alt="logo" />
-      </div>
-
-      <ul className="dashboard__sidebar-links">
-        <li>
-          <a href="dashboard">
-            <span className="material-symbols-outlined">home</span>
-            Dashboard
-          </a>
-        </li>
-        <li>
-          <a href="settings">
-            <span className="material-symbols-outlined">settings</span>
-            Settings
-          </a>
-        </li>
-        <li>
-        </li>
-        <li>
-          <a href="timesheet">
-            <span className="material-symbols-outlined">calendar_month</span>
-            Timesheet
-          </a>
-        </li>
-        <li>
-          <a href="time-off">
-            <span className="material-symbols-outlined">
-              nest_clock_farsight_analog
-            </span>
-            Time-off
-          </a>
-        </li>
-        {user.role === "ADMIN" && (
-          <li>
-            <a href="time-off-admin">
-              <span className="material-symbols-outlined">manage_accounts</span>
-              Time-off Admin
-            </a>
-          </li>
-        )}
-      </ul>
-
-      {/* User */}
-      <div className="dashboard__user-account">
-        <div
-          className="dashboard__user-profile"
-          ref={userProfileRef}
-          onClick={(e) => {
-            setUserMenuOpen(!userMenuOpen);
-            setDropdownPos({ x: e.clientX, y: e.clientY });
-          }}
-        >
-          <img src="defaultProfile.png" alt="profile" />
-          <div className="dashboard__user-detail">
-            <h3>{user.username || "Guest"}</h3>
-            <h4>{user.email || "guest@exampple.com"}</h4>
-          </div>
-        </div>
-
-        {userMenuOpen && (
-          <UserDropdownMenu ref={userMenuRef} pos={dropdownPos} />
-        )}
-      </div>
-    </aside>
-
-    <main className="dashboard__main">{children}
-      <footer>
-        <Footer/>
-      </footer>
-    </main>
-  </div>
-
-  
-</div>
   );
 }
-
-export default DashboardLayout;
