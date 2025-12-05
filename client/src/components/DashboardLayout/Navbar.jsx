@@ -38,6 +38,9 @@ export default function Navbar({ user }) {
             <Link to="/time-off-admin">Admin</Link>
           </li>
         )}
+        <li className="navbar__item">
+          <a href="/user-info">Profile</a>
+        </li>
       </ul>
     </nav>
   );
