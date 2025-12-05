@@ -1,8 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react"
 import "../styles/Dashboard.css";
-// import TimeInOut from "../components/TimeInOutBtn.jsx"
-// import LunchInOutBtn from "../components/LunchInOutBtn.jsx";
 import AttBtn from "../components/AttBtn.jsx";
 import DashboardLayout from "../components/DashboardLayout";
 import Clock from "../components/Dashboard/Clock.jsx";
@@ -28,15 +26,6 @@ function Dashboard() {
                 reload={reload}
                 onAttendanceChange={() => setReload((r) => !r)}
               />
-              {/* <TimeInOut
-                userId={user.id}
-                onAttendanceChange={() => setReload((r) => !r)}
-              />
-              <LunchInOutBtn
-                userId={user.id}
-                reload={reload}
-                onAttendanceChange={() => setReload((r) => !r)}
-              /> */}
             </div>
             <div className="dashboard__right">
               <LogsCard

@@ -5,63 +5,65 @@
 }
 
 .att__carousel {
-    max-width: 250px;
-    overflow-x: auto;
-    margin: 0 auto;
-    margin-left: 100px;
-    display: flex;
-    gap: 0;
-    scroll-behavior: smooth;
-    anchor-name: --att__carousel;
-    scroll-snap-type: x mandatory;
+  max-width: 250px;
+  overflow-x: auto;
+  margin: 0 auto;
+  margin-left: 100px;
+  display: flex;
+  gap: 0;
+  scroll-behavior: smooth;
+  anchor-name: --att__carousel;
+  scroll-snap-type: x mandatory;
 }
 
 .att__carousel-card {
-    scroll-snap-align: center;
-    flex: 0 0 100%;
-    height: 12em;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: .5em;
-    text-align: center;
-    align-content: center;
+  scroll-snap-align: center;
+  flex: 0 0 100%;
+  height: 12em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: .5em;
+  text-align: center;
+  align-content: center;
 }
 
 .att__carousel::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
-.att__carousel::scroll-button(right), .att__carousel::scroll-button(left) {
-    content: "→";
-    border: none;
-    background-color: #fff;
-    font-size: large;
-    height: 30px;
-    width: 30px;
-    border-radius: 50%;
-    padding-bottom: .1em;
-    cursor: pointer;
-    position: fixed;
-    position-anchor: --att__carousel;
-    position-area: right center;
-    translate: -50%;
+.att__carousel::scroll-button(right),
+.att__carousel::scroll-button(left) {
+  content: "→";
+  border: none;
+  background-color: #fff;
+  font-size: large;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  padding-bottom: .1em;
+  cursor: pointer;
+  position: fixed;
+  position-anchor: --att__carousel;
+  position-area: right center;
+  translate: -50%;
 }
 
 .att__carousel::scroll-button(left) {
-    content: "←";
-    position-area: left center;
-    translate: 50%;
+  content: "←";
+  position-area: left center;
+  translate: 50%;
 }
 
-.att__carousel::scroll-button(right), .att__carousel::scroll-button(left):disabled {
-    cursor: auto;
+.att__carousel::scroll-button(right),
+.att__carousel::scroll-button(left):disabled {
+  cursor: auto;
 }
 
 .att__carousel::scroll-button(left):hover,
 .att__carousel::scroll-button(right):hover {
-    background-color: #1a5dac;
-    color: #fff;
+  background-color: #1a5dac;
+  color: #fff;
 }
 
 .att__btn-ti {
@@ -140,15 +142,56 @@
   cursor: not-allowed;
 }
 
+@media (max-width: 1200px) {
+  .att__carousel {
+    max-width: 250px;
+    overflow-x: auto;
+    margin: 100px;
+    display: flex;
+    gap: 0;
+    scroll-behavior: smooth;
+    anchor-name: --att__carousel;
+    scroll-snap-type: x mandatory;
+  }
+
+  .att__carousel-card {
+    flex: 0 0 100%;
+
+  }
+
+  .att__carousel::scroll-button(right),
+  .att__carousel::scroll-button(left) {
+    height: 42px;
+    width: 42px;
+    border-radius: 50%;
+    padding-bottom: .1em;
+    cursor: pointer;
+    position: fixed;
+    font-size: x-large;
+  }
+
+}
+
 @media (max-width: 768px) {
 
-    .att__carousel {
-      margin: 0 auto;
-    }
+  .att__carousel {
+    margin: 0 auto;
+  }
 
-    .att__carousel-card {
-        flex: 0 0 100%;
-        
-    }
-    
+  .att__carousel-card {
+    flex: 0 0 100%;
+
+  }
+
+  .att__carousel::scroll-button(right),
+  .att__carousel::scroll-button(left) {
+    height: 42px;
+    width: 42px;
+    border-radius: 50%;
+    padding-bottom: .1em;
+    cursor: pointer;
+    position: fixed;
+    font-size: x-large;
+  }
+
 }
