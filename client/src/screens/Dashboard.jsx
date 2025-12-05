@@ -45,6 +45,7 @@ function Dashboard() {
                   { timeIn: "November 18, 2025 09:00 AM", timeOut: "November 18, 2025 06:00 PM" },
                   { timeIn: "November 19, 2025 09:05 AM", timeOut: "November 19, 2025 06:10 PM" },
                 ]}
+                reload={reload}
               />
             </div>
           </div>
