@@ -109,3 +109,16 @@
   background-color: #004ca3;
   transform: scale(0.99);
 }
+
+@media (max-width: 768px) {
+
+  .time-adjustment-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  top: 120px;
+  right: 5px;
+
+  }
+}

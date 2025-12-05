@@ -172,11 +172,7 @@ function Timesheet() {
                 &rarr;
               </button>
             </div>
-
-            <div className="attendance_head">
-              <h1>Timesheet</h1>
-            </div>
-
+          
             <AttendanceTable
               userId={user.id}
               userEmail={user.email}

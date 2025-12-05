@@ -238,6 +238,7 @@ export default function AttendanceTable({
 
   return (
     <div className="attendance_body">
+      <h1 className="attendance_head">Timesheet</h1>
       <div className="leave-table__search" style={{ marginBottom: "10px" }}>
         <select
           value={searchField}
