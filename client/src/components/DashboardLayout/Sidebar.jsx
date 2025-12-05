@@ -10,7 +10,7 @@ export default function Sidebar() {
   const userMenuRef = useRef(null);
   const userProfileRef = useRef(null);
 
-   const [user, setUser] = useState(() => {
+  const [user, setUser] = useState(() => {
     return JSON.parse(localStorage.getItem("user"));
   });
 
@@ -49,8 +49,9 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`dashboard__sidebar ${sidebarExpanded ? "expanded" : "collapsed"
-        }`}
+      className={`dashboard__sidebar ${
+        sidebarExpanded ? "expanded" : "collapsed"
+      }`}
       onMouseEnter={() => setSidebarExpanded(true)}
       onMouseLeave={() => setSidebarExpanded(false)}
     >
@@ -92,9 +93,7 @@ export default function Sidebar() {
         {user.role === "ADMIN" && (
           <li>
             <Link to="/time-off-admin">
-              <span className="material-symbols-outlined">
-                manage_accounts
-              </span>
+              <span className="material-symbols-outlined">manage_accounts</span>
               Time-off Admin
             </Link>
           </li>
@@ -111,8 +110,12 @@ export default function Sidebar() {
             setDropdownPos({ x: e.clientX, y: e.clientY });
           }}
         >
-          <img src="defaultProfile.png" alt="profile" />
-          <div className="dashboard__user-detail">
+          <img
+            src="defaultProfile.png"
+            alt="profile"
+            style={{ cursor: "pointer" }}
+          />
+          <div className="dashboard__user-detail" style={{ cursor: "pointer" }}>
             <h3>{user.username}</h3>
             <h4>{user.email}</h4>
           </div>
