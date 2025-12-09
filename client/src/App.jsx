@@ -1,4 +1,4 @@
-// Sser log out when server is down through pinging
+// User log out when server is down through pinging
 import { useEffect } from "react";
 import { pingServer } from "./api/api";
 import { useState } from "react";
@@ -17,7 +17,9 @@ import Signup from "./screens/Signup";
 import Timeoff from "./screens/Timeoff";
 import Timesheet from "./screens/Timesheet";
 import UserInfo from "./screens/UserInfo";
+import UserRequests from "./screens/UserRequests";
 import TimeoffAdmin from "./screens/TimeoffAdmin";
+import ViewRequestsAdmin from "./screens/ViewRequestsAdmin";
 
 function App() {
   useEffect(() => {
@@ -71,10 +73,26 @@ function App() {
           }
         />
         <Route
+          path="/my-requests"
+          element={
+            <ProtectedRoute>
+              <UserRequests />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/time-off-admin"
           element={
             <ProtectedRoute adminOnly={true}>
               <TimeoffAdmin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/view-requests-admin"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <ViewRequestsAdmin />
             </ProtectedRoute>
           }
         />

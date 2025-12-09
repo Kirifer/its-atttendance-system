@@ -81,6 +81,17 @@ export default function Sidebar() {
           </Link>
         </li>
 
+        {user.role === "ADMIN" && (
+          <li>
+            <Link to="/view-requests-admin">
+              <span className="material-symbols-outlined">
+                person_raised_hand
+              </span>
+              View Requests
+            </Link>
+          </li>
+        )}
+
         <li>
           <Link to="/time-off">
             <span className="material-symbols-outlined">
