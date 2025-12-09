@@ -25,27 +25,38 @@ export function useTimeInOut(userId, onAttendanceChange) {
   }, [userId, role]);
 
   const handleTimeIn = async () => {
-    await timeIn();
+    try {
+      await timeIn();
 
-    showToast({
+      showToast({
         message: "Successfully timed in",
         color: "#ffffff",
         type: "success",
       });
 
-    setIsTimedIn(true);
-    onAttendanceChange();
-    
+      setIsTimedIn(true);
+      onAttendanceChange();
+
+
+    } catch(err) {
+      showToast({
+        message: "Failed timed in",
+        color: "#ffffff",
+        type: "error",
+      });
+
+    }
+
   };
 
   const handleTimeOut = async () => {
     await timeOut();
 
     showToast({
-        message: "Successfully timed out",
-        color: "#ffffff",
-        type: "success",
-      });
+      message: "Successfully timed out",
+      color: "#ffffff",
+      type: "success",
+    });
 
     setIsTimedIn(false);
     onAttendanceChange();
