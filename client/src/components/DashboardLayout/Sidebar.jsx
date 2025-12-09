@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import UserDropDownMenu from "../UserDropdownMenu";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -61,58 +61,82 @@ export default function Sidebar() {
 
       <ul className="dashboard__sidebar-links">
         <li>
-          <Link to="/dashboard">
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) => (isActive ? "active-link" : undefined)}
+          >
             <span className="material-symbols-outlined">home</span>
             Dashboard
-          </Link>
+          </NavLink>
         </li>
 
         <li>
-          <Link to="/settings">
+          <NavLink
+            to="/settings"
+            className={({ isActive }) => (isActive ? "active-link" : undefined)}
+          >
             <span className="material-symbols-outlined">settings</span>
             Settings
-          </Link>
+          </NavLink>
         </li>
 
         <li>
-          <Link to="/timesheet">
+          <NavLink
+            to="/timesheet"
+            className={({ isActive }) => (isActive ? "active-link" : undefined)}
+          >
             <span className="material-symbols-outlined">calendar_month</span>
             Timesheet
-          </Link>
+          </NavLink>
         </li>
 
         {user.role === "ADMIN" && (
           <li>
-            <Link to="/view-requests-admin">
+            <NavLink
+              to="/view-requests-admin"
+              className={({ isActive }) =>
+                isActive ? "active-link" : undefined
+              }
+            >
               <span className="material-symbols-outlined">
                 person_raised_hand
               </span>
               View Requests
-            </Link>
+            </NavLink>
           </li>
         )}
 
         <li>
-          <Link to="/time-off">
+          <NavLink
+            to="/time-off"
+            className={({ isActive }) => (isActive ? "active-link" : undefined)}
+          >
             <span className="material-symbols-outlined">
               nest_clock_farsight_analog
             </span>
             Time-off
-          </Link>
+          </NavLink>
         </li>
 
         {user.role === "ADMIN" && (
           <li>
-            <Link to="/time-off-admin">
+            <NavLink
+              to="/time-off-admin"
+              className={({ isActive }) =>
+                isActive ? "active-link" : undefined
+              }
+            >
               <span className="material-symbols-outlined">manage_accounts</span>
               Time-off Admin
-            </Link>
+            </NavLink>
           </li>
         )}
       </ul>
 
       {/* User section */}
-      <div className="dashboard__user-account">
+      <div
+        className={`dashboard__user-account ${userMenuOpen ? "menu-open" : ""}`}
+      >
         <div
           ref={userProfileRef}
           className="dashboard__user-profile"
@@ -132,9 +156,11 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {userMenuOpen && (
-          <UserDropDownMenu ref={userMenuRef} pos={dropdownPos} />
-        )}
+        <UserDropDownMenu
+          ref={userMenuRef}
+          pos={dropdownPos}
+          open={userMenuOpen}
+        />
       </div>
     </aside>
   );
