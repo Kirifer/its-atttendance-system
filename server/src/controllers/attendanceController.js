@@ -334,8 +334,11 @@ export const deleteAttendance = async (req, res) => {
 
 export const getLoginStatus = async (req, res) => {
   try {
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
 
     const users = await prisma.user.findMany({
       where: { role: "USER" },
@@ -347,7 +350,12 @@ export const getLoginStatus = async (req, res) => {
     });
 
     const attendance = await prisma.attendance.findMany({
-      where: { date: today },
+      where: { 
+        date: {
+          gte: start,
+          lte: end
+        }
+      },
       orderBy: { timeIn: "asc" }
     });
 
