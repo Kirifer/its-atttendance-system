@@ -25,8 +25,8 @@
 }
 
 .user-status-tabs button.active {
-  border-bottom: 3px solid #007bff;
-  color: #007bff;
+  border-bottom: 3px solid #1a5dac;
+  color: #1a5dac;
 }
 
 .user-status-tabs button:hover {
@@ -82,4 +82,31 @@
   .user-time {
     align-self: flex-end;
   }
+}
+
+.user-time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 0.9rem;
+}
+
+.user-time .started-on {
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.user-status-list.scrollable {
+  max-height: calc(4 * 60px); 
+  overflow-y: auto;
+  padding-right: 5px; 
+}
+
+.user-status-list.scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.user-status-list.scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
 }
