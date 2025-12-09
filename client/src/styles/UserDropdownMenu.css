@@ -29,6 +29,9 @@
 }
 
 .user-dropdown ul li {
+  display: flex;
+  align-items: center;
+  gap: 20px;
   padding: 10px 20px;
   cursor: pointer;
   transition: background-color 0.15s ease-in-out;

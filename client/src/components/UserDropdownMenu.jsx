@@ -25,8 +25,14 @@ const UserDropDownMenu = forwardRef(({ pos, open }, ref) => {
       className={`user-dropdown ${open ? "show" : ""}`}
     >
       <ul>
-        <li onClick={() => navigate("/user-info")}>View Profile</li>
-        <li onClick={handleSignOut}>Sign Out</li>
+        <li onClick={() => navigate("/user-info")}>
+          {" "}
+          <span className="material-symbols-outlined">person</span>
+          View Profile
+        </li>
+        <li onClick={handleSignOut}>
+          <span className="material-symbols-outlined">logout</span>Sign Out
+        </li>
       </ul>
     </div>
   );
