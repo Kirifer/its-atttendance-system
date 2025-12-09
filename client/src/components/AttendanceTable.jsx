@@ -127,11 +127,15 @@ export default function AttendanceTable({
               ? workMinutes - lunchMinutes - ( tardyMinutes + lunchTardyMinutes )
               : null;
 
+          const straightWorkHours =
+            workMinutes !== null
+            ? (workMinutes/ 60).toFixed(2)
+            : "-";
+
           const totalHours =
             totalMinutes !== null
               ? (totalMinutes / 60).toFixed(2)
               : "-";
-
 
           return {
             id: r.id,
@@ -152,9 +156,10 @@ export default function AttendanceTable({
             "Lunch In": li ? li.toLocaleTimeString("en-US", timeOptions) : "-",
             "Duration": lo && li ? `${lunchMinutes} mins` : "-",
             "Time Out": to ? to.toLocaleTimeString("en-US", timeOptions) : "-",
-            TOTAL: totalHours !== "-" ? `${totalHours} hrs` : "-",
            "Lunch Tardy": lunchTardyMinutes > 0 ? `${lunchTardyMinutes} mins` : "-",
             Tardiness: tardyMinutes > 0 ? `${tardyMinutes} mins` : "-",
+            HOURS: straightWorkHours !== "-" ? `${straightWorkHours}` : "-",
+            TOTAL: totalHours !== "-" ? `${totalHours} hrs` : "-",
           };
         });
 
