@@ -2,8 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { getUserAttendance, getAllAttendance } from "../api/attendance";
 import { formatAttStatus } from "../hooks/formatAttStatus";
 import "../styles/AttendanceTable.css";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import useExportPDF from "../hooks/useExportPDF";
 import EditAttendancePopup from "./EditAttendancePopup";
 
 export default function AttendanceTable({
@@ -124,13 +123,13 @@ export default function AttendanceTable({
 
           const totalMinutes =
             workMinutes !== null
-              ? workMinutes - lunchMinutes - ( tardyMinutes + lunchTardyMinutes )
+              ? workMinutes - lunchMinutes - (tardyMinutes + lunchTardyMinutes)
               : null;
 
           const straightWorkHours =
             workMinutes !== null
-            ? (workMinutes/ 60).toFixed(2)
-            : "-";
+              ? (workMinutes / 60).toFixed(2)
+              : "-";
 
           const totalHours =
             totalMinutes !== null
@@ -155,7 +154,7 @@ export default function AttendanceTable({
             "Lunch Out": lo ? lo.toLocaleTimeString("en-US", timeOptions) : "-",
             "Lunch In": li ? li.toLocaleTimeString("en-US", timeOptions) : "-",
             "Time Out": to ? to.toLocaleTimeString("en-US", timeOptions) : "-",
-           "Lunch Tardy": lunchTardyMinutes > 0 ? `${lunchTardyMinutes} mins` : "-",
+            "Lunch Tardy": lunchTardyMinutes > 0 ? `${lunchTardyMinutes} mins` : "-",
             Tardiness: tardyMinutes > 0 ? `${tardyMinutes} mins` : "-",
             HOURS: straightWorkHours !== "-" ? `${straightWorkHours} hrs` : "-",
             TOTAL: totalHours !== "-" ? `${totalHours} hrs` : "-",
@@ -185,50 +184,7 @@ export default function AttendanceTable({
     role,
   ]);
 
-  const exportPDF = () => {
-    if (!filteredRecords.length) {
-      alert("No filtered data available to export.");
-      return;
-    }
-
-    const doc = new jsPDF();
-
-    const columnsToInclude = Object.keys(filteredRecords[0]).filter(
-      (col) => !["rawDate", "rawTimeIn", "rawTimeOut", "rawLunchOut", "rawLunchIn", "id"].includes(col)
-    );
-
-    const tableBody = filteredRecords.map((record) =>
-      columnsToInclude.map((col) => record[col])
-    );
-
-    // ---- Calculate Total Hours ---
-    let totalHours = filteredRecords.reduce((sum, r) => {
-      if (!r.TOTAL || r.TOTAL === "-") return sum;
-      return sum + parseFloat(r.TOTAL.replace(" hrs", ""));
-    }, 0);
-
-    const summaryRow = columnsToInclude.map((col, index) => {
-      if (index === 0) return "TOTAL HOURS";
-      if (col === "TOTAL") return `${totalHours.toFixed(2)} hrs`;
-      return "";
-    });
-    tableBody.push(summaryRow);
-
-    autoTable(doc, {
-      head: [columnsToInclude],
-      body: tableBody,
-      startY: 25,
-      styles: { fontSize: 10 },
-      didParseCell: function (data) {
-        if (data.row.index === filteredRecords.length) {
-          data.cell.styles.fontStyle = "bold";
-        }
-      },
-    });
-
-    doc.text("Timesheet Report (Filtered)", 14, 15);
-    doc.save("timesheet_filtered.pdf");
-  };
+  const { exportPDF } = useExportPDF();
 
   const openEditPopup = (record) => setEditingRecord(record);
   const closeEditPopup = () => setEditingRecord(null);
@@ -264,7 +220,7 @@ export default function AttendanceTable({
       </div>
       <div className="attendance_top_bar">
         {role === "ADMIN" && (
-          <button className="attendance_export_btn" onClick={exportPDF}>
+          <button className="attendance_export_btn" onClick={() => exportPDF(filteredRecords)}>
             Export
           </button>
         )}
