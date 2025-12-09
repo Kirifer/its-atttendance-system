@@ -103,7 +103,17 @@
   margin-top: auto;
   padding: 12px 10px;
   align-items: center;
+  border-radius: 20px;
   display: flex;
+  transition: all ease-in-out 0.2s;
+}
+
+.dashboard__user-account:hover {
+  background-color: #dbdbdb;
+}
+
+.dashboard__user-account:hover:active {
+  background-color: #c2c2c2;
 }
 
 .dashboard__user-profile {
