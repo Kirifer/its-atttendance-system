@@ -1,27 +1,44 @@
 .user-dropdown {
   position: absolute;
-  top: 60px; /* adjust according to sidebar */
+  top: 60px;
   left: 0;
-  background-color: white;
+  background-color: #fff;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 10px;
   width: 200px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
+
+  transform: scale(0.9) translateY(-20px);
+  transform-origin: top left;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+}
+
+.user-dropdown.show {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .user-dropdown ul {
   list-style: none;
   padding: 10px 0;
-  margin: 0;
+  margin: 10px;
 }
 
 .user-dropdown ul li {
   padding: 10px 20px;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: background-color 0.15s ease-in-out;
+  border-radius: 5px;
 }
 
 .user-dropdown ul li:hover {
-  background-color: #f0f0f0;
+  background-color: #dbdbdb;
+}
+
+.user-dropdown ul li:active {
+  background-color: #c9c9c9;
 }

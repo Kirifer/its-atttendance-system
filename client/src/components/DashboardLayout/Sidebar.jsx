@@ -134,7 +134,9 @@ export default function Sidebar() {
       </ul>
 
       {/* User section */}
-      <div className="dashboard__user-account">
+      <div
+        className={`dashboard__user-account ${userMenuOpen ? "menu-open" : ""}`}
+      >
         <div
           ref={userProfileRef}
           className="dashboard__user-profile"
@@ -154,9 +156,11 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {userMenuOpen && (
-          <UserDropDownMenu ref={userMenuRef} pos={dropdownPos} />
-        )}
+        <UserDropDownMenu
+          ref={userMenuRef}
+          pos={dropdownPos}
+          open={userMenuOpen}
+        />
       </div>
     </aside>
   );
