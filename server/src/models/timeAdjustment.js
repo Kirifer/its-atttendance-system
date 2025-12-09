@@ -17,10 +17,12 @@ async function getTimeAdjustments(userId = null) {
     return await prisma.timeAdjustment.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
+      include: { user: true },
     });
   }
   return await prisma.timeAdjustment.findMany({
     orderBy: { createdAt: "desc" },
+    include: { user: true },
   });
 }
 

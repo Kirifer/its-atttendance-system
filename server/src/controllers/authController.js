@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 // Fetch current user data
 export const getMe = async (req, res) => {
   try {
-    const userId = req.user;
+    const userId = req.user.id;
     const result = await pool.query(
       "SELECT id, username, email, role, profile_pic FROM users WHERE id = $1",
       [userId]

@@ -31,6 +31,7 @@ model User {
 
   leaves      Leave[]
   attendance  Attendance[]
+  timeAdjustments TimeAdjustment[]
 }
 
 enum LeaveStatus {
@@ -102,6 +103,7 @@ model Attendance {
 model TimeAdjustment {
   id        Int      @id @default(autoincrement())
   userId    Int
+  user      User     @relation(fields: [userId], references: [id])
   type      String
   details   String
   status    String   @default("pending")

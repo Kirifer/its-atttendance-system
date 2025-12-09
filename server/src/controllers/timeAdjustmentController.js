@@ -1,3 +1,7 @@
+// Accept and decline user time adjustment requests - ADMIN only
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
 const {
   createTimeAdjustment,
   getTimeAdjustments,
@@ -34,7 +38,16 @@ const fetchTimeAdjustments = async (req, res) => {
       ? await getTimeAdjustments()
       : await getTimeAdjustments(userId);
 
-    res.status(200).json({ requests });
+    const serializedRequests = requests.map((req) => ({
+      id: req.id,
+      type: req.type,
+      details: req.details,
+      status: req.status,
+      createdAt: req.createdAt,
+      user: req.user ? { id: req.user.id, username: req.user.username } : null,
+    }));
+
+    res.status(200).json({ requests: serializedRequests });
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch time adjustment requests",
@@ -57,8 +70,37 @@ const fetchMyTimeAdjustments = async (req, res) => {
   }
 };
 
+// Accept and decline user time adjustment requests - ADMIN only
+const updateTimeAdjustmentStatus = async (req, res) => {
+  try {
+    const { id } = req.params; // request ID
+    const { status } = req.body; // "approved" or "rejected"
+    const isAdmin = req.user.role === "ADMIN";
+
+    if (!isAdmin) return res.status(403).json({ message: "Unauthorized" });
+
+    if (!["approved", "rejected"].includes(status.toLowerCase()))
+      return res.status(400).json({ message: "Invalid status" });
+
+    const updatedRequest = await prisma.timeAdjustment.update({
+      where: { id: parseInt(id) },
+      data: { status: status.toLowerCase() },
+      include: { user: true },
+    });
+
+    res.json({
+      message: `Request ${status.toLowerCase()} successfully`,
+      request: updatedRequest,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to update request status" });
+  }
+};
+
 module.exports = {
   fileTimeAdjustment,
   fetchTimeAdjustments,
   fetchMyTimeAdjustments,
+  updateTimeAdjustmentStatus,
 };
