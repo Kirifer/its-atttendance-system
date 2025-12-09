@@ -47,6 +47,11 @@ enum LeaveType {
   OFFSET
 }
 
+enum LeaveCoverage {
+  FULL_DAY
+  HALF_DAY
+} 
+
 model Leave {
   id        String      @id @default(uuid())
   userId    Int
@@ -57,6 +62,7 @@ model Leave {
   status    LeaveStatus @default(PENDING)
   reason    String?
   attachment String? 
+  coverage   LeaveCoverage @default(FULL_DAY)
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
