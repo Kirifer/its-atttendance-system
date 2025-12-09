@@ -345,3 +345,52 @@ export const deleteAttendance = async (req, res) => {
         res.status(500).json({ message: "Error deleting attendance" });
     }
 };
+
+export const getLoginStatus = async (req, res) => {
+  try {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    const users = await prisma.user.findMany({
+      where: { role: "USER" },
+      select: { 
+        id: true,
+        username: true,
+        email: true
+      }
+    });
+
+    const attendance = await prisma.attendance.findMany({
+      where: { date: today },
+      orderBy: { timeIn: "asc" }
+    });
+
+    const loggedIn = [];
+    const loggedOut = [];
+
+    users.forEach(user => {
+      const record = attendance.find(a => a.userId === user.id);
+
+      if (record && record.timeIn && !record.timeOut) {
+        loggedIn.push({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          timeIn: record.timeIn
+        });
+      } else {
+        loggedOut.push({
+          id: user.id,
+          username: user.username,
+          email: user.email
+        });
+      }
+    });
+
+    res.json({ loggedIn, loggedOut });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching login status" });
+  }
+};
+
