@@ -1,5 +1,6 @@
 import { PrismaClient, AttendanceStatus } from "@prisma/client";
 import { autoLunchTardy } from "../utils/autoLunchTardy.js";
+import { getWorkSchedule } from "../utils/workSchedule.js";
 
 const prisma = new PrismaClient();
 
@@ -23,6 +24,11 @@ export const timeIn = async (req, res) => {
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0)
 
+        const schedule = getWorkSchedule(new Date());
+        if(!schedule) {
+            return res.status(400).json({message:"test"});
+        }
+
         const existing = await prisma.attendance.findUnique({
             where: { userId_date: { userId, date: today } },
         });
@@ -32,15 +38,13 @@ export const timeIn = async (req, res) => {
         }
 
         const now = new Date();
-
-        const worksStart = new Date();
-        worksStart.setHours(9, 0, 0, 0);
+        const { start: workStart } = schedule;
 
         let status = AttendanceStatus.PRESENT;
         let tardinessMinutes = 0;
 
-        if (now > worksStart) {
-            tardinessMinutes = Math.floor((now - worksStart) / 60000);
+        if (now > workStart) {
+            tardinessMinutes = Math.floor((now - workStart) / 60000);
             status = AttendanceStatus.TARDY;
         }
 
