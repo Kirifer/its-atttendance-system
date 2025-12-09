@@ -13,7 +13,6 @@ export const isAdmin = (req, res, next) => {
 
 export const timeIn = async (req, res) => {
     try {
-
         const user = req.user;
 
         if (user.role === "ADMIN") {
@@ -21,12 +20,13 @@ export const timeIn = async (req, res) => {
         }
 
         const userId = req.user.id;
-        const today = new Date();
-        today.setUTCHours(0, 0, 0, 0)
 
-        const schedule = getWorkSchedule(new Date());
-        if(!schedule) {
-            return res.status(400).json({message:"test"});
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const schedule = getWorkSchedule(today);
+        if (!schedule) {
+            return res.status(400).json({ message: "Weekend — no schedule" });
         }
 
         const existing = await prisma.attendance.findUnique({
@@ -40,12 +40,20 @@ export const timeIn = async (req, res) => {
         const now = new Date();
         const { start: workStart } = schedule;
 
+        console.log("Now:", now.toLocaleString());
+        console.log("Work Start:", workStart.toLocaleString());
+        console.log("Today Date:", today.toLocaleDateString());
+        console.log("Timezone Offset (minutes):", now.getTimezoneOffset());
+   
         let status = AttendanceStatus.PRESENT;
         let tardinessMinutes = 0;
 
-        if (now > workStart) {
-            tardinessMinutes = Math.floor((now - workStart) / 60000);
+        const nowMinutes = Math.floor(now.getTime() / 60000);
+        const startMinutes = Math.floor(workStart.getTime() / 60000);
+
+        if (nowMinutes > startMinutes) {
             status = AttendanceStatus.TARDY;
+            tardinessMinutes = nowMinutes - startMinutes;
         }
 
         const attendance = await prisma.attendance.create({
@@ -59,11 +67,13 @@ export const timeIn = async (req, res) => {
         });
 
         res.status(201).json({ message: "Time-in logged", attendance });
+
     } catch (error) {
-        console.error(error);
+        console.error("Error in timeIn:", error);
         res.status(500).json({ message: "Error logging Time-in" });
     }
 };
+
 
 export const lunchOut = async (req, res) => {
     try {
