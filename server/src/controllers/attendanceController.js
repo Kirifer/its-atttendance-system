@@ -1,6 +1,7 @@
 import { PrismaClient, AttendanceStatus } from "@prisma/client";
 import { autoLunchTardy } from "../utils/autoLunchTardy.js";
 import { getWorkSchedule } from "../utils/workSchedule.js";
+import { countWorkDays } from "../utils/countWorkDays.js";
 
 const prisma = new PrismaClient();
 
@@ -262,7 +263,9 @@ export const getUserAttendance = async (req, res) => {
             records.map((r) => autoLunchTardy(r, prisma))
         );
 
-        res.json({ attendance: records });
+        const workDays = countWorkDays(records);
+
+        res.json({ attendance: records, workDays });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error fetching attendance" });
@@ -294,7 +297,9 @@ export const getAllAttendance = async (req, res) => {
             records.map((r) => autoLunchTardy(r, prisma))
         );
 
-        res.json({ attendance: records });
+         const workDays = countWorkDays(records);
+
+        res.json({ attendance: records, workDays });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error fetching all attendance" });

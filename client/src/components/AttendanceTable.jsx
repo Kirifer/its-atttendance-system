@@ -106,6 +106,8 @@ export default function AttendanceTable({
           }
         }
 
+  
+
         const formatted = dateFiltered.map((r) => {
           const ti = r.timeIn ? new Date(r.timeIn) : null;
           const to = r.timeOut ? new Date(r.timeOut) : null;
@@ -136,6 +138,8 @@ export default function AttendanceTable({
               ? (totalMinutes / 60).toFixed(2)
               : "-";
 
+          const presentDays = res.workDays[String(r.userId)] || 0;
+
           return {
             id: r.id,
             rawDate: r.date,
@@ -156,6 +160,7 @@ export default function AttendanceTable({
             "Time Out": to ? to.toLocaleTimeString("en-US", timeOptions) : "-",
             "Lunch Tardy": lunchTardyMinutes > 0 ? `${lunchTardyMinutes} mins` : "-",
             Tardiness: tardyMinutes > 0 ? `${tardyMinutes} mins` : "-",
+            DAYS: presentDays,
             HOURS: straightWorkHours !== "-" ? `${straightWorkHours} hrs` : "-",
             TOTAL: totalHours !== "-" ? `${totalHours} hrs` : "-",
           };
