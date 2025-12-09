@@ -2,23 +2,23 @@
 
 .dashboard {
   display: flex;
-  flex-direction: column;  
-  min-height: 100vh;  
+  flex-direction: column;
+  min-height: 100vh;
   background-color: #ffffff;
   font-family: Arial, sans-serif;
 }
 
 .dashboard__content-wrapper {
-  flex: 1; 
+  flex: 1;
   display: flex;
   overflow: hidden;
-  align-items: stretch; 
+  align-items: stretch;
 }
 
 .dashboard__sidebar {
   top: 0;
   left: 0;
-  height: 100%; 
+  height: 100%;
   width: 80px;
   background: #ffffff;
   padding: 25px 0;
@@ -31,7 +31,6 @@
 .dashboard__sidebar.expanded {
   width: 260px;
 }
-
 
 .dashboard__sidebar-header {
   display: flex;
@@ -62,16 +61,42 @@
   text-decoration: none;
   font-weight: 500;
   padding: 15px 0;
-  margin-right: 10px;
+  margin-right: 25px;
   margin-left: -10px;
   white-space: nowrap;
   margin-bottom: 15px;
+  transition: ease-in 0.2s;
 }
 
 .dashboard__sidebar-links li a:hover {
-  background: #1a5dac;
-  color: #ffffff;
+  color: white;
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard__sidebar-links li a::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  left: -10px;
+  right: -10px;
+  background-color: #1a5dac;
   border-radius: 10px;
+  z-index: -1;
+  opacity: 0;
+  transform: scaleX(0.95) scaleY(0.9);
+  transition: all 0.3s ease;
+}
+
+.dashboard__sidebar-links li a:hover::before {
+  opacity: 1;
+  transform: scaleX(1) scaleY(1);
+}
+.dashboard__sidebar-links li a:active::before {
+  background-color: #154883;
+  transform: scale(0.98);
+  opacity: 1;
 }
 
 .dashboard__user-account {
@@ -121,7 +146,6 @@
   display: flex;
   flex-direction: column;
 }
-
 
 footer {
   margin-top: auto;
@@ -240,4 +264,27 @@ footer {
   .dashboard__main {
     margin-top: 20px;
   }
+}
+
+/* Sidebar active coloring */
+.dashboard__sidebar-links .active-link {
+  position: relative;
+  color: white;
+  z-index: 1;
+}
+
+/* Active box color */
+.dashboard__sidebar-links .active-link::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  left: -10px;
+  right: -10px;
+  background-color: #1a5dac;
+  border-radius: 10px;
+  z-index: -1;
+  opacity: 1;
+  transform: scaleX(1) scaleY(1);
+  transition: all 0.3s ease;
 }
