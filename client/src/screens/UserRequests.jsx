@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import API from "../api/api";
-import "../styles/UserRequests.css";
 import "../styles/ViewRequestTable.css";
 
 function UserRequests() {
