@@ -23,6 +23,22 @@ export default function UserStatusCard({ reload }) {
 
   const list = tab === "online" ? users.loggedIn : users.loggedOut;
 
+  const [user, setUser] = useState(() => {
+    return JSON.parse(localStorage.getItem("user"));
+  });
+
+  useEffect(() => {
+    if (user?.role !== "ADMIN") return; // only fetch if admin
+
+    setLoading(true);
+    getLoginStatus()
+      .then((data) => setUsers(data))
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  }, [reload, user]);
+
+  if (user?.role !== "ADMIN") return null;
+
   return (
     <div className="user-status-card">
       <div className="user-status-tabs">
@@ -39,27 +55,31 @@ export default function UserStatusCard({ reload }) {
           Offline Users
         </button>
       </div>
+      
 
       {loading ? (
         <div className="loading">Loading...</div>
       ) : (
-        <div className="user-status-list">
-          {list && list.length > 0 ? (
-            list.map((user) => (
-              <div key={user.id} className="user-status-item">
-                <div className="user-info">
-                  <span className="user-name">{user.username}</span>
-                  <span className="user-email">{user.email}</span>
-                </div>
-                {tab === "online" && (
-                  <div className="user-time">{formatTime(user.timeIn)}</div>
-                )}
-              </div>
-            ))
-          ) : (
-            <div className="no-users">No users in this tab</div>
-          )}
+        <div className="user-status-list scrollable">
+  {list && list.length > 0 ? (
+    list.map((user) => (
+      <div key={user.id} className="user-status-item">
+        <div className="user-info">
+          <span className="user-name">{user.username}</span>
+          <span className="user-email">{user.email}</span>
         </div>
+        {tab === "online" && (
+          <div className="user-time">
+            <div>{formatTime(user.timeIn)}</div>
+            <div className="started-on">Started on</div>
+          </div>
+        )}
+      </div>
+    ))
+  ) : (
+    <div className="no-users">No users in this tab</div>
+  )}
+</div>
       )}
     </div>
   );

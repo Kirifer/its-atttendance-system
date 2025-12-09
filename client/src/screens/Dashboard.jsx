@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react"
+import { useState } from "react";
 import "../styles/Dashboard.css";
 import AttBtn from "../components/AttBtn.jsx";
 import DashboardLayout from "../components/DashboardLayout";
 import Clock from "../components/Dashboard/Clock.jsx";
 import LogsCard from "../components/Dashboard/LogsCard.jsx";
 import FiledLeavesCard from "../components/Dashboard/FiledLeavesCard.jsx";
-import Calendar from"../components/Dashboard/Calendar.jsx";
+import Calendar from "../components/Dashboard/Calendar.jsx";
 import UserStatusCard from "../components/Dashboard/UserStatusCard.jsx";
 
 function Dashboard() {
@@ -22,34 +22,36 @@ function Dashboard() {
           <div className="dashboard__containerone">
             <div className="dashboard__left">
               <Clock format="HH:mm:ss" />
-              <AttBtn 
+              <AttBtn
                 userId={user.id}
                 reload={reload}
                 onAttendanceChange={() => setReload((r) => !r)}
               />
             </div>
+
             <div className="dashboard__right">
-              <LogsCard
-                userName={user.name}
-                logs={[
-                  { timeIn: "November 18, 2025 09:00 AM", timeOut: "November 18, 2025 06:00 PM" },
-                  { timeIn: "November 19, 2025 09:05 AM", timeOut: "November 19, 2025 06:10 PM" },
-                ]}
-                reload={reload}
-              />
+              {user.role === "ADMIN" ? (
+                <UserStatusCard reload={reload} />
+              ) : (
+                <LogsCard
+                  userName={user.name}
+                  logs={[
+                    { timeIn: "November 18, 2025 09:00 AM", timeOut: "November 18, 2025 06:00 PM" },
+                    { timeIn: "November 19, 2025 09:05 AM", timeOut: "November 19, 2025 06:10 PM" },
+                  ]}
+                  reload={reload}
+                />
+              )}
             </div>
           </div>
+
           <div className="dashboard__container__two">
             <div className="dashboard__left__two">
-              <FiledLeavesCard/>
+              <FiledLeavesCard />
             </div>
             <div className="dashboard__right__two">
-              <Calendar/>
+              <Calendar />
             </div>
-          
-          </div>
-          <div>
-            <UserStatusCard reload={reload} />
           </div>
         </div>
       </div>
