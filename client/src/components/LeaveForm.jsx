@@ -7,6 +7,7 @@ function LeaveForm({ onSubmit }) {
     startDate: "",
     endDate: "",
     leaveType: "OFFSET",
+    leaveCoverage:"FULL_DAY",
     reason: "",
     attachment: null, // new field for file
   };
@@ -41,6 +42,7 @@ function LeaveForm({ onSubmit }) {
       submissionData.append("startDate", formData.startDate);
       submissionData.append("endDate", formData.endDate);
       submissionData.append("leaveType", formData.leaveType);
+      submissionData.append("coverage", formData.leaveCoverage);
       submissionData.append("reason", formData.reason || "");
       if (formData.attachment) {
         submissionData.append("attachment", formData.attachment);
@@ -113,6 +115,21 @@ function LeaveForm({ onSubmit }) {
         </label>
       </div>
 
+      <div className="row">
+        <label>
+          Leave Coverage:
+          <select
+            name="leaveCoverage"
+            value={formData.leaveCoverage}
+            onChange={handleChange}
+            required
+          >
+            <option value="FULL_DAY">Full Day</option>
+            <option value="HALF_DAY">Half Day</option>
+          </select>
+        </label>
+      </div>
+      
       <div className="row">
         <label>
           Reason For Leave
