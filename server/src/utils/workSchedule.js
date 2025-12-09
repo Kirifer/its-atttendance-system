@@ -1,4 +1,4 @@
-export const workSchedule = (date = new Date()) => {
+export const getWorkSchedule = (date = new Date()) => {
     const day = date.getDay();
 
     if (day === 0 || day === 0) {
