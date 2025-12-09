@@ -86,7 +86,7 @@ export const lunchOut = async (req, res) => {
 
         const userId = req.user.id;
         const today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
 
         const attendance = await prisma.attendance.findUnique({
             where: { userId_date: { userId, date: today } },
@@ -98,10 +98,6 @@ export const lunchOut = async (req, res) => {
 
         if (attendance.lunchOut) {
             return res.status(400).json({ message: "Already out for lunch" });
-        }
-
-        if (attendance.lunchIn) {
-            return res.status(400).json({ message: "Already back from lunch" });
         }
 
         if (attendance.timeOut) {
@@ -131,7 +127,7 @@ export const lunchIn = async (req, res) => {
 
         const userId = req.user.id;
         const today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
 
         const attendance = await prisma.attendance.findUnique({
             where: { userId_date: { userId, date: today } },
@@ -197,7 +193,7 @@ export const timeOut = async (req, res) => {
 
         const userId = req.user.id;
         const today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
 
         const attendance = await prisma.attendance.findUnique({
             where: { userId_date: { userId, date: today } },
@@ -349,7 +345,7 @@ export const deleteAttendance = async (req, res) => {
 export const getLoginStatus = async (req, res) => {
   try {
     const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
 
     const users = await prisma.user.findMany({
       where: { role: "USER" },
