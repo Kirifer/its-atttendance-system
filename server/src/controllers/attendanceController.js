@@ -28,11 +28,11 @@ export const timeIn = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const schedule = getWorkSchedule(today);
+    const schedule = await getWorkSchedule(userId, today);
     if (!schedule) {
       return res.status(400).json({ message: "Weekend — no schedule" });
     }
-
+    
     const existing = await prisma.attendance.findUnique({
       where: { userId_date: { userId, date: today } },
     });
