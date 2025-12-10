@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/"); 
+    cb(null, "uploads/");
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -60,7 +60,7 @@ export const getLeaves = async (req, res) => {
     if (req.user.role === "USER") {
       filters.userId = req.user.id;
     } else {
-      if (req.query.userId) filters.userId = parseInt(req.query.userId);
+      if (req.query.userId) filters.userId = req.query.userId;
       if (req.query.status) filters.status = req.query.status.toUpperCase();
     }
 

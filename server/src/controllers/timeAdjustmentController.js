@@ -83,7 +83,7 @@ const updateTimeAdjustmentStatus = async (req, res) => {
       return res.status(400).json({ message: "Invalid status" });
 
     const updatedRequest = await prisma.timeAdjustment.update({
-      where: { id: parseInt(id) },
+      where: { id },
       data: { status: status.toLowerCase() },
       include: { user: true },
     });
