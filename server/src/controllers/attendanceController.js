@@ -16,6 +16,10 @@ export const isAdmin = (req, res, next) => {
 export const timeIn = async (req, res) => {
   try {
     const user = req.user;
+    
+    if (req.user.onLeave) {
+      return res.status(400).json({ message: "You are currently on leave" });
+    }
 
     if (user.role === "ADMIN") {
       return res

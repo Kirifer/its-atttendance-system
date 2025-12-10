@@ -102,18 +102,79 @@ export const updateLeaveStatus = async (req, res) => {
     const { status } = req.body;
 
     const upperStatus = status.toUpperCase();
-
     if (!Object.values(LeaveStatus).includes(upperStatus)) {
       return res.status(400).json({ message: "Invalid status" });
     }
 
+    // 1. Update leave status
     const leave = await prisma.leave.update({
       where: { id },
       data: { status: upperStatus },
+      include: { user: true }
     });
 
-    res.json(leave);
+    const userId = leave.userId;
+
+    // Only run automation on APPROVED
+    if (upperStatus === "APPROVED") {
+      
+      // 2. Mark user as ON_LEAVE
+      await prisma.user.update({
+        where: { id: userId },
+        data: { onLeave: true }
+      });
+
+      // 3. Auto-create attendance ON_LEAVE until endDate
+      let date = new Date(leave.startDate);
+      const end = new Date(leave.endDate);
+
+      while (date <= end) {
+        const day = date.getDay(); // 0 = Sunday, 6 = Saturday
+        if (day !== 0 && day !== 6) {
+          // weekdays only
+          await prisma.attendance.upsert({
+            where: {
+              userId_date: { userId, date: new Date(date.setHours(0,0,0,0)) }
+            },
+            update: {
+              status: "ON_LEAVE",
+              leaveId: leave.id
+            },
+            create: {
+              userId,
+              date: new Date(date.setHours(0,0,0,0)),
+              status: "ON_LEAVE",
+              leaveId: leave.id
+            }
+          });
+        }
+
+        date.setDate(date.getDate() + 1); // next day
+      }
+    }
+
+    // If REJECTED → ensure user.onLeave = false
+    if (upperStatus === "REJECTED") {
+      const activeLeaves = await prisma.leave.count({
+        where: {
+          userId: leave.userId,
+          status: "APPROVED",
+          endDate: { gte: new Date() }
+        }
+      });
+
+      if (activeLeaves === 0) {
+        await prisma.user.update({
+          where: { id: leave.userId },
+          data: { onLeave: false }
+        });
+      }
+    }
+
+    res.json({ message: "Leave status updated", leave });
+
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Error updating leave status" });
   }
 };
