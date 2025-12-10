@@ -66,6 +66,7 @@ function ViewRequestsAdmin() {
                   <th>Details</th>
                   <th>Status</th>
                   <th>Submitted At</th>
+                  <th>Actions </th>
                 </tr>
               </thead>
               <tbody>
@@ -94,7 +95,10 @@ function ViewRequestsAdmin() {
                               handleUpdateStatus(req.id, "APPROVED")
                             }
                           >
-                            Accept
+                            <span className="material-symbols-outlined">
+                              check
+                            </span>
+                            &nbsp;&nbsp;&nbsp;Accept
                           </button>
                           <button
                             className="admin-decline-btn"
@@ -102,7 +106,10 @@ function ViewRequestsAdmin() {
                               handleUpdateStatus(req.id, "REJECTED")
                             }
                           >
-                            Decline
+                            <span className="material-symbols-outlined">
+                              close
+                            </span>
+                            &nbsp;&nbsp;&nbsp;Decline
                           </button>
                         </>
                       )}

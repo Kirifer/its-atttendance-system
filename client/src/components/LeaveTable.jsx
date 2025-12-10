@@ -20,6 +20,8 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
         ? leave.leaveType
         : filterType === "reason"
         ? leave.reason
+        : filterType === "coverage"
+        ? leave.coverage
         : filterType === "status"
         ? leave.status
         : filterType === "username"
@@ -39,6 +41,7 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
         >
           <option value="id">ID</option>
           <option value="leaveType">Leave Type</option>
+          <option value="coverage">Coverage</option>
           <option value="reason">Reason</option>
           <option value="username">Intern Username</option>
           <option value="status">Status</option>
@@ -60,6 +63,7 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
               <th>Type</th>
               <th>Reason</th>
               <th>Intern</th>
+              <th>Coverage</th>
               <th>Duration</th>
               <th>Status</th>
               <th>Attachment</th> 
@@ -83,6 +87,7 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                 <td>{leave.leaveType}</td>
                 <td>{leave.reason}</td>
                 <td>{leave.user ? leave.user.username : "N/A"}</td>
+                <td>{leave.coverage}</td>
                 <td>
                   {leave.startDate.slice(0, 10)} → {leave.endDate.slice(0, 10)}
                 </td>

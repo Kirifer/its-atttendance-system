@@ -1,6 +1,8 @@
 import { PrismaClient, AttendanceStatus } from "@prisma/client";
 import { autoLunchTardy } from "../utils/autoLunchTardy.js";
 import { getWorkSchedule } from "../utils/workSchedule.js";
+import { countWorkDays } from "../utils/countWorkDays.js";
+import { updateAttStatus } from "../utils/updateAttStatus.js";
 
 const prisma = new PrismaClient();
 
@@ -13,7 +15,6 @@ export const isAdmin = (req, res, next) => {
 
 export const timeIn = async (req, res) => {
     try {
-
         const user = req.user;
 
         if (user.role === "ADMIN") {
@@ -21,12 +22,13 @@ export const timeIn = async (req, res) => {
         }
 
         const userId = req.user.id;
-        const today = new Date();
-        today.setUTCHours(0, 0, 0, 0)
 
-        const schedule = getWorkSchedule(new Date());
-        if(!schedule) {
-            return res.status(400).json({message:"test"});
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const schedule = getWorkSchedule(today);
+        if (!schedule) {
+            return res.status(400).json({ message: "Weekend — no schedule" });
         }
 
         const existing = await prisma.attendance.findUnique({
@@ -40,12 +42,20 @@ export const timeIn = async (req, res) => {
         const now = new Date();
         const { start: workStart } = schedule;
 
+        console.log("Now:", now.toLocaleString());
+        console.log("Work Start:", workStart.toLocaleString());
+        console.log("Today Date:", today.toLocaleDateString());
+        console.log("Timezone Offset (minutes):", now.getTimezoneOffset());
+
         let status = AttendanceStatus.PRESENT;
         let tardinessMinutes = 0;
 
-        if (now > workStart) {
-            tardinessMinutes = Math.floor((now - workStart) / 60000);
+        const nowMinutes = Math.floor(now.getTime() / 60000);
+        const startMinutes = Math.floor(workStart.getTime() / 60000);
+
+        if (nowMinutes > startMinutes) {
             status = AttendanceStatus.TARDY;
+            tardinessMinutes = nowMinutes - startMinutes;
         }
 
         const attendance = await prisma.attendance.create({
@@ -59,11 +69,13 @@ export const timeIn = async (req, res) => {
         });
 
         res.status(201).json({ message: "Time-in logged", attendance });
+
     } catch (error) {
-        console.error(error);
+        console.error("Error in timeIn:", error);
         res.status(500).json({ message: "Error logging Time-in" });
     }
 };
+
 
 export const lunchOut = async (req, res) => {
     try {
@@ -76,7 +88,7 @@ export const lunchOut = async (req, res) => {
 
         const userId = req.user.id;
         const today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
 
         const attendance = await prisma.attendance.findUnique({
             where: { userId_date: { userId, date: today } },
@@ -88,10 +100,6 @@ export const lunchOut = async (req, res) => {
 
         if (attendance.lunchOut) {
             return res.status(400).json({ message: "Already out for lunch" });
-        }
-
-        if (attendance.lunchIn) {
-            return res.status(400).json({ message: "Already back from lunch" });
         }
 
         if (attendance.timeOut) {
@@ -121,7 +129,7 @@ export const lunchIn = async (req, res) => {
 
         const userId = req.user.id;
         const today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
 
         const attendance = await prisma.attendance.findUnique({
             where: { userId_date: { userId, date: today } },
@@ -187,7 +195,7 @@ export const timeOut = async (req, res) => {
 
         const userId = req.user.id;
         const today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
 
         const attendance = await prisma.attendance.findUnique({
             where: { userId_date: { userId, date: today } },
@@ -205,9 +213,27 @@ export const timeOut = async (req, res) => {
             return res.status(400).json({ message: "Please return from lunch before timing out" });
         }
 
+        const now = new Date();
+
+        const timeIn = attendance.timeIn;
+        const timeOut = now;
+
+        const workMinutes = timeIn && timeOut ? (timeOut - timeIn) / 1000 / 60 : 0;
+        const lunchMinutes =
+            attendance.lunchOut && attendance.lunchIn
+                ? (attendance.lunchIn - attendance.lunchOut) / 1000 / 60
+                : 0;
+
+        const straightWorkHours = workMinutes / 60;
+        const totalWorkHours = (workMinutes - lunchMinutes - (attendance.tardinessMinutes + attendance.lunchTardinessMinutes)) / 60;
+
         const updated = await prisma.attendance.update({
             where: { id: attendance.id },
-            data: { timeOut: new Date() },
+            data: {
+                timeOut: now,
+                straightWorkHours: parseFloat(straightWorkHours.toFixed(2)),
+                totalWorkHours: parseFloat(totalWorkHours.toFixed(2)),
+            },
         });
 
         res.json({ message: "Time-out logged", attendance: updated });
@@ -227,9 +253,9 @@ export const getUserAttendance = async (req, res) => {
         }
 
         let records = await prisma.attendance.findMany({
-            where: { 
-                userId: requestedUserId,  
-                user: { role: { not: "ADMIN" } } 
+            where: {
+                userId: requestedUserId,
+                user: { role: { not: "ADMIN" } }
             },
             orderBy: { date: "desc" },
         });
@@ -238,7 +264,9 @@ export const getUserAttendance = async (req, res) => {
             records.map((r) => autoLunchTardy(r, prisma))
         );
 
-        res.json({ attendance: records });
+        const workDays = countWorkDays(records);
+
+        res.json({ attendance: records, workDays });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error fetching attendance" });
@@ -270,7 +298,9 @@ export const getAllAttendance = async (req, res) => {
             records.map((r) => autoLunchTardy(r, prisma))
         );
 
-        res.json({ attendance: records });
+         const workDays = countWorkDays(records);
+
+        res.json({ attendance: records, workDays });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error fetching all attendance" });
@@ -280,7 +310,7 @@ export const getAllAttendance = async (req, res) => {
 export const updateAttendance = async (req, res) => {
     try {
         const { id } = req.params;
-        const { timeIn, timeOut } = req.body;
+        const { timeIn, timeOut, lunchOut, lunchIn } = req.body;
 
         const attendance = await prisma.attendance.findUnique({
             where: { id },
@@ -290,13 +320,7 @@ export const updateAttendance = async (req, res) => {
             return res.status(404).json({ message: "Attendance not found" });
         }
 
-        const updated = await prisma.attendance.update({
-            where: { id },
-            data: {
-                timeIn: timeIn ? new Date(timeIn) : attendance.timeIn,
-                timeOut: timeOut ? new Date(timeOut) : attendance.timeOut,
-            },
-        });
+        const updated = await updateAttStatus(attendance, timeIn, timeOut, lunchOut, lunchIn);
 
         res.json({
             message: "Attendance updated by admin",
@@ -335,3 +359,53 @@ export const deleteAttendance = async (req, res) => {
         res.status(500).json({ message: "Error deleting attendance" });
     }
 };
+
+export const getLoginStatus = async (req, res) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const users = await prisma.user.findMany({
+            where: { role: "USER" },
+            select: {
+                id: true,
+                username: true,
+                email: true
+            }
+        });
+
+        const attendance = await prisma.attendance.findMany({
+            where: { date: today },
+            orderBy: { timeIn: "asc" }
+        });
+
+        const loggedIn = [];
+        const loggedOut = [];
+
+        users.forEach(user => {
+            const record = attendance.find(a => a.userId === user.id);
+
+            if (record && record.timeIn && !record.timeOut) {
+                loggedIn.push({
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    timeIn: record.timeIn
+                });
+            } else {
+                loggedOut.push({
+                    id: user.id,
+                    username: user.username,
+                    email: user.email
+                });
+            }
+        });
+
+        res.json({ loggedIn, loggedOut });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error fetching login status" });
+    }
+};
+
+

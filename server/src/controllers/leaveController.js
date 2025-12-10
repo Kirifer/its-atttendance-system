@@ -1,4 +1,4 @@
-import { PrismaClient, LeaveStatus } from "@prisma/client";
+import { PrismaClient, LeaveStatus, LeaveCoverage } from "@prisma/client";
 import multer from "multer";
 import path from "path";
 
@@ -20,7 +20,14 @@ export const upload = multer({ storage });
 export const createLeave = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { startDate, endDate, leaveType, reason } = req.body;
+    const { startDate, endDate, leaveType, coverage, reason } = req.body;
+
+    const coverageUpper = coverage?.toUpperCase();
+    if (!Object.values(LeaveCoverage).includes(coverageUpper)) {
+      return res.status(400).json({
+        message: "Invalid coverage type. Use FULL_DAY or HALF_DAY",
+      });
+    }
 
     const filePath = req.file
       ? `/uploads/${req.file.filename}` // frontend-friendly path
@@ -32,6 +39,7 @@ export const createLeave = async (req, res) => {
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         leaveType,
+        coverage: coverageUpper,
         reason,
         attachment: filePath,
       },

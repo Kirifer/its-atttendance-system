@@ -1,0 +1,112 @@
+.user-status-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  padding: 16px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.user-status-tabs {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 12px;
+}
+
+.user-status-tabs button {
+  flex: 1;
+  padding: 10px;
+  background: none;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.user-status-tabs button.active {
+  border-bottom: 3px solid #1a5dac;
+  color: #1a5dac;
+}
+
+.user-status-tabs button:hover {
+  background-color: #f7f7f7;
+}
+
+.user-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: 600;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.user-time {
+  font-weight: 500;
+  font-family: monospace;
+}
+
+.no-users {
+  text-align: center;
+  color: #888;
+  padding: 20px 0;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .user-status-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .user-time {
+    align-self: flex-end;
+  }
+}
+
+.user-time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 0.9rem;
+}
+
+.user-time .started-on {
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.user-status-list.scrollable {
+  max-height: calc(4 * 60px); 
+  overflow-y: auto;
+  padding-right: 5px; 
+}
+
+.user-status-list.scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.user-status-list.scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}

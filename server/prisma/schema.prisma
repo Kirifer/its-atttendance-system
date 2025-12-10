@@ -92,6 +92,7 @@ model Attendance {
 
   tardinessMinutes        Int   @default(0)
   lunchTardinessMinutes   Int   @default(0)
+  straightWorkHours Float?
   totalWorkHours Float? 
 
   leaveId String?
