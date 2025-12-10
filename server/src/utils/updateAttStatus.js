@@ -6,9 +6,9 @@ const prisma = new PrismaClient();
 export const updateAttStatus = async (attendance, timeIn, timeOut, lunchOut, lunchIn) => {
 
     const date = new Date(attendance.date);
-    const schedule = getWorkSchedule(date);
-    const workStart = schedule.start;
-
+    const schedule = await getWorkSchedule(attendance.userId, date);
+    const workStart = schedule ? schedule.start : new Date(date.setHours(9, 0, 0, 0));
+    
     const newTimeIn = timeIn ? new Date(timeIn) : attendance.timeIn;
     const newTimeOut = timeOut ? new Date(timeOut) : attendance.timeOut;
     const newLunchOut = lunchOut ? new Date(lunchOut) : attendance.lunchOut;
