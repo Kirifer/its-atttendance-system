@@ -9,6 +9,7 @@ import attendanceRoutes from "./src/routes/attendanceRoutes.js";
 import timeAdjustmentRoutes from "./src/routes/timeAdjustmentRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import "./src/cron/leaveChecker.js";
 
 dotenv.config();
 
