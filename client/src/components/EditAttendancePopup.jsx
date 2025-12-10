@@ -9,6 +9,12 @@ export default function EditAttendancePopup({ record, onClose, onSave }) {
   const [timeOut, setTimeOut] = useState(
     record["Time Out"] !== "-" ? record["Time Out"] : ""
   );
+  const [lunchOut, setLunchOut] = useState(
+    record["Lunch Out"] !== "-" ? record["Lunch Out"] : ""
+  );
+  const [lunchIn, setLunchIn] = useState(
+    record["Lunch In"] !== "-" ? record["Lunch In"] : ""
+  );
 
   const handleSave = async () => {
     try {
@@ -24,6 +30,8 @@ export default function EditAttendancePopup({ record, onClose, onSave }) {
       await updateAttendance(record.id, {
         timeIn: formatTime(timeIn),
         timeOut: formatTime(timeOut),
+        lunchOut: formatTime(lunchOut),
+        lunchIn: formatTime(lunchIn),
       });
 
       onSave();
@@ -45,6 +53,20 @@ export default function EditAttendancePopup({ record, onClose, onSave }) {
           value={timeIn}
           onChange={(e) => setTimeIn(e.target.value)}
         />
+        
+        <label>Lunch Out:</label>
+        <input
+          type="time"
+          value={lunchOut}
+          onChange={(e) => setLunchOut(e.target.value)}
+        />
+
+        <label>Lunch In:</label>
+        <input
+          type="time"
+          value={lunchIn}
+          onChange={(e) => setLunchIn(e.target.value)}
+        />
 
         <label>Time Out:</label>
         <input
@@ -52,6 +74,7 @@ export default function EditAttendancePopup({ record, onClose, onSave }) {
           value={timeOut}
           onChange={(e) => setTimeOut(e.target.value)}
         />
+
 
         <div className="attendance_popup_buttons">
           <button onClick={handleSave}>Save</button>
