@@ -48,8 +48,8 @@ function UserRequests() {
         </a>
 
         {/* User's Requests */}
+        <h1 className="title">My Time Adjustment Requests</h1>
         <div className="user-requests">
-          <h3>My Time Adjustment Requests</h3>
           {userRequests.length === 0 ? (
             <p>No requests submitted yet.</p>
           ) : (
@@ -57,7 +57,7 @@ function UserRequests() {
               <thead>
                 <tr>
                   <th>Type</th>
-                  <th>Details</th>
+                  <th>Reason</th>
                   <th>Status</th>
                   <th>Submitted At</th>
                 </tr>
@@ -73,7 +73,7 @@ function UserRequests() {
                       data-label="Status"
                       className={`status ${req.status.toLowerCase()}`}
                     >
-                      {req.status}
+                      {req.status.toUpperCase()}
                     </td>
                     <td data-label="Submitted At">
                       {new Date(req.createdAt).toLocaleString()}

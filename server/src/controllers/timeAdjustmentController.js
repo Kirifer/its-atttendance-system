@@ -98,9 +98,33 @@ const updateTimeAdjustmentStatus = async (req, res) => {
   }
 };
 
+// Delete time adjustment submitted request
+const deleteTimeAdjustment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const isAdmin = req.user.role === "ADMIN";
+
+    if (!isAdmin) return res.status(403).json({ message: "Unauthorized" });
+
+    const existing = await prisma.timeAdjustment.findUnique({ where: { id } });
+    if (!existing)
+      return res
+        .status(404)
+        .json({ message: "Time adjustment request not found" });
+
+    await prisma.timeAdjustment.delete({ where: { id } });
+
+    res.status(200).json({ message: "Time adjustment deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to delete time adjustment" });
+  }
+};
+
 module.exports = {
   fileTimeAdjustment,
   fetchTimeAdjustments,
   fetchMyTimeAdjustments,
   updateTimeAdjustmentStatus,
+  deleteTimeAdjustment,
 };
