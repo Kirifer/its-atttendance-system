@@ -1,53 +1,61 @@
+
 .attendance_edit_btn {
-  padding: 8px 14px;
+  padding: 10px 16px;
   background: #007bff;
-  color: white;
-  border-radius: 6px;
+  color: #fff;
+  border-radius: 8px;
   cursor: pointer;
   border: none;
   font-size: 14px;
-  transition: 0.2s ease-in-out;
+  font-weight: 500;
+  transition: background 0.2s ease-in-out;
 }
 
 .attendance_edit_btn:hover {
   background: #0066d3;
 }
 
-/* Overlay */
+
 .attendance_popup_overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  backdrop-filter: blur(4px);
-  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.35);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
-/* Popup Box */
+
 .attendance_popup {
-  background: #ffffff;
-  padding: 24px;
-  width: 340px;
-  border-radius: 14px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  background: #fff;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 380px; 
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   animation: fadeIn 0.25s ease-in-out;
   font-family: "Inter", sans-serif;
+  box-sizing: border-box; /* prevents inputs from overflowing */
 }
 
+
 .attendance_popup h2 {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   font-size: 20px;
   font-weight: 600;
   text-align: center;
   color: #333;
 }
 
-
+/* Labels */
 .attendance_popup label {
   display: block;
   font-weight: 500;
@@ -55,61 +63,65 @@
   color: #555;
 }
 
-.attendance_popup input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 6px;
+
+.attendance_popup input,
+.attendance_popup select {
+  width: 100%; 
+  padding: 10px 12px;
+  border-radius: 8px;
   border: 1px solid #ccc;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   font-size: 15px;
   outline: none;
   transition: 0.2s;
+  box-sizing: border-box;
 }
 
-.attendance_popup input:focus {
+.attendance_popup input:focus,
+.attendance_popup select:focus {
   border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
 
 
 .attendance_popup_buttons {
-  margin-top: 10px;
   display: flex;
+  gap: 12px;
   justify-content: space-between;
-  gap: 10px;
+  margin-top: 12px;
 }
+
 
 .attendance_popup_buttons button {
   flex: 1;
-  padding: 10px;
-  border-radius: 6px;
+  padding: 10px 0;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   transition: 0.2s;
 }
 
-
 .attendance_popup_buttons button:first-child {
   background: #007bff;
-  color: white;
+  color: #fff;
 }
 
 .attendance_popup_buttons button:first-child:hover {
   background: #0066d3;
 }
 
-
 .attendance_popup_buttons button:last-child {
-  background: #e5e5e5;
+  background: #f0f0f0;
+  color: #333;
 }
 
 .attendance_popup_buttons button:last-child:hover {
-  background: #d6d6d6;
+  background: #e0e0e0;
 }
 
-
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-8px); }
+  from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
