@@ -3,7 +3,7 @@ import { getWorkSchedule } from "./workSchedule.js";
 
 const prisma = new PrismaClient();
 
-export const updateAttStatus = async (attendance, timeIn, timeOut) => {
+export const updateAttStatus = async (attendance, timeIn, timeOut, lunchOut, lunchIn) => {
 
     const date = new Date(attendance.date);
     const schedule = getWorkSchedule(date);
@@ -11,6 +11,8 @@ export const updateAttStatus = async (attendance, timeIn, timeOut) => {
 
     const newTimeIn = timeIn ? new Date(timeIn) : attendance.timeIn;
     const newTimeOut = timeOut ? new Date(timeOut) : attendance.timeOut;
+    const newLunchOut = lunchOut ? new Date(lunchOut) : attendance.lunchOut;
+    const newLunchIn = lunchIn ? new Date(lunchIn) : attendance.lunchIn;
 
     let status = AttendanceStatus.PRESENT;
     let tardinessMinutes = 0;
@@ -25,10 +27,21 @@ export const updateAttStatus = async (attendance, timeIn, timeOut) => {
         }
     }
 
-    const lunchTardy = attendance.lunchTardinessMinutes || 0;
+    let lunchTardy = attendance.lunchTardinessMinutes || 0;
 
-    if (tardinessMinutes > 0 || lunchTardy > 0) {
-        status = AttendanceStatus.TARDY;
+    if (newLunchOut && newLunchIn) {
+        const lunchDuration = Math.floor((newLunchIn - newLunchOut) / 60000);
+
+        const MAX_LUNCH_MINUTES = 60;
+
+        lunchTardy = lunchDuration > MAX_LUNCH_MINUTES 
+            ? lunchDuration - MAX_LUNCH_MINUTES 
+            : 0;
+
+        if (lunchTardy > 0) status = AttendanceStatus.TARDY;
+    } else {
+        
+        if (lunchTardy > 0) status = AttendanceStatus.TARDY;
     }
 
     let straightWorkHours = attendance.straightWorkHours;
@@ -38,11 +51,12 @@ export const updateAttStatus = async (attendance, timeIn, timeOut) => {
         const workMinutes = (newTimeOut - newTimeIn) / 60000;
 
         const lunchMinutes =
-            attendance.lunchOut && attendance.lunchIn
-                ? (attendance.lunchIn - attendance.lunchOut) / 60000
+            newLunchOut && newLunchIn
+                ? (newLunchIn - newLunchOut) / 60000
                 : 0;
 
         straightWorkHours = parseFloat((workMinutes / 60).toFixed(2));
+
         totalWorkHours = parseFloat(
             ((workMinutes - lunchMinutes - (tardinessMinutes + lunchTardy)) / 60).toFixed(2)
         );
@@ -53,11 +67,14 @@ export const updateAttStatus = async (attendance, timeIn, timeOut) => {
         data: {
             timeIn: newTimeIn,
             timeOut: newTimeOut,
+            lunchOut: newLunchOut,
+            lunchIn: newLunchIn,
             tardinessMinutes,
+            lunchTardinessMinutes: lunchTardy,
             status,
             straightWorkHours,
             totalWorkHours,
-        },
+        }
     });
 
     return updated;

@@ -310,7 +310,7 @@ export const getAllAttendance = async (req, res) => {
 export const updateAttendance = async (req, res) => {
     try {
         const { id } = req.params;
-        const { timeIn, timeOut } = req.body;
+        const { timeIn, timeOut, lunchOut, lunchIn } = req.body;
 
         const attendance = await prisma.attendance.findUnique({
             where: { id },
@@ -320,7 +320,7 @@ export const updateAttendance = async (req, res) => {
             return res.status(404).json({ message: "Attendance not found" });
         }
 
-        const updated = await updateAttStatus(attendance, timeIn, timeOut);
+        const updated = await updateAttStatus(attendance, timeIn, timeOut, lunchOut, lunchIn);
 
         res.json({
             message: "Attendance updated by admin",
