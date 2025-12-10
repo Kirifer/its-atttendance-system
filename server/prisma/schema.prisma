@@ -28,7 +28,7 @@ model User {
   created_at         DateTime  @default(now())
   reset_token        String?
   reset_token_expiry DateTime?
-
+  onLeave            Boolean   @default(false) 
   leaves      Leave[]
   attendance  Attendance[]
   timeAdjustments TimeAdjustment[]
