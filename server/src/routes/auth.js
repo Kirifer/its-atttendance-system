@@ -124,6 +124,7 @@ router.post("/login", validateLogin, async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
+        leave: user.onLeave 
       },
     });
   } catch (err) {
