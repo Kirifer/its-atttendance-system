@@ -64,7 +64,7 @@ function Timesheet() {
               className="time-adjustment-box"
               onClick={() => setIsModalOpen(true)}
             >
-              + &nbsp;&nbsp; File time adjustment
+              <span class="material-symbols-outlined">add</span>
             </button>
 
             <a
