@@ -212,6 +212,7 @@ router.get("/me", verifyToken, async (req, res) => {
         email: true,
         role: true,
         profilePic: true,
+        onLeave: true,  
       },
     });
 
