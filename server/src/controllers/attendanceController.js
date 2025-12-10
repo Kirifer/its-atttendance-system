@@ -2,6 +2,7 @@ import { PrismaClient, AttendanceStatus } from "@prisma/client";
 import { autoLunchTardy } from "../utils/autoLunchTardy.js";
 import { getWorkSchedule } from "../utils/workSchedule.js";
 import { countWorkDays } from "../utils/countWorkDays.js";
+import { updateAttStatus } from "../utils/updateAttStatus.js";
 
 const prisma = new PrismaClient();
 
@@ -319,13 +320,7 @@ export const updateAttendance = async (req, res) => {
             return res.status(404).json({ message: "Attendance not found" });
         }
 
-        const updated = await prisma.attendance.update({
-            where: { id },
-            data: {
-                timeIn: timeIn ? new Date(timeIn) : attendance.timeIn,
-                timeOut: timeOut ? new Date(timeOut) : attendance.timeOut,
-            },
-        });
+        const updated = await updateAttStatus(attendance, timeIn, timeOut);
 
         res.json({
             message: "Attendance updated by admin",
