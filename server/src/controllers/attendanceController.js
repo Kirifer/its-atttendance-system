@@ -7,405 +7,413 @@ import { updateAttStatus } from "../utils/updateAttStatus.js";
 const prisma = new PrismaClient();
 
 export const isAdmin = (req, res, next) => {
-    if (req.user.role !== "ADMIN") {
-        return res.status(403).json({ message: "Admin only" });
-    }
-    next();
+  if (req.user.role !== "ADMIN") {
+    return res.status(403).json({ message: "Admin only" });
+  }
+  next();
 };
 
 export const timeIn = async (req, res) => {
-    try {
-        const user = req.user;
+  try {
+    const user = req.user;
 
-        if (user.role === "ADMIN") {
-            return res.status(403).json({ message: "Admins cannot have attendance records" });
-        }
-
-        const userId = req.user.id;
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const schedule = getWorkSchedule(today);
-        if (!schedule) {
-            return res.status(400).json({ message: "Weekend — no schedule" });
-        }
-
-        const existing = await prisma.attendance.findUnique({
-            where: { userId_date: { userId, date: today } },
-        });
-
-        if (existing) {
-            return res.status(400).json({ message: "Already timed in today" });
-        }
-
-        const now = new Date();
-        const { start: workStart } = schedule;
-
-        console.log("Now:", now.toLocaleString());
-        console.log("Work Start:", workStart.toLocaleString());
-        console.log("Today Date:", today.toLocaleDateString());
-        console.log("Timezone Offset (minutes):", now.getTimezoneOffset());
-
-        let status = AttendanceStatus.PRESENT;
-        let tardinessMinutes = 0;
-
-        const nowMinutes = Math.floor(now.getTime() / 60000);
-        const startMinutes = Math.floor(workStart.getTime() / 60000);
-
-        if (nowMinutes > startMinutes) {
-            status = AttendanceStatus.TARDY;
-            tardinessMinutes = nowMinutes - startMinutes;
-        }
-
-        const attendance = await prisma.attendance.create({
-            data: {
-                userId,
-                date: today,
-                timeIn: now,
-                status,
-                tardinessMinutes,
-            },
-        });
-
-        res.status(201).json({ message: "Time-in logged", attendance });
-
-    } catch (error) {
-        console.error("Error in timeIn:", error);
-        res.status(500).json({ message: "Error logging Time-in" });
+    if (user.role === "ADMIN") {
+      return res
+        .status(403)
+        .json({ message: "Admins cannot have attendance records" });
     }
+
+    const userId = req.user.id;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const schedule = getWorkSchedule(today);
+    if (!schedule) {
+      return res.status(400).json({ message: "Weekend — no schedule" });
+    }
+
+    const existing = await prisma.attendance.findUnique({
+      where: { userId_date: { userId, date: today } },
+    });
+
+    if (existing) {
+      return res.status(400).json({ message: "Already timed in today" });
+    }
+
+    const now = new Date();
+    const { start: workStart } = schedule;
+
+    console.log("Now:", now.toLocaleString());
+    console.log("Work Start:", workStart.toLocaleString());
+    console.log("Today Date:", today.toLocaleDateString());
+    console.log("Timezone Offset (minutes):", now.getTimezoneOffset());
+
+    let status = AttendanceStatus.PRESENT;
+    let tardinessMinutes = 0;
+
+    const nowMinutes = Math.floor(now.getTime() / 60000);
+    const startMinutes = Math.floor(workStart.getTime() / 60000);
+
+    if (nowMinutes > startMinutes) {
+      status = AttendanceStatus.TARDY;
+      tardinessMinutes = nowMinutes - startMinutes;
+    }
+
+    const attendance = await prisma.attendance.create({
+      data: {
+        userId,
+        date: today,
+        timeIn: now,
+        status,
+        tardinessMinutes,
+      },
+    });
+
+    res.status(201).json({ message: "Time-in logged", attendance });
+  } catch (error) {
+    console.error("Error in timeIn:", error);
+    res.status(500).json({ message: "Error logging Time-in" });
+  }
 };
 
-
 export const lunchOut = async (req, res) => {
-    try {
+  try {
+    const user = req.user;
 
-        const user = req.user;
-
-        if (user.role === "ADMIN") {
-            return res.status(403).json({ message: "Admins cannot have attendance records" });
-        }
-
-        const userId = req.user.id;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const attendance = await prisma.attendance.findUnique({
-            where: { userId_date: { userId, date: today } },
-        });
-
-        if (!attendance || !attendance.timeIn) {
-            return res.status(400).json({ message: "You need to time in first" })
-        }
-
-        if (attendance.lunchOut) {
-            return res.status(400).json({ message: "Already out for lunch" });
-        }
-
-        if (attendance.timeOut) {
-            return res.status(400).json({ message: "Unable to lunch out after time out" })
-        }
-
-        const updated = await prisma.attendance.update({
-            where: { id: attendance.id },
-            data: { lunchOut: new Date() },
-        });
-
-        res.json({ message: "Lunch out logged", attendance: updated });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error logging lunch out" });
+    if (user.role === "ADMIN") {
+      return res
+        .status(403)
+        .json({ message: "Admins cannot have attendance records" });
     }
+
+    const userId = req.user.id;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const attendance = await prisma.attendance.findUnique({
+      where: { userId_date: { userId, date: today } },
+    });
+
+    if (!attendance || !attendance.timeIn) {
+      return res.status(400).json({ message: "You need to time in first" });
+    }
+
+    if (attendance.lunchOut) {
+      return res.status(400).json({ message: "Already out for lunch" });
+    }
+
+    if (attendance.timeOut) {
+      return res
+        .status(400)
+        .json({ message: "Unable to lunch out after time out" });
+    }
+
+    const updated = await prisma.attendance.update({
+      where: { id: attendance.id },
+      data: { lunchOut: new Date() },
+    });
+
+    res.json({ message: "Lunch out logged", attendance: updated });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error logging lunch out" });
+  }
 };
 
 export const lunchIn = async (req, res) => {
-    try {
+  try {
+    const user = req.user;
 
-        const user = req.user;
-
-        if (user.role === "ADMIN") {
-            return res.status(403).json({ message: "Admins cannot have attendance records" });
-        }
-
-        const userId = req.user.id;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const attendance = await prisma.attendance.findUnique({
-            where: { userId_date: { userId, date: today } },
-        });
-
-        if (!attendance || !attendance.timeIn) {
-            return res.status(400).json({ message: "You need to time in first" });
-        }
-
-        if (!attendance.lunchOut) {
-            return res.status(400).json({ message: "You are not out for lunch" });
-        }
-
-        if (attendance.lunchIn) {
-            return res.status(400).json({ message: "Already back from lunch" });
-        }
-
-        if (attendance.timeOut) {
-            return res.status(400).json({ message: "Already timed out" });
-        }
-
-        const now = new Date();
-
-        const lunchDurationMinutes = Math.floor(
-            (now - attendance.lunchOut) / 60000
-        );
-
-        const MAX_LUNCH_MINUTES = 60;
-        let extraTardy = 0;
-
-        if (lunchDurationMinutes > MAX_LUNCH_MINUTES) {
-            extraTardy = lunchDurationMinutes - MAX_LUNCH_MINUTES;
-        }
-
-        const updated = await prisma.attendance.update({
-            where: { id: attendance.id },
-            data: {
-                lunchIn: now,
-                lunchTardinessMinutes: extraTardy,
-                status:
-                    attendance.tardinessMinutes > 0 || extraTardy > 0
-                        ? AttendanceStatus.TARDY
-                        : AttendanceStatus.PRESENT,
-            },
-        });
-
-        res.json({ message: "Lunch in logged", extraLunchTardiness: extraTardy, attendance: updated });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error logging lunch in" });
+    if (user.role === "ADMIN") {
+      return res
+        .status(403)
+        .json({ message: "Admins cannot have attendance records" });
     }
+
+    const userId = req.user.id;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const attendance = await prisma.attendance.findUnique({
+      where: { userId_date: { userId, date: today } },
+    });
+
+    if (!attendance || !attendance.timeIn) {
+      return res.status(400).json({ message: "You need to time in first" });
+    }
+
+    if (!attendance.lunchOut) {
+      return res.status(400).json({ message: "You are not out for lunch" });
+    }
+
+    if (attendance.lunchIn) {
+      return res.status(400).json({ message: "Already back from lunch" });
+    }
+
+    if (attendance.timeOut) {
+      return res.status(400).json({ message: "Already timed out" });
+    }
+
+    const now = new Date();
+
+    const lunchDurationMinutes = Math.floor(
+      (now - attendance.lunchOut) / 60000
+    );
+
+    const MAX_LUNCH_MINUTES = 60;
+    let extraTardy = 0;
+
+    if (lunchDurationMinutes > MAX_LUNCH_MINUTES) {
+      extraTardy = lunchDurationMinutes - MAX_LUNCH_MINUTES;
+    }
+
+    const updated = await prisma.attendance.update({
+      where: { id: attendance.id },
+      data: {
+        lunchIn: now,
+        lunchTardinessMinutes: extraTardy,
+        status:
+          attendance.tardinessMinutes > 0 || extraTardy > 0
+            ? AttendanceStatus.TARDY
+            : AttendanceStatus.PRESENT,
+      },
+    });
+
+    res.json({
+      message: "Lunch in logged",
+      extraLunchTardiness: extraTardy,
+      attendance: updated,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error logging lunch in" });
+  }
 };
 
-
 export const timeOut = async (req, res) => {
-    try {
+  try {
+    const user = req.user;
 
-        const user = req.user;
-
-        if (user.role === "ADMIN") {
-            return res.status(403).json({ message: "Admins cannot have attendance records" });
-        }
-
-        const userId = req.user.id;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const attendance = await prisma.attendance.findUnique({
-            where: { userId_date: { userId, date: today } },
-        });
-
-        if (!attendance) {
-            return res.status(400).json({ message: "You have not timed in today" });
-        }
-
-        if (attendance.timeOut) {
-            return res.status(400).json({ message: "Already timed out today" });
-        }
-
-        if (attendance.lunchOut && !attendance.lunchIn) {
-            return res.status(400).json({ message: "Please return from lunch before timing out" });
-        }
-
-        const now = new Date();
-
-        const timeIn = attendance.timeIn;
-        const timeOut = now;
-
-        const workMinutes = timeIn && timeOut ? (timeOut - timeIn) / 1000 / 60 : 0;
-        const lunchMinutes =
-            attendance.lunchOut && attendance.lunchIn
-                ? (attendance.lunchIn - attendance.lunchOut) / 1000 / 60
-                : 0;
-
-        const straightWorkHours = workMinutes / 60;
-        const totalWorkHours = (workMinutes - lunchMinutes - (attendance.tardinessMinutes + attendance.lunchTardinessMinutes)) / 60;
-
-        const updated = await prisma.attendance.update({
-            where: { id: attendance.id },
-            data: {
-                timeOut: now,
-                straightWorkHours: parseFloat(straightWorkHours.toFixed(2)),
-                totalWorkHours: parseFloat(totalWorkHours.toFixed(2)),
-            },
-        });
-
-        res.json({ message: "Time-out logged", attendance: updated });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error logging time-out" });
+    if (user.role === "ADMIN") {
+      return res
+        .status(403)
+        .json({ message: "Admins cannot have attendance records" });
     }
+
+    const userId = req.user.id;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const attendance = await prisma.attendance.findUnique({
+      where: { userId_date: { userId, date: today } },
+    });
+
+    if (!attendance) {
+      return res.status(400).json({ message: "You have not timed in today" });
+    }
+
+    if (attendance.timeOut) {
+      return res.status(400).json({ message: "Already timed out today" });
+    }
+
+    if (attendance.lunchOut && !attendance.lunchIn) {
+      return res
+        .status(400)
+        .json({ message: "Please return from lunch before timing out" });
+    }
+
+    const now = new Date();
+
+    const timeIn = attendance.timeIn;
+    const timeOut = now;
+
+    const workMinutes = timeIn && timeOut ? (timeOut - timeIn) / 1000 / 60 : 0;
+    const lunchMinutes =
+      attendance.lunchOut && attendance.lunchIn
+        ? (attendance.lunchIn - attendance.lunchOut) / 1000 / 60
+        : 0;
+
+    const straightWorkHours = workMinutes / 60;
+    const totalWorkHours =
+      (workMinutes -
+        lunchMinutes -
+        (attendance.tardinessMinutes + attendance.lunchTardinessMinutes)) /
+      60;
+
+    const updated = await prisma.attendance.update({
+      where: { id: attendance.id },
+      data: {
+        timeOut: now,
+        straightWorkHours: parseFloat(straightWorkHours.toFixed(2)),
+        totalWorkHours: parseFloat(totalWorkHours.toFixed(2)),
+      },
+    });
+
+    res.json({ message: "Time-out logged", attendance: updated });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error logging time-out" });
+  }
 };
 
 export const getUserAttendance = async (req, res) => {
-    try {
-        const requestedUserId = Number(req.params.userId);
-        const loggedInUser = req.user;
+  try {
+    const requestedUserId = req.params.userId;
+    const loggedInUser = req.user;
 
-        if (loggedInUser.role !== "ADMIN" && loggedInUser.id !== requestedUserId) {
-            return res.status(403).json({ message: "Forbidden" });
-        }
-
-        let records = await prisma.attendance.findMany({
-            where: {
-                userId: requestedUserId,
-                user: { role: { not: "ADMIN" } }
-            },
-            orderBy: { date: "desc" },
-        });
-
-        records = await Promise.all(
-            records.map((r) => autoLunchTardy(r, prisma))
-        );
-
-        const workDays = countWorkDays(records);
-
-        res.json({ attendance: records, workDays });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error fetching attendance" });
+    if (loggedInUser.role !== "ADMIN" && loggedInUser.id !== requestedUserId) {
+      return res.status(403).json({ message: "Forbidden" });
     }
+
+    let records = await prisma.attendance.findMany({
+      where: {
+        userId: requestedUserId,
+        user: { role: { not: "ADMIN" } },
+      },
+      orderBy: { date: "desc" },
+    });
+
+    records = await Promise.all(records.map((r) => autoLunchTardy(r, prisma)));
+
+    const workDays = countWorkDays(records);
+
+    res.json({ attendance: records, workDays });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching attendance" });
+  }
 };
 
 export const getAllAttendance = async (req, res) => {
-    try {
-        if (req.user.role !== "ADMIN") {
-            return res.status(403).json({ message: "Admins only" });
-        }
-
-        let records = await prisma.attendance.findMany({
-            include: {
-                user: {
-                    select: {
-                        email: true,
-                        username: true,
-                    },
-                },
-            },
-            orderBy: [
-                { date: "desc" },
-                { userId: "asc" },
-            ],
-        });
-
-        records = await Promise.all(
-            records.map((r) => autoLunchTardy(r, prisma))
-        );
-
-         const workDays = countWorkDays(records);
-
-        res.json({ attendance: records, workDays });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error fetching all attendance" });
+  try {
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Admins only" });
     }
+
+    let records = await prisma.attendance.findMany({
+      include: {
+        user: {
+          select: {
+            email: true,
+            username: true,
+          },
+        },
+      },
+      orderBy: [{ date: "desc" }, { userId: "asc" }],
+    });
+
+    records = await Promise.all(records.map((r) => autoLunchTardy(r, prisma)));
+
+    const workDays = countWorkDays(records);
+
+    res.json({ attendance: records, workDays });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching all attendance" });
+  }
 };
 
 export const updateAttendance = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { timeIn, timeOut, lunchOut, lunchIn } = req.body;
+  try {
+    const { id } = req.params;
+    const { timeIn, timeOut, lunchOut, lunchIn } = req.body;
 
-        const attendance = await prisma.attendance.findUnique({
-            where: { id },
-        });
+    const attendance = await prisma.attendance.findUnique({
+      where: { id },
+    });
 
-        if (!attendance) {
-            return res.status(404).json({ message: "Attendance not found" });
-        }
-
-        const updated = await updateAttStatus(attendance, timeIn, timeOut, lunchOut, lunchIn);
-
-        res.json({
-            message: "Attendance updated by admin",
-            updated,
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error updating attendance" });
+    if (!attendance) {
+      return res.status(404).json({ message: "Attendance not found" });
     }
+
+    const updated = await updateAttStatus(
+      attendance,
+      timeIn,
+      timeOut,
+      lunchOut,
+      lunchIn
+    );
+
+    res.json({
+      message: "Attendance updated by admin",
+      updated,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error updating attendance" });
+  }
 };
 
-
 export const deleteAttendance = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const attendance = await prisma.attendance.findUnique({
-            where: { id },
-        });
+  try {
+    const { id } = req.params;
+    const attendance = await prisma.attendance.findUnique({
+      where: { id },
+    });
 
-        if (!attendance) {
-            return res.status(404).json({ message: "Attendance not found" });
-        }
-
-        await prisma.attendance.delete({
-            where: { id },
-        });
-
-        res.json({
-            message: "Attendance deleted successfully",
-            deletedId: id,
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error deleting attendance" });
+    if (!attendance) {
+      return res.status(404).json({ message: "Attendance not found" });
     }
+
+    await prisma.attendance.delete({
+      where: { id },
+    });
+
+    res.json({
+      message: "Attendance deleted successfully",
+      deletedId: id,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error deleting attendance" });
+  }
 };
 
 export const getLoginStatus = async (req, res) => {
-    try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-        const users = await prisma.user.findMany({
-            where: { role: "USER" },
-            select: {
-                id: true,
-                username: true,
-                email: true
-            }
+    const users = await prisma.user.findMany({
+      where: { role: "USER" },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+      },
+    });
+
+    const attendance = await prisma.attendance.findMany({
+      where: { date: today },
+      orderBy: { timeIn: "asc" },
+    });
+
+    const loggedIn = [];
+    const loggedOut = [];
+
+    users.forEach((user) => {
+      const record = attendance.find((a) => a.userId === user.id);
+
+      if (record && record.timeIn && !record.timeOut) {
+        loggedIn.push({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          timeIn: record.timeIn,
         });
-
-        const attendance = await prisma.attendance.findMany({
-            where: { date: today },
-            orderBy: { timeIn: "asc" }
+      } else {
+        loggedOut.push({
+          id: user.id,
+          username: user.username,
+          email: user.email,
         });
+      }
+    });
 
-        const loggedIn = [];
-        const loggedOut = [];
-
-        users.forEach(user => {
-            const record = attendance.find(a => a.userId === user.id);
-
-            if (record && record.timeIn && !record.timeOut) {
-                loggedIn.push({
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    timeIn: record.timeIn
-                });
-            } else {
-                loggedOut.push({
-                    id: user.id,
-                    username: user.username,
-                    email: user.email
-                });
-            }
-        });
-
-        res.json({ loggedIn, loggedOut });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error fetching login status" });
-    }
+    res.json({ loggedIn, loggedOut });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching login status" });
+  }
 };
-
-
