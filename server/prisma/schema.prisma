@@ -32,6 +32,7 @@ model User {
   leaves      Leave[]
   attendance  Attendance[]
   timeAdjustments TimeAdjustment[]
+  schedules   UserSchedule[]    
 }
 
 enum LeaveStatus {
@@ -115,4 +116,15 @@ model TimeAdjustment {
   details   String
   status    String   @default("pending")
   createdAt DateTime @default(now())
+}
+
+model UserSchedule { 
+  id          String    @id @default(uuid()) 
+  userId      String
+  user        User      @relation(fields: [userId], references: [id]) 
+  weekday     Int       // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  startTime   String    // "07:00" 
+  endTime     String    // "16:00" 
+
+  @@unique([userId, weekday])
 }
