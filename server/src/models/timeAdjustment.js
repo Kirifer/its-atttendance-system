@@ -1,12 +1,13 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-async function createTimeAdjustment(userId, type, details) {
+async function createTimeAdjustment(userId, type, details, attachment = null) {
   return await prisma.timeAdjustment.create({
     data: {
       userId,
       type,
       details,
+      attachment,
       status: "pending",
     },
   });

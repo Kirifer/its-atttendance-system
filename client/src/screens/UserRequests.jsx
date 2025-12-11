@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import API from "../api/api";
+import "../styles/UserRequests.css";
 import "../styles/ViewRequestTable.css";
 
 function UserRequests() {
@@ -37,53 +38,86 @@ function UserRequests() {
 
   return (
     <DashboardLayout>
-      <div>
+      <h3 className="title">My Time Adjustment Requests</h3>
+      <div className="time-requests">
         {/* Go back */}
-        <a
-          href="/timesheet"
-          className="x-button"
-          style={{ textDecoration: "none", textAlign: "center" }}
-        >
+        <a href="/timesheet" className="x-button">
           X
         </a>
 
-        {/* User's Requests */}
-        <h1 className="title">My Time Adjustment Requests</h1>
-        <div className="user-requests">
-          {userRequests.length === 0 ? (
-            <p>No requests submitted yet.</p>
-          ) : (
-            <table>
+        {userRequests.length === 0 ? (
+          <p>No requests submitted yet.</p>
+        ) : (
+          <div className="time-table-container">
+            <table className="time-table" style={{ tableLayout: "auto" }}>
               <thead>
                 <tr>
                   <th>Type</th>
-                  <th>Reason</th>
+                  <th style={{ minWidth: "250px" }}>Reason</th>
                   <th>Status</th>
+                  <th>Attachment</th>
                   <th>Submitted At</th>
                 </tr>
               </thead>
               <tbody>
-                {userRequests.map((req) => (
-                  <tr key={req.id}>
-                    <td data-label="Type">
-                      {typeLabels[req.type] || req.type}
-                    </td>
-                    <td data-label="Details">{req.details}</td>
-                    <td
-                      data-label="Status"
-                      className={`status ${req.status.toLowerCase()}`}
-                    >
-                      {req.status.toUpperCase()}
-                    </td>
-                    <td data-label="Submitted At">
-                      {new Date(req.createdAt).toLocaleString()}
-                    </td>
-                  </tr>
-                ))}
+                {userRequests.map((req) => {
+                  const status = req.status ? req.status.toLowerCase() : "";
+
+                  const fullAttachmentUrl = req.attachment
+                    ? `${
+                        process.env.REACT_APP_BACKEND_URL ||
+                        "http://localhost:5001"
+                      }${req.attachment}`
+                    : null;
+
+                  return (
+                    <tr key={req.id}>
+                      <td data-label="Type">
+                        {typeLabels[req.type] || req.type}
+                      </td>
+                      <td
+                        data-label="Details"
+                        style={{
+                          whiteSpace: "normal",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        {req.details}
+                      </td>
+                      <td
+                        data-label="Status"
+                        className={`time-table__status time-table__status--${status}`}
+                      >
+                        {req.status.toUpperCase()}
+                      </td>
+
+                      <td
+                        data-label="Attachment"
+                        style={{ whiteSpace: "nowrap" }}
+                      >
+                        {fullAttachmentUrl ? (
+                          <a
+                            href={fullAttachmentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View / Download
+                          </a>
+                        ) : (
+                          "No Attachment"
+                        )}
+                      </td>
+
+                      <td data-label="Submitted At">
+                        {new Date(req.createdAt).toLocaleString()}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

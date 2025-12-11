@@ -109,13 +109,14 @@ model Attendance {
 }
 
 model TimeAdjustment {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  type      String
-  details   String
-  status    String   @default("pending")
-  createdAt DateTime @default(now())
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  type       String
+  details    String
+  attachment String?
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
 }
 
 model UserSchedule { 

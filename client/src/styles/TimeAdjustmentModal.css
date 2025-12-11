@@ -8,9 +8,10 @@
   display: flex;
   justify-content: right;
   align-items: flex-start;
-
   z-index: 999999;
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
 }
 
 .modal-content {
@@ -23,6 +24,21 @@
   margin: 40px 40px 0px 0px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   pointer-events: auto;
+
+  transform: scale(0.9) translateY(-20px);
+  opacity: 0;
+  transition: transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28),
+    opacity 0.2s ease-out;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-overlay.show .modal-content {
+  transform: scale(1) translateY(0);
+  opacity: 1;
 }
 
 .modal-content h2 {
@@ -111,14 +127,12 @@
 }
 
 @media (max-width: 768px) {
-
   .time-adjustment-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 
-  top: 120px;
-  right: 5px;
-
+    top: 120px;
+    right: 5px;
   }
 }
