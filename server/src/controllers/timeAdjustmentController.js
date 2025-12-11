@@ -15,7 +15,17 @@ const fileTimeAdjustment = async (req, res) => {
     if (!type || !details)
       return res.status(400).json({ message: "Missing fields." });
 
-    const request = await createTimeAdjustment(userId, type, details);
+    let attachmentPath = null;
+    if (req.file) {
+      attachmentPath = "/uploads/" + req.file.filename;
+    }
+
+    const request = await createTimeAdjustment(
+      userId,
+      type,
+      details,
+      attachmentPath
+    );
 
     res.status(201).json({
       message: "Time adjustment request filed",
@@ -44,6 +54,7 @@ const fetchTimeAdjustments = async (req, res) => {
       details: req.details,
       status: req.status,
       createdAt: req.createdAt,
+      attachment: req.attachment,
       user: req.user ? { id: req.user.id, username: req.user.username } : null,
     }));
 
