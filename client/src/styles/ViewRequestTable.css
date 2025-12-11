@@ -1,248 +1,117 @@
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
 
-.user-requests {
-  margin: 20px;
-  overflow-x: auto;
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.title_h3 {
+  color: #1a5dac;
+  margin-top: 50px;
+  margin-bottom: 30px;
+  font-size: 30px;
 }
 
-.user-requests table {
+.time-table-container {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 15px;
-  font-family: "Arial", sans-serif;
-  border-radius: 12px;
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 20px;
 }
 
-.user-requests th,
-.user-requests td {
-  padding: 12px 15px;
+.time-requests {
+  margin: 20px;
+}
+
+.time-table {
+  min-width: 800px; /* ensures table stays wide */
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  table-layout: fixed;
+  white-space: nowrap;
+  margin: auto;
+}
+
+/* Table headers */
+.time-table th {
+  color: black;
+  padding: 12px;
   text-align: left;
-  border: none;
-  background-color: transparent;
+  white-space: nowrap;
 }
 
-/* Details word wrap */
-.user-requests td[data-label="Details"] {
-  max-width: 500px;
-  white-space: normal;
-  word-wrap: break-word;
-  overflow-y: auto;
-  max-height: 100px;
-  padding: 8px;
+.time-table td {
+  padding: 12px;
+  border-bottom: 1px solid #8b8b8b;
+  white-space: nowrap;
+  display: table-cell;
 }
 
-/* Reason word wrap */
-.user-requests td.reason {
-  max-width: 150px;
-  white-space: normal;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-/* Smooth corners for the entire table */
-/* Blue header */
-.user-requests tr th:first-child {
-  border-top-left-radius: 12px;
-}
-
-.user-requests tr th:last-child {
-  border-top-right-radius: 12px;
-}
-
-.user-requests tr td:first-child {
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 12px;
-}
-
-.user-requests tr td:last-child {
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-
-.user-requests td:not(.status) {
-  padding-right: 25px;
-}
-
-.user-requests tr:nth-child(even) {
-  background-color: #f1f1f1;
-}
-
-.user-requests tr:hover {
-  background-color: #e0f0ff;
-}
-
-.user-requests th {
-  background-color: #0077ff;
-  color: #fff;
-  font-weight: 600;
-}
-
-.user-requests td {
-  color: #333;
+.time-table__actions .material-symbols-outlined {
+  cursor: pointer;
+  font-size: 24px;
+  margin-right: 8px;
   vertical-align: middle;
+  transition: 0.2s;
 }
 
-/* Status badges */
-.user-requests td.status {
-  font-weight: bold;
-  padding: 8px 12px;
-  border-radius: 12px;
-  text-align: center;
-  color: white;
+.time-table__actions .material-symbols-outlined:hover {
+  opacity: 0.7;
 }
 
-.user-requests td.status.pending {
-  background-color: #ff9800;
-}
-
-.user-requests td.status.approved {
-  background-color: #4caf50;
-}
-
-.user-requests td.status.rejected {
-  background-color: #f44336;
-}
-
-.user-requests td.status.PENDING {
-  background-color: #ff9800;
-}
-.user-requests td.status.APPROVED {
-  background-color: #4caf50;
-}
-.user-requests td.status.REJECTED {
-  background-color: #f44336;
-}
-
-/* Responsive table for mobile */
-@media (max-width: 768px) {
-  .user-requests table,
-  .user-requests thead,
-  .user-requests tbody,
-  .user-requests th,
-  .user-requests td,
-  .user-requests tr {
-    display: block;
-  }
-
-  .user-requests thead {
-    display: none;
-  }
-
-  .user-requests tr {
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 10px;
-  }
-
-  .user-requests td {
-    text-align: right;
-    padding-left: 50%;
-    position: relative;
-  }
-
-  .user-requests td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 15px;
-    width: calc(50% - 30px);
-    text-align: left;
-    font-weight: bold;
-    color: #555;
-  }
-}
-
-/* Admin */
-/* Actions word wrap */
-.user-requests td[data-label="Actions"] {
-  max-width: 200px;
-  white-space: normal;
-  word-wrap: break-word;
-  overflow-y: auto;
-  max-height: 100px;
-  padding: 8px;
-}
-
-.admin-accept-btn {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 10px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
+.time-table__approve {
   color: #4caf50;
-  cursor: pointer;
-  transition: background-color 0.3s, ease 0.2s;
 }
 
-.admin-accept-btn:hover {
-  color: #45a049;
-  transform: scale(1.1);
+.time-table__reject {
+  color: #ff9800;
 }
 
-.admin-accept-btn:active:hover {
-  color: #397d3a;
-  transform: scale(0.98);
+.time-table__delete {
+  color: #d9534f;
 }
 
-.admin-decline-btn {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 10px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
-  color: #fbc02d;
-  cursor: pointer;
-  transition: background-color 0.3s, ease 0.2s;
+.time-table__status {
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
-.admin-decline-btn:hover {
-  color: #f9a825;
-  transform: scale(1.1);
+.time-table__status--pending {
+  color: #d2a516;
 }
 
-.admin-decline-btn:active:hover {
-  color: #f57f17;
-  transform: scale(0.98);
+.time-table__status--approved {
+  color: #54cc58;
 }
 
-.admin-delete-btn {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 10px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
-  color: #f44336;
-  cursor: pointer;
-  transition: background-color 0.3s, ease 0.2s;
+.time-table__status--rejected {
+  color: #d40707;
 }
 
-.admin-delete-btn:hover {
-  color: #e53935;
-  transform: scale(1.1);
+/* Responsive adjustments for mobile */
+@media (max-width: 600px) {
+  .time-table th,
+  .time-table td {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .time-table__actions .material-symbols-outlined {
+    font-size: 20px;
+    margin-right: 6px;
+  }
 }
 
-.admin-delete-btn:active:hover {
-  color: #b71c1c;
-  transform: scale(0.98);
+.time-table__search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
-.admin-accept-btn,
-.admin-decline-btn,
-.admin-delete-btn {
-  margin-right: 2px;
+.time-table__dropdown,
+.time-table__input {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
 }
 
-/* X button to go back */
 .x-button {
-  /* Positioning */
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -252,8 +121,6 @@
   margin-right: 10px;
   z-index: 1000;
   text-align: center;
-
-  /* Styling */
   background: none;
   border: none;
   font-size: 24px;
