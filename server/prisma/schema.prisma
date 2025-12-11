@@ -29,6 +29,9 @@ model User {
   reset_token        String?
   reset_token_expiry DateTime?
   onLeave            Boolean   @default(false) 
+  totalOJTHours      Float     @default(0)
+  remainingWorkHours Float     @default(0)
+
   leaves      Leave[]
   attendance  Attendance[]
   timeAdjustments TimeAdjustment[]
