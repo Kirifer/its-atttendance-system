@@ -265,7 +265,7 @@ export default function AttendanceTable({
             </label>
           )}
           {filterType === "Custom" && (
-            <div style={{ marginLeft: "10px", display: "flex", gap: "10px" }}>
+            <div className="attendance_filter-custom-range">
               <input
                 type="date"
                 value={customStart}

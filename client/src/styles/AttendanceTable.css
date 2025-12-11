@@ -34,6 +34,12 @@
   margin: 0;
 }
 
+.attendance_filter-custom-range {
+  margin-left: 10px;
+  display: flex;
+  gap: 10px;
+}
+
 .attendance_filter_btn,
 .attendance_filter_bar select {
   padding: 8px 12px;
@@ -260,4 +266,25 @@
     white-space: nowrap;
   }
 
+}
+
+@media (max-width: 627px) {
+  .attendance_filter_bar {
+    flex-direction: column;     
+    align-items: flex-start;
+    gap: 5px;       
+    width: 100%;
+  }
+
+  .attendance_filter-custom-range {
+    width: 50%;
+    display: flex;
+    flex-direction: column;  
+    gap: 6px;                  
+    margin: 0;
+  }
+
+  .attendance_filter-custom-range input {
+    width: 100%;                
+  }
 }
