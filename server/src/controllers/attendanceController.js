@@ -3,6 +3,7 @@ import { autoLunchTardy } from "../utils/autoLunchTardy.js";
 import { getWorkSchedule } from "../utils/workSchedule.js";
 import { countWorkDays } from "../utils/countWorkDays.js";
 import { updateAttStatus } from "../utils/updateAttStatus.js";
+import { recalculateHours } from "../utils/hoursOJT/recalculateHours.js";
 
 const prisma = new PrismaClient();
 
@@ -331,17 +332,13 @@ export const updateAttendance = async (req, res) => {
       validatedStatus = status;
     }
 
-    const updated = await updateAttStatus(
-      attendance,
-      timeIn,
-      timeOut,
-      lunchOut,
-      lunchIn
-    );
+    await updateAttStatus(attendance, timeIn, timeOut, lunchOut, lunchIn, validatedStatus);
+
+    const updatedHours = await recalculateHours(id);
 
     res.json({
       message: "Attendance updated by admin",
-      updated,
+      updated: updatedHours,
     });
   } catch (error) {
     console.error("Error updating attendance:", error);

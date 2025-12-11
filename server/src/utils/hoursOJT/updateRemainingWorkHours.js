@@ -1,33 +1,28 @@
+
 import { PrismaClient } from "@prisma/client";
-import { calculateOJTHours } from "./calculateOJTHours";
 
 const prisma = new PrismaClient();
 
 export async function updateRemainingWorkHours(userId) {
-
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: {
-      totalOJTHours: true,
-      remainingWorkHours: true,
-    }
   });
 
   if (!user) return;
 
-  
-  const accumulatedHours = await calculateOJTHours(userId);
+  // Sum TOTAL WORK HOURS of the user
+  const { _sum } = await prisma.attendance.aggregate({
+    where: { userId },
+    _sum: { totalWorkHours: true },
+  });
 
- 
-  const remaining = user.totalOJTHours - accumulatedHours;
-
-  
-  const updatedRemaining = remaining < 0 ? 0 : remaining;
+  const earnedHours = _sum.totalWorkHours || 0;
+  const remaining = parseFloat((user.totalOJTHours - earnedHours).toFixed(2));
 
   await prisma.user.update({
     where: { id: userId },
-    data: { remainingWorkHours: updatedRemaining },
+    data: { remainingWorkHours: remaining },
   });
 
-  return updatedRemaining;
+  return remaining;
 }
