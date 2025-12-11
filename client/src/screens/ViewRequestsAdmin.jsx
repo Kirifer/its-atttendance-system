@@ -1,128 +1,41 @@
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
-import API from "../api/api";
 import {
   getAllLeaves,
   updateLeaveStatus,
   deleteLeave,
 } from "../api/leaveAdmin";
-import ViewRequestTable from "../components/ViewRequestTable";
+import LeaveTable from "../components/LeaveTable";
 import "../styles/ViewRequestsAdmin.css";
+import TimeAdjustmentTable from "../components/TimeAdjustmentTable";
 
 function ViewRequestsAdmin() {
-  const [requests, setRequests] = useState([]);
+  const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Time adjustment proper labeling
-  const typeLabels = {
-    change_log: "Change Log Request",
-    change_shift: "Change Shift Schedule",
-    offset_hours: "Offset Extended Hours",
-    overtime: "Overtime",
-    undertime: "Undertime",
-  };
-
-  // Time off proper labeling
-  const leaveTypeLabels = {
-    SICK: "Sick Leave",
-    VACATION: "Vacation",
-    HOLIDAY: "Holiday",
-    OFFSET: "Offset Hours",
-  };
-
-  const coverageTypeLabels = {
-    FULL_DAY: "Full Day",
-    HALF_DAY: "Half Day",
-  };
-
-  const fetchRequests = async () => {
+  const fetchLeaves = async () => {
     try {
-      const leavesData = await getAllLeaves();
-      const leaves = leavesData.map((l) => ({
-        id: l.id,
-        rawType: l.leaveType,
-        type: leaveTypeLabels[l.leaveType] || l.leaveType,
-        reason: l.reason,
-        intern: l.user?.username || "Unknown",
-        coverage: coverageTypeLabels[l.coverage] || l.coverageType,
-        duration: `${l.startDate} → ${l.endDate}`,
-        status: l.status,
-        attachment: l.attachment || null,
-        source: "leave",
-        createdAt: l.createdAt,
-      }));
-
-      const adjustmentsRes = await API.get("/time-adjustments", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      const adjustments = adjustmentsRes.data.requests.map((r) => ({
-        id: r.id,
-        rawType: r.type,
-        type: typeLabels[r.type] || r.type,
-        reason: r.details,
-        intern: r.user?.username || "Unknown",
-        coverage: "-",
-        duration: "-",
-        status: r.status,
-        attachment: r.attachment || null,
-        source: "adjustment",
-        createdAt: r.createdAt,
-      }));
-
-      const merged = [...leaves, ...adjustments].sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-
-      setRequests(merged);
+      const data = await getAllLeaves();
+      setLeaves(data);
     } catch (err) {
-      console.error("Error fetching requests:", err);
+      console.error("Error fetching leaves:", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchRequests();
+    fetchLeaves();
   }, []);
 
-  const handleStatusChange = async (id, source, status) => {
-    try {
-      if (source === "leave") {
-        await updateLeaveStatus(id, status);
-      } else {
-        await API.put(
-          `/time-adjustments/${id}/status`,
-          { status },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-      }
-      fetchRequests();
-    } catch (err) {
-      console.error(err);
-      throw new Error(err.response?.data?.message || "Failed to update status");
-    }
+  const handleStatusUpdate = async (id, status) => {
+    await updateLeaveStatus(id, status);
+    fetchLeaves();
   };
 
-  const handleDelete = async (id, source) => {
-    try {
-      if (source === "leave") {
-        await deleteLeave(id);
-      } else {
-        await API.delete(`/time-adjustments/${id}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-      }
-      fetchRequests();
-    } catch (err) {
-      console.error(err);
-      throw new Error(
-        err.response?.data?.message || "Failed to delete request"
-      );
-    }
+  const handleDelete = async (id) => {
+    await deleteLeave(id);
+    fetchLeaves();
   };
 
   if (loading)
@@ -134,18 +47,25 @@ function ViewRequestsAdmin() {
 
   return (
     <DashboardLayout>
-      <div>
-        <section className="user-requests">
-          {requests.length === 0 ? (
-            <p>No requests submitted yet.</p>
-          ) : (
-            <ViewRequestTable
-              requests={requests}
-              onStatusChange={handleStatusChange}
-              onDelete={handleDelete}
-            />
-          )}
-        </section>
+      <div className="admin__main">
+        <h1 className="admin__title">Time-off Requests</h1>
+        <p className="admin__description">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo
+          diam, interdum nec placerat in, venenatis egestas justo. Nam eu
+          gravida ante, vel egestas turpis.
+        </p>
+        <LeaveTable
+          leaves={leaves}
+          onStatusChange={handleStatusUpdate}
+          onDelete={handleDelete}
+        />
+        <h1 className="admin__title"> Time Adjustment Requests</h1>
+        <p className="admin__description">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo
+          diam, interdum nec placerat in, venenatis egestas justo. Nam eu
+          gravida ante, vel egestas turpis.
+        </p>
+        <TimeAdjustmentTable/>
       </div>
     </DashboardLayout>
   );
