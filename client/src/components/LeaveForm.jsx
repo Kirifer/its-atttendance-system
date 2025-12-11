@@ -26,50 +26,64 @@ function LeaveForm({ onSubmit }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // Validate leave type
-    const validTypes = ["SICK", "VACATION", "HOLIDAY", "OFFSET"];
-    if (!validTypes.includes(formData.leaveType)) {
-      setError("Invalid leave type selected");
-      setSuccess("");
-      return;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const startDate = new Date(formData.startDate);
+  const endDate = new Date(formData.endDate);
+
+  // Validate that start and end dates are in the future
+  if (startDate <= today || endDate <= today) {
+    setError("Leave dates must be in the future.");
+    setSuccess("");
+    return;
+  }
+
+  // Validate leave type
+  const validTypes = ["SICK", "VACATION", "HOLIDAY", "OFFSET"];
+  if (!validTypes.includes(formData.leaveType)) {
+    setError("Invalid leave type selected");
+    setSuccess("");
+    return;
+  }
+
+  try {
+    // Create FormData
+    const submissionData = new FormData();
+    submissionData.append("startDate", formData.startDate);
+    submissionData.append("endDate", formData.endDate);
+    submissionData.append("leaveType", formData.leaveType);
+    submissionData.append("coverage", formData.leaveCoverage);
+    submissionData.append("reason", formData.reason || "");
+    if (formData.attachment) {
+      submissionData.append("attachment", formData.attachment);
     }
 
-    try {
-      // Create FormData
-      const submissionData = new FormData();
-      submissionData.append("startDate", formData.startDate);
-      submissionData.append("endDate", formData.endDate);
-      submissionData.append("leaveType", formData.leaveType);
-      submissionData.append("coverage", formData.leaveCoverage);
-      submissionData.append("reason", formData.reason || "");
-      if (formData.attachment) {
-        submissionData.append("attachment", formData.attachment);
-      }
+    // Call API
+    await onSubmit(submissionData);
 
-      // Call API
-      await onSubmit(submissionData);
+    showToast({
+      message: "Leave submitted successfully!",
+      color: "#ffffff",
+      type: "success",
+    });
 
-      showToast({
-        message: "Leave submitted successfully!",
-        color: "#ffffff",
-        type: "success",
-      });
+    setFormData(initialFormData);
+    setError("");
+    setSuccess("Leave submitted successfully!");
+  } catch (err) {
+    showToast({
+      message: err.message || "Error submitting leave",
+      color: "#ffffff",
+      type: "error",
+    });
+    setError(err.message || "Error submitting leave");
+    setSuccess("");
+  }
+};
 
-      setFormData(initialFormData);
-      setError("");
-      setSuccess("Leave submitted successfully!");
-    } catch (err) {
-      showToast({
-        message: err.message || "Error submitting leave",
-        color: "#ffffff",
-        type: "error",
-      });
-      setError(err.message || "Error submitting leave");
-      setSuccess("");
-    }
-  };
 
   return (
     <form className="leave-form" onSubmit={handleSubmit}>
@@ -101,6 +115,9 @@ function LeaveForm({ onSubmit }) {
             value={formData.startDate}
             onChange={handleChange}
             required
+            min={new Date(new Date().setDate(new Date().getDate() + 1))
+              .toISOString()
+              .split("T")[0]} // tomorrow's date
           />
         </label>
         <label>
@@ -111,6 +128,9 @@ function LeaveForm({ onSubmit }) {
             value={formData.endDate}
             onChange={handleChange}
             required
+            min={new Date(new Date().setDate(new Date().getDate() + 1))
+              .toISOString()
+              .split("T")[0]} // tomorrow's date
           />
         </label>
       </div>
