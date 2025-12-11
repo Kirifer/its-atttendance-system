@@ -18,7 +18,6 @@ import Timeoff from "./screens/Timeoff";
 import Timesheet from "./screens/Timesheet";
 import UserInfo from "./screens/UserInfo";
 import UserRequests from "./screens/UserRequests";
-import TimeoffAdmin from "./screens/TimeoffAdmin";
 import ViewRequestsAdmin from "./screens/ViewRequestsAdmin";
 
 function App() {
@@ -77,14 +76,6 @@ function App() {
           element={
             <ProtectedRoute>
               <UserRequests />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/time-off-admin"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <TimeoffAdmin />
             </ProtectedRoute>
           }
         />

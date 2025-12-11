@@ -90,22 +90,6 @@ export default function Sidebar() {
           </NavLink>
         </li>
 
-        {user.role === "ADMIN" && (
-          <li>
-            <NavLink
-              to="/view-requests-admin"
-              className={({ isActive }) =>
-                isActive ? "active-link" : undefined
-              }
-            >
-              <span className="material-symbols-outlined">
-                person_raised_hand
-              </span>
-              View Requests
-            </NavLink>
-          </li>
-        )}
-
         <li>
           <NavLink
             to="/time-off"
@@ -118,7 +102,7 @@ export default function Sidebar() {
           </NavLink>
         </li>
 
-        {user.role === "ADMIN" && (
+        {/* {user.role === "ADMIN" && (
           <li>
             <NavLink
               to="/time-off-admin"
@@ -128,6 +112,22 @@ export default function Sidebar() {
             >
               <span className="material-symbols-outlined">manage_accounts</span>
               Time-off Admin
+            </NavLink>
+          </li>
+        )} */}
+
+        {user.role === "ADMIN" && (
+          <li>
+            <NavLink
+              to="/view-requests-admin"
+              className={({ isActive }) =>
+                isActive ? "active-link" : undefined
+              }
+            >
+              <span className="material-symbols-outlined">
+                person_raised_hand
+              </span>
+              View Requests
             </NavLink>
           </li>
         )}

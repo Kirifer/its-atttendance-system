@@ -7,6 +7,7 @@ import {
   // view user requests
   fetchMyTimeAdjustments,
   updateTimeAdjustmentStatus,
+  deleteTimeAdjustment,
 } from "../controllers/timeAdjustmentController.js";
 
 const router = express.Router();
@@ -17,5 +18,7 @@ router.get("/", authMiddleware, fetchTimeAdjustments);
 router.get("/my-requests", authMiddleware, fetchMyTimeAdjustments);
 // Accept and decline user time adjustment requests - ADMIN only
 router.put("/:id/status", authMiddleware, updateTimeAdjustmentStatus);
+// Delete time adjustment submitted request
+router.delete("/:id", authMiddleware, deleteTimeAdjustment);
 
 export default router;
