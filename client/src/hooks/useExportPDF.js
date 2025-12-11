@@ -8,7 +8,7 @@ export default function useExportPDF() {
       return;
     }
 
-    const doc = new jsPDF();
+    const doc = new jsPDF({ orientation: "landscape" });
 
     const columnsToInclude = Object.keys(records[0]).filter(
       (col) =>
