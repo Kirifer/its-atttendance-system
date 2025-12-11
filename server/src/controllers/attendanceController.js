@@ -331,16 +331,13 @@ export const updateAttendance = async (req, res) => {
       validatedStatus = status;
     }
 
-    const updated = await prisma.attendance.update({
-      where: { id },
-      data: {
-        timeIn: timeIn ?? attendance.timeIn,
-        timeOut: timeOut ?? attendance.timeOut,
-        lunchOut: lunchOut ?? attendance.lunchOut,
-        lunchIn: lunchIn ?? attendance.lunchIn,
-        status: validatedStatus,
-      },
-    });
+    const updated = await updateAttStatus(
+      attendance,
+      timeIn,
+      timeOut,
+      lunchOut,
+      lunchIn
+    );
 
     res.json({
       message: "Attendance updated by admin",
