@@ -11,7 +11,6 @@ import "../styles/ViewRequestsAdmin.css";
 
 function ViewRequestsAdmin() {
   const [requests, setRequests] = useState([]);
-  const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Time adjustment proper labeling
@@ -41,13 +40,14 @@ function ViewRequestsAdmin() {
       const leavesData = await getAllLeaves();
       const leaves = leavesData.map((l) => ({
         id: l.id,
+        rawType: l.leaveType,
         type: leaveTypeLabels[l.leaveType] || l.leaveType,
         reason: l.reason,
         intern: l.user?.username || "Unknown",
         coverage: coverageTypeLabels[l.coverage] || l.coverageType,
         duration: `${l.startDate} → ${l.endDate}`,
         status: l.status,
-        attachment: l.attachment || "No Attachment",
+        attachment: l.attachment || null,
         source: "leave",
         createdAt: l.createdAt,
       }));
@@ -57,13 +57,14 @@ function ViewRequestsAdmin() {
       });
       const adjustments = adjustmentsRes.data.requests.map((r) => ({
         id: r.id,
+        rawType: r.type,
         type: typeLabels[r.type] || r.type,
         reason: r.details,
         intern: r.user?.username || "Unknown",
         coverage: "-",
         duration: "-",
         status: r.status,
-        attachment: "No Attachment",
+        attachment: r.attachment || null,
         source: "adjustment",
         createdAt: r.createdAt,
       }));
@@ -84,37 +85,25 @@ function ViewRequestsAdmin() {
     fetchRequests();
   }, []);
 
-  const fetchLeaves = async () => {
-    try {
-      const data = await getAllLeaves();
-      setLeaves(data);
-    } catch (err) {
-      console.error("Error fetching leaves:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchLeaves();
-  }, []);
-
-  const handleStatusUpdate = async (id, status) => {
-    await updateLeaveStatus(id, status);
-    fetchLeaves();
-  };
-
   const handleStatusChange = async (id, source, status) => {
     try {
       if (source === "leave") {
         await updateLeaveStatus(id, status);
       } else {
-        await API.put(`/time-adjustments/${id}/status`, { status });
+        await API.put(
+          `/time-adjustments/${id}/status`,
+          { status },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
       }
       fetchRequests();
     } catch (err) {
       console.error(err);
-      alert("Failed to update status");
+      throw new Error(err.response?.data?.message || "Failed to update status");
     }
   };
 
@@ -130,7 +119,9 @@ function ViewRequestsAdmin() {
       fetchRequests();
     } catch (err) {
       console.error(err);
-      alert("Failed to delete request");
+      throw new Error(
+        err.response?.data?.message || "Failed to delete request"
+      );
     }
   };
 
@@ -144,7 +135,6 @@ function ViewRequestsAdmin() {
   return (
     <DashboardLayout>
       <div>
-        <h1 className="title">Admin Requests Dashboard</h1>
         <section className="user-requests">
           {requests.length === 0 ? (
             <p>No requests submitted yet.</p>
