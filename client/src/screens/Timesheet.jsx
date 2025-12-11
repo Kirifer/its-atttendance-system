@@ -88,7 +88,7 @@ function Timesheet() {
           </button>
 
           <div className="daterange_bar">
-            Date Range: {firstDay.toLocaleDateString()} -{" "}
+            <span className="daterange_bar-hide-title">Date Range:</span> {firstDay.toLocaleDateString()} -{" "}
             {lastDay.toLocaleDateString()}
           </div>
 

@@ -204,6 +204,7 @@ export default function AttendanceTable({
   return (
     <div className="attendance_body">
       <h1 className="attendance_head">Timesheet</h1>
+      <div className="attendance_top_bar">
       <div className="leave-table__search" style={{ marginBottom: "10px" }}>
         <select
           value={searchField}
@@ -223,7 +224,7 @@ export default function AttendanceTable({
           className="leave-table__input"
         />
       </div>
-      <div className="attendance_top_bar">
+      
         {role === "ADMIN" && (
           <button className="attendance_export_btn" onClick={() => exportPDF(filteredRecords)}>
             Export
@@ -304,7 +305,6 @@ export default function AttendanceTable({
                   .map((col) => (
                     <th key={col}>{col}</th>
                   ))}
-                <th></th>
               </tr>
             </thead>
             <tbody>
