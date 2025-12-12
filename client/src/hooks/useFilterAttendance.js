@@ -1,4 +1,3 @@
-// hooks/useFilterAttendance.js
 import { useState } from "react";
 
 export default function useFilterAttendance() {
