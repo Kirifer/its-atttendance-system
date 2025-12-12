@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import useUserSchedule from "../hooks/useUserSchedule";
 import { getAllUsers } from "../api/auth";
 
-export default function EditUserSchedulePopup({ 
+export default function EditUserSchedule({ 
   onClose = () => {},
   onSave = () => {},
 }) {

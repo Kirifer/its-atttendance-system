@@ -8,7 +8,7 @@ import LogsCard from "../components/Dashboard/LogsCard.jsx";
 import FiledLeavesCard from "../components/Dashboard/FiledLeavesCard.jsx";
 import Calendar from "../components/Dashboard/Calendar.jsx";
 import UserStatusCard from "../components/Dashboard/UserStatusCard.jsx";
-import EditUserSchedulePopup from "../components/EditSchedulePopup";
+import EditUserSchedule from "../components/EditUserSchedule.jsx";
 
 function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -46,7 +46,7 @@ function Dashboard() {
            
             </div>
           </div>
-                 <EditUserSchedulePopup />
+                 <EditUserSchedule />
           <div className="dashboard__container__two">
             <div className="dashboard__left__two">
               <FiledLeavesCard />
