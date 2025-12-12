@@ -103,3 +103,19 @@ export const updateUserInfo = async (username, email) => {
     throw new Error(message);
   }
 };
+
+// Get all non-admin users
+export const getAllUsers = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await API.get("/auth/users", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.users || [];
+  } catch (err) {
+    let message = "Error fetching users";
+    if (err.response?.data?.message) message = err.response.data.message;
+    else if (err.message) message = err.message;
+    throw new Error(message);
+  }
+};
