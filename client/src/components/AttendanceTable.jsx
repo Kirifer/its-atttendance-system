@@ -95,8 +95,8 @@ export default function AttendanceTable({
         // --- CUSTOM RANGE FILTER ---
         if (filterType === "Custom") {
           if (customStart && customEnd) {
-            const start = new Date(customStart);
-            const end = new Date(customEnd);
+            const start = new Date(customStart + "T00:00:00");
+            const end = new Date(customEnd + "T23:59:59");
             end.setHours(23, 59, 59);
 
             dateFiltered = res.attendance.filter((r) => {
