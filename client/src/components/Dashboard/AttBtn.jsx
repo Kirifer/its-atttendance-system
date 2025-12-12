@@ -1,6 +1,6 @@
-import "../styles/AttBtn.css";
-import { useTimeInOut } from "../hooks/useTimeInOut";
-import { useLunchInOut } from "../hooks/useLunchInOut";
+import "../../styles/AttBtn.css";
+import { useTimeInOut } from "../../hooks/useTimeInOut";
+import { useLunchInOut } from "../../hooks/useLunchInOut";
 
 function AttBtn({ userId, onAttendanceChange, reload }) {
   const {

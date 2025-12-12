@@ -4,6 +4,7 @@ import { formatAttStatus } from "../hooks/formatAttStatus";
 import "../styles/AttendanceTable.css";
 import useExportPDF from "../hooks/useExportPDF";
 import EditAttendancePopup from "./EditAttendancePopup";
+import FilterAttendanceActions from "./FilterAttendanceActions";
 
 export default function AttendanceTable({
   userId,
@@ -15,17 +16,26 @@ export default function AttendanceTable({
   const role = user?.role;
 
   const [records, setRecords] = useState([]);
-  const [filterType, setFilterType] = useState("Month");
-  const [filterWeek, setFilterWeek] = useState(1);
-
   const [editingRecord, setEditingRecord] = useState(null);
   const [reloadCounter, setReloadCounter] = useState(0);
 
-  const [searchField, setSearchField] = useState("Intern");
-  const [query, setQuery] = useState("");
+  const [filters, setFilters] = useState({
+    filterType: "Month",
+    filterWeek: 1,
+    searchField: "Intern",
+    query: "",
+    customStart: "",
+    customEnd: "",
+  });
 
-  const [customStart, setCustomStart] = useState("");
-  const [customEnd, setCustomEnd] = useState("");
+  const {
+    filterType,
+    filterWeek,
+    searchField,
+    query,
+    customStart,
+    customEnd,
+  } = filters;
 
   const options = useMemo(
     () => ({
@@ -46,22 +56,12 @@ export default function AttendanceTable({
     []
   );
 
+  const reload = () => setReloadCounter((prev) => prev + 1);
+
   const getWeekOfMonth = (date) => {
     const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
     return Math.ceil((date.getDate() + firstDay) / 7);
   };
-
-  const getTotalWeeksInMonth = (date) => {
-    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-    const lastDate = new Date(
-      date.getFullYear(),
-      date.getMonth() + 1,
-      0
-    ).getDate();
-    return Math.ceil((lastDate + firstDay) / 7);
-  };
-
-  const reload = () => setReloadCounter((prev) => prev + 1);
 
   useEffect(() => {
     const fetchAttendance = async () => {
@@ -95,8 +95,8 @@ export default function AttendanceTable({
         // --- CUSTOM RANGE FILTER ---
         if (filterType === "Custom") {
           if (customStart && customEnd) {
-            const start = new Date(customStart);
-            const end = new Date(customEnd);
+            const start = new Date(customStart + "T00:00:00");
+            const end = new Date(customEnd + "T23:59:59");
             end.setHours(23, 59, 59);
 
             dateFiltered = res.attendance.filter((r) => {
@@ -105,8 +105,6 @@ export default function AttendanceTable({
             });
           }
         }
-
-  
 
         const formatted = dateFiltered.map((r) => {
           const ti = r.timeIn ? new Date(r.timeIn) : null;
@@ -204,86 +202,14 @@ export default function AttendanceTable({
   return (
     <div className="attendance_body">
       <h1 className="attendance_head">Timesheet</h1>
-      <div className="attendance_top_bar">
-      <div className="leave-table__search" style={{ marginBottom: "10px" }}>
-        <select
-          value={searchField}
-          onChange={(e) => setSearchField(e.target.value)}
-          className="leave-table__dropdown"
-        >
-          <option value="id">ID</option>
-          <option value="Intern">Intern Email</option>
-          <option value="Status">Status</option>
-          <option value="Date">Date</option>
-        </select>
-        <input
-          type="text"
-          placeholder={`Search by ${searchField}...`}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="leave-table__input"
-        />
-      </div>
-      
-        {role === "ADMIN" && (
-          <button className="attendance_export_btn" onClick={() => exportPDF(filteredRecords)}>
-            Export
-          </button>
-        )}
 
-        <div className="attendance_filter_bar">
-          <label>
-            Filter Type:&nbsp;
-            <select
-              className="attendance_filter_btn"
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-            >
-              <option value="Month">Month</option>
-              <option value="Week">Week</option>
-              <option value="Custom">Custom Range</option>
-            </select>
-          </label>
-
-          {filterType === "Week" && (
-            <label style={{ marginLeft: "10px" }}>
-              Week:&nbsp;
-              <select
-                className="attendance_filter_btn"
-                value={filterWeek}
-                onChange={(e) => setFilterWeek(Number(e.target.value))}
-              >
-                {Array.from(
-                  { length: getTotalWeeksInMonth(firstDay) },
-                  (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  )
-                )}
-              </select>
-            </label>
-          )}
-          {filterType === "Custom" && (
-            <div className="attendance_filter-custom-range">
-              <input
-                type="date"
-                value={customStart}
-                onChange={(e) => setCustomStart(e.target.value)}
-                className="attendance_filter_btn"
-              />
-
-              <input
-                type="date"
-                value={customEnd}
-                onChange={(e) => setCustomEnd(e.target.value)}
-                className="attendance_filter_btn"
-              />
-            </div>
-          )}
-
-        </div>
-      </div>
+      <FilterAttendanceActions
+        role={role}
+        firstDay={firstDay}
+        exportPDF={exportPDF}
+        filteredRecords={filteredRecords}
+        onFilterChange={setFilters}
+      />
 
       {records.length === 0 ? (
         <p className="attendance_message">
