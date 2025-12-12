@@ -1,0 +1,21 @@
+/* Container */
+.admin__main {
+  border-radius: 10px;
+  padding: 30px;
+  width: 90%;
+  margin-right: 100px;
+  margin: 50px auto;
+  margin-bottom: 140px;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin__title {
+  color: #1a5dac;
+}
+
+.admin__description {
+  color: #828282;
+  margin-top: -10px;
+  margin-bottom: 50px;
+}

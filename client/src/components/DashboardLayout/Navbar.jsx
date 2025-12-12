@@ -22,10 +22,6 @@ export default function Navbar({ user }) {
         </li>
 
         <li className="navbar__item">
-          <Link to="/settings">Settings</Link>
-        </li>
-
-        <li className="navbar__item">
           <Link to="/timesheet">Timesheet</Link>
         </li>
 
@@ -35,11 +31,11 @@ export default function Navbar({ user }) {
 
         {user.role === "ADMIN" && (
           <li className="navbar__item">
-            <Link to="/time-off-admin">Admin</Link>
+            <Link to="/approvals">Approvals</Link>
           </li>
         )}
         <li className="navbar__item">
-          <a href="/user-info">Profile</a>
+          <a href="/user-info">View Profile</a>
         </li>
       </ul>
     </nav>
