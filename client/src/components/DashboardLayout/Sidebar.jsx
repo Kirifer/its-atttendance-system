@@ -72,16 +72,6 @@ export default function Sidebar() {
 
         <li>
           <NavLink
-            to="/settings"
-            className={({ isActive }) => (isActive ? "active-link" : undefined)}
-          >
-            <span className="material-symbols-outlined">settings</span>
-            Settings
-          </NavLink>
-        </li>
-
-        <li>
-          <NavLink
             to="/timesheet"
             className={({ isActive }) => (isActive ? "active-link" : undefined)}
           >
@@ -119,7 +109,7 @@ export default function Sidebar() {
         {user.role === "ADMIN" && (
           <li>
             <NavLink
-              to="/view-requests-admin"
+              to="/approvals"
               className={({ isActive }) =>
                 isActive ? "active-link" : undefined
               }
@@ -127,7 +117,7 @@ export default function Sidebar() {
               <span className="material-symbols-outlined">
                 person_raised_hand
               </span>
-              View Requests
+              Approvals
             </NavLink>
           </li>
         )}

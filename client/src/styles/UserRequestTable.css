@@ -1,0 +1,98 @@
+.user-time-table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.user-time-table {
+  min-width: 800px; /* ensures table stays wide */
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  table-layout: fixed;
+  white-space: nowrap;
+  margin: auto;
+}
+
+/* Table headers */
+.user-time-table th {
+  color: black;
+  padding: 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.user-time-table td {
+  padding: 12px;
+  border-bottom: 1px solid #8b8b8b;
+  white-space: nowrap;
+  display: table-cell;
+}
+
+.user-time-table__actions .material-symbols-outlined {
+  cursor: pointer;
+  font-size: 24px;
+  margin-right: 8px;
+  vertical-align: middle;
+  transition: 0.2s;
+}
+
+.user-time-table__actions .material-symbols-outlined:hover {
+  opacity: 0.7;
+}
+
+.user-time-table__approve {
+  color: #4caf50;
+}
+
+.user-time-table__reject {
+  color: #ff9800;
+}
+
+.user-time-table__delete {
+  color: #d9534f;
+}
+
+.user-time-table__status {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.user-time-table__status--pending {
+  color: #d2a516;
+}
+
+.user-time-table__status--approved {
+  color: #54cc58;
+}
+
+.user-time-table__status--rejected {
+  color: #d40707;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .user-time-table th,
+  .user-time-table td {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .user-time-table__actions .material-symbols-outlined {
+    font-size: 20px;
+    margin-right: 6px;
+  }
+}
+
+.user-time-table__search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.user-time-table__dropdown,
+.user-time-table__input {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
