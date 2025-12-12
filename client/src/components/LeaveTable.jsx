@@ -12,6 +12,31 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
   const [query, setQuery] = useState("");
   const [expandedId, setExpandedId] = useState(null);
 
+  // Time off proper labeling
+  const leaveTypeLabels = {
+    SICK: "Sick Leave",
+    VACATION: "Vacation",
+    HOLIDAY: "Holiday",
+    OFFSET: "Offset Hours",
+  };
+
+  const coverageTypeLabels = {
+    FULL_DAY: "Full Day",
+    HALF_DAY: "Half Day",
+  };
+
+  const timeOffRawTypes = ["SICK", "VACATION", "HOLIDAY", "OFFSET"];
+
+  // Custom filter request placeholder names
+  const placeholderMap = {
+    id: "id",
+    leaveType: "request type",
+    coverage: "coverage",
+    reason: "reason",
+    username: "username",
+    status: "status",
+  };
+
   const filteredLeaves = leaves.filter((leave) => {
     const value =
       filterType === "id"
@@ -40,16 +65,16 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
           className="leave-table__dropdown"
         >
           <option value="id">ID</option>
-          <option value="leaveType">Leave Type</option>
-          <option value="coverage">Coverage</option>
+          <option value="leaveType">Request Type</option>
           <option value="reason">Reason</option>
           <option value="username">Intern Username</option>
+          <option value="coverage">Coverage</option>
           <option value="status">Status</option>
         </select>
 
         <input
           type="text"
-          placeholder={`Search by ${filterType}...`}
+          placeholder={`Search by ${placeholderMap[filterType]}...`}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="leave-table__input"
@@ -60,13 +85,13 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Type</th>
+              <th>Request Type</th>
               <th>Reason</th>
               <th>Intern</th>
               <th>Coverage</th>
               <th>Duration</th>
               <th>Status</th>
-              <th>Attachment</th> 
+              <th>Attachment</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -84,10 +109,22 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                     : leave.id.substring(0, 8) + "..."}
                 </td>
 
-                <td>{leave.leaveType}</td>
-                <td>{leave.reason}</td>
+                <td>{leaveTypeLabels[leave.leaveType || leave.leaveType]}</td>
+                <td
+                  style={{
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                    minWidth: "250px",
+                    maxWidth: "600px",
+                    paddingRight: "12px",
+                  }}
+                >
+                  {leave.reason}
+                </td>
                 <td>{leave.user ? leave.user.username : "N/A"}</td>
-                <td>{leave.coverage}</td>
+                <td>
+                  {coverageTypeLabels[leave.coverage] || coverageTypeLabels}
+                </td>
                 <td>
                   {leave.startDate.slice(0, 10)} → {leave.endDate.slice(0, 10)}
                 </td>
@@ -100,7 +137,10 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                 <td>
                   {leave.attachment ? (
                     <a
-                      href={`${process.env.REACT_APP_BACKEND_URL || "http://localhost:5001"}${leave.attachment}`}
+                      href={`${
+                        process.env.REACT_APP_BACKEND_URL ||
+                        "http://localhost:5001"
+                      }${leave.attachment}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
