@@ -1,21 +1,29 @@
 import { useState } from "react";
-import axios from "axios";
+import API from "../api/api"; // use your configured Axios instance
 
 export default function useUserSchedule() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Set or update user schedule
-  const setSchedule = async ({ userId, weekday, startTime, endTime }) => {
+  // Set or update user schedule (with optional date)
+  const setSchedule = async ({ userId, weekday, startTime, endTime, date }) => {
     try {
       setLoading(true);
       setError(null);
 
-      const res = await axios.post("/api/attendance/schedule/user", {
+      // If date is provided, calculate weekday from it
+      let computedWeekday = weekday;
+      if (date) {
+        const d = new Date(date);
+        computedWeekday = d.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      }
+
+      const res = await API.post("/attendance/schedule/user", {
         userId,
-        weekday,
+        weekday: computedWeekday,
         startTime,
         endTime,
+        date,
       });
 
       return res.data; // { message, schedule }
@@ -29,12 +37,19 @@ export default function useUserSchedule() {
   };
 
   // Edit attendance even after submission
-  const editAttendance = async ({ attendanceId, timeIn, timeOut, lunchOut, lunchIn, status }) => {
+  const editAttendance = async ({
+    attendanceId,
+    timeIn,
+    timeOut,
+    lunchOut,
+    lunchIn,
+    status,
+  }) => {
     try {
       setLoading(true);
       setError(null);
 
-      const res = await axios.put(`/api/attendance/${attendanceId}`, {
+      const res = await API.put(`/attendance/${attendanceId}`, {
         timeIn,
         timeOut,
         lunchOut,
