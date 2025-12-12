@@ -22,6 +22,8 @@ import {
   validateChangePassword,
   validateUpdateUserInfo,
 } from "../middlewares/validateUser.js";
+// Get all users except admin routing
+import { getAllUsers } from "../controllers/authController.js";
 
 //prisma
 import { PrismaClient } from "@prisma/client";
@@ -274,6 +276,9 @@ router.post(
 
 // Update user info
 router.put("/update", validateUpdateUserInfo, verifyToken, updateUserInfo);
+
+// Get all non-admin users
+router.get("/users", verifyToken, getAllUsers);
 
 // Must be always below
 export default router;

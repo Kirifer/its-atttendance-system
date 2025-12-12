@@ -92,3 +92,23 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ message: "Server error " });
   }
 };
+
+// Get all non-admin users
+export const getAllUsers = async (req, res) => {
+  try {
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Admins only" });
+    }
+
+    const users = await prisma.user.findMany({
+      where: { role: "USER" }, // Only normal users
+      select: { id: true, email: true, username: true },
+      orderBy: { email: "asc" },
+    });
+
+    res.json({ users });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching users" });
+  }
+};
