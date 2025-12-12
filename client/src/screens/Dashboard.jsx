@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "../styles/Dashboard.css";
-import AttBtn from "../components/AttBtn.jsx";
+import AttBtn from "../components/Dashboard/AttBtn.jsx";
 import DashboardLayout from "../components/DashboardLayout";
 import Clock from "../components/Dashboard/Clock.jsx";
 import LogsCard from "../components/Dashboard/LogsCard.jsx";
