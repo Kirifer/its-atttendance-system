@@ -154,3 +154,28 @@ export const getAllAdminUsers = async (req, res) => {
     res.status(500).json({ message: "Error fetching admins" });
   }
 };
+
+export const getAllUsersWithRoles = async (req, res) => {
+  try {
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Admins only" });
+    }
+
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        resignedAt: true,
+      },
+      orderBy: { email: "asc" },
+    });
+
+    res.json({ users });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching users" });
+  }
+};
+

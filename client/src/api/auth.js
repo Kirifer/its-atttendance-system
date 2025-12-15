@@ -134,3 +134,36 @@ export const getAllAdminUsers = async () => {
     throw new Error(message);
   }
 };
+
+export const changeUserRole = async (userId, role) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await API.put(
+      `/admins/change-role/${userId}`,
+      { role },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return res.data;
+  } catch (err) {
+    throw new Error(
+      err.response?.data?.message || "Failed to change role"
+    );
+  }
+};
+
+export const getAllUsersWithRoles = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await API.get("/admins/all-users", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data.users || [];
+  } catch (err) {
+    let message = "Error fetching all users";
+    if (err.response?.data?.message) message = err.response.data.message;
+    else if (err.message) message = err.message;
+    throw new Error(message);
+  }
+};
