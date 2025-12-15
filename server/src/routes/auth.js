@@ -214,7 +214,15 @@ router.get("/me", verifyToken, async (req, res) => {
         email: true,
         role: true,
         profilePic: true,
-        onLeave: true,  
+        onLeave: true,
+        useCustomSchedule: true, 
+        schedules: {
+          select: {
+            weekday: true,
+            startTime: true,
+            endTime: true,
+          },
+        },
       },
     });
 

@@ -8,7 +8,7 @@ export const setUserSchedule = async (req, res) => {
         if (req.user.role !== "ADMIN") {
             return res.status(403).json({ message: "Admin only" });
         }
-        
+
         if (weekday < 0 || weekday > 6) {
             return res.status(400).json({ message: "Invalid weekday (0-6)" });
         }
@@ -17,6 +17,11 @@ export const setUserSchedule = async (req, res) => {
             where: { userId_weekday: { userId, weekday } },
             update: { startTime, endTime },
             create: { userId, weekday, startTime, endTime },
+        });
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { useCustomSchedule: true },
         });
 
         res.json({ message: "User schedule updated", schedule });
