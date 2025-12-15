@@ -28,6 +28,7 @@ import { getAllUsers } from "../controllers/authController.js";
 import { deleteExpiredSched } from "../utils/deleteExpiredSched.js";
 //prisma
 import { PrismaClient } from "@prisma/client";
+import { getTodaySchedule } from "../utils/getTodaySchedule.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -220,19 +221,23 @@ router.get("/me", verifyToken, async (req, res) => {
         role: true,
         profilePic: true,
         onLeave: true,
-        useCustomSchedule: true, 
-        schedules: {
-          select: {
-            weekday: true,
-            startTime: true,
-            endTime: true,
-          },
-        },
+        useCustomSchedule: true,
       },
     });
 
-    res.json(user);
+    const todaySchedule = await getTodaySchedule(userId, prisma);
+
+    res.json({
+      ...user,
+      todaySchedule: todaySchedule
+        ? {
+            startTime: todaySchedule.startTime,
+            endTime: todaySchedule.endTime,
+          }
+        : null,
+    });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Cannot fetch user" });
   }
 });
