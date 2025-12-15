@@ -1,0 +1,90 @@
+import express from "express";
+import { PrismaClient } from "@prisma/client";
+import authMiddleware from "../middlewares/authMiddleware.js";
+
+const router = express.Router();
+const prisma = new PrismaClient();
+
+// admin only middleware
+const adminOnly = (req, res, next) => {
+  if (req.user.role !== "ADMIN")
+    return res.status(403).json({ message: "Admins only" });
+  next();
+};
+
+// get all admins
+router.get("/", authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const admins = await prisma.user.findMany({
+      where: { role: "ADMIN" },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        resignedAt: true,
+        // ------------------ Disabled for now ------------------
+        // profilePic: true,
+        created_at: true,
+      },
+      // ascending ordering
+      orderBy: { created_at: "asc" },
+    });
+
+    res.json({ admins });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching admins" });
+  }
+});
+
+// resign the admin from the system
+router.put("/resign/:id", authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // prevents self resignation
+    if (id === req.user.id)
+      return res.status(400).json({ message: "Cannot resign yourself." });
+
+    const admin = await prisma.user.findUnique({ where: { id } });
+    if (!admin || admin.role !== "ADMIN")
+      return res.status(400).json({ message: "Admin not found." });
+
+    await prisma.user.update({
+      where: { id },
+      data: { resignedAt: new Date() },
+    });
+
+    res.json({ message: `Admin ${admin.username} has been resigned.` });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "Error resigning admin!" });
+  }
+});
+
+// reinstate the admin from the system
+router.put("/reinstate/:id", authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // prevents self reinstation
+    if (id === req.user.id)
+      return res.status(400).json({ message: "Cannot reinstate yourself." });
+
+    const admin = await prisma.user.findUnique({ where: { id } });
+    if (!admin || admin.role !== "ADMIN")
+      return res.status(400).json({ message: "Admin not found." });
+
+    await prisma.user.update({
+      where: { id },
+      data: { resignedAt: null },
+    });
+
+    res.json({ message: `Admin ${admin.username} has been reinstated.` });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "Error reinstating admin!" });
+  }
+});
+
+export default router;
