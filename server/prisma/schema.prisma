@@ -25,6 +25,7 @@ model User {
   password           String
   profilePic         String?
   role               Role      @default(USER)
+  useCustomSchedule  Boolean   @default(false)
   created_at         DateTime  @default(now())
   reset_token        String?
   reset_token_expiry DateTime?
@@ -122,13 +123,16 @@ model TimeAdjustment {
   createdAt  DateTime @default(now())
 }
 
-model UserSchedule { 
-  id          String    @id @default(uuid()) 
-  userId      String
-  user        User      @relation(fields: [userId], references: [id]) 
-  weekday     Int       // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  startTime   String    // "07:00" 
-  endTime     String    // "16:00" 
+model UserSchedule {
+  id        String   @id @default(uuid())
+  userId    String
+  weekday   Int
+  startTime String
+  endTime   String
 
-  @@unique([userId, weekday])
+  scheduleDate DateTime? 
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, weekday, scheduleDate])
 }

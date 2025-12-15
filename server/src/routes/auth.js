@@ -24,7 +24,8 @@ import {
 } from "../middlewares/validateUser.js";
 // Get all users except admin routing
 import { getAllUsers } from "../controllers/authController.js";
-
+// Enable expiry helper
+import { deleteExpiredSched } from "../utils/deleteExpiredSched.js";
 //prisma
 import { PrismaClient } from "@prisma/client";
 
@@ -206,15 +207,27 @@ router.post("/reset-password", validateResetPassword, async (req, res) => {
 // Get Logged in user data
 router.get("/me", verifyToken, async (req, res) => {
   try {
+    const userId = req.user.id;
+
+    await deleteExpiredSched(userId, prisma);
+
     const user = await prisma.user.findUnique({
-      where: { id: req.user.id },
+      where: { id: userId },
       select: {
         id: true,
         username: true,
         email: true,
         role: true,
         profilePic: true,
-        onLeave: true,  
+        onLeave: true,
+        useCustomSchedule: true, 
+        schedules: {
+          select: {
+            weekday: true,
+            startTime: true,
+            endTime: true,
+          },
+        },
       },
     });
 
