@@ -46,8 +46,8 @@ export default function useExportPDF() {
       .toFixed(2);
 
     const totalRow = Array(headers.length).fill("");
-    totalRow[4] = "Total Hours Spent";
-    totalRow[6] = `${totalHoursSpent} hrs`;
+    totalRow[6] = "Total Hours Spent";
+    totalRow[7] = `${totalHoursSpent} hrs`;
 
     body.push(totalRow);
 
@@ -169,7 +169,7 @@ export default function useExportPDF() {
     doc.setFont("helvetica", "normal");
     doc.text("Role", 25, signY + 26);
 
-    doc.text("Approved by:", 180, signY - 15);
+    doc.text("Approved by:", 180, signY - 15  );
     doc.line(180, signY + 8, 260, signY + 8);
 
     doc.setFont("helvetica", "bold");
