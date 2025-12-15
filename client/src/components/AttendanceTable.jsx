@@ -150,7 +150,7 @@ export default function AttendanceTable({
             Status: r.status,
 
             Date: new Date(r.date).toLocaleDateString("en-US", options),
-            Week: getWeekOfMonth(new Date(r.date)),
+            /* Week: getWeekOfMonth(new Date(r.date)),*/
 
             "Time In": ti ? ti.toLocaleTimeString("en-US", timeOptions) : "-",
             "Lunch Out": lo ? lo.toLocaleTimeString("en-US", timeOptions) : "-",
