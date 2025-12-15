@@ -1,0 +1,112 @@
+.crud-table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.crud-table {
+  min-width: 800px; /* ensures table stays wide */
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  table-layout: fixed;
+  white-space: nowrap;
+  margin: auto;
+}
+
+/* Table headers */
+.crud-table th {
+  color: black;
+  padding: 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.crud-table td {
+  padding: 12px;
+  border-bottom: 1px solid #8b8b8b;
+  white-space: nowrap;
+  display: table-cell;
+}
+
+.crud-table__actions {
+  cursor: pointer;
+  font-size: 16px;
+  padding: 10px;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all ease-in-out 0.2s;
+}
+
+.crud-table__approve {
+  color: #fff;
+  background-color: #54cc58;
+}
+
+.crud-table__approve:hover {
+  background-color: #3fa243;
+  transform: scale(1.01);
+}
+
+.crud-table__approve:active {
+  background-color: #2e7d32;
+  transform: scale(0.98);
+}
+
+.crud-table__reject {
+  color: #fff;
+  background-color: #d40707;
+}
+
+.crud-table__reject:hover {
+  background-color: #a00505;
+  transform: scale(1.01);
+}
+
+.crud-table__reject:active {
+  background-color: #800000;
+  transform: scale(0.98);
+}
+
+.crud-table__status {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.crud-table__status--approved {
+  color: #54cc58;
+}
+
+.crud-table__status--rejected {
+  color: #d40707;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 600px) {
+  .crud-table th,
+  .crud-table td {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .crud-table__actions .material-symbols-outlined {
+    font-size: 20px;
+    margin-right: 6px;
+  }
+}
+
+.crud-table__search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.crud-table__dropdown,
+.crud-table__input {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
