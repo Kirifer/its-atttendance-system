@@ -69,7 +69,6 @@ export default function useExportPDF() {
     const body = records.map((r) => [
       r.Date,
       r["Time In"],
-      r["Time Out"],
       r["Lunch Out"],
       r["Lunch In"],
       r["Time Out"],
@@ -111,9 +110,9 @@ export default function useExportPDF() {
       },
 
       columnStyles: {
+        5: { halign: "left" },
         6: { halign: "left" },
         7: { halign: "left" },
-        8: { halign: "left" },
       },
 
       tableWidth: "auto",
