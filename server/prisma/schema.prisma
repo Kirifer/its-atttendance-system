@@ -130,6 +130,7 @@ model UserSchedule {
   weekday     Int       // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
   startTime   String    // "07:00" 
   endTime     String    // "16:00" 
-
+  validUntil  DateTime
+  
   @@unique([userId, weekday])
 }
