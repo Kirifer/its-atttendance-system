@@ -31,6 +31,7 @@ import {
 //prisma
 import { PrismaClient } from "@prisma/client";
 import { getTodaySchedule } from "../utils/getTodaySchedule.js";
+import { deleteExpiredSched } from "../utils/deleteExpiredSched.js";
 import { getAllUsersWithRoles } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -217,6 +218,8 @@ router.get("/me", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
 
+    await deleteExpiredSched(userId, prisma);
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -226,6 +229,7 @@ router.get("/me", verifyToken, async (req, res) => {
         role: true,
         profilePic: true,
         onLeave: true,
+        useCustomSchedule: true,
       },
     });
 

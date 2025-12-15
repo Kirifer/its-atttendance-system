@@ -1,21 +1,19 @@
 export const deleteExpiredSched = async (userId, prisma) => {
   try {
-    const now = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
 
-    // delete expired schedules
     await prisma.userSchedule.deleteMany({
       where: {
         userId,
-        scheduleDate: { lt: now },
+        scheduleDate: { lt: today },
       },
     });
 
-    // check if any schedules remain
     const remaining = await prisma.userSchedule.count({
       where: { userId },
     });
 
-    // enforce consistency
     if (remaining === 0) {
       await prisma.user.update({
         where: { id: userId },
@@ -24,6 +22,5 @@ export const deleteExpiredSched = async (userId, prisma) => {
     }
   } catch (err) {
     console.error("Error in deleteExpiredSched:", err);
-    // swallow error so /me doesn't fail
   }
 };
