@@ -8,8 +8,9 @@ import {
 import LeaveTable from "../components/LeaveTable";
 import "../styles/Approvals.css";
 import TimeAdjustmentTable from "../components/TimeAdjustmentTable";
+import AdminCRUD from "../components/AdminCRUD";
 
-function ViewRequestsAdmin() {
+function Approvals() {
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -68,9 +69,18 @@ function ViewRequestsAdmin() {
           onStatusChange={handleStatusUpdate}
           onDelete={handleDelete}
         />
+        <br></br>
+        <br></br>
+        <h1 className="admin__title">Admin Management</h1>
+        <p className="admin__description">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo
+          diam, interdum nec placerat in, venenatis egestas justo. Nam eu
+          gravida ante, vel egestas turpis.
+        </p>
+        <AdminCRUD />
       </div>
     </DashboardLayout>
   );
 }
 
-export default ViewRequestsAdmin;
+export default Approvals;

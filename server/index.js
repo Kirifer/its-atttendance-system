@@ -7,6 +7,7 @@ import authRoutes from "./src/routes/auth.js";
 import leaveRoutes from "./src/routes/leaveRoutes.js";
 import attendanceRoutes from "./src/routes/attendanceRoutes.js";
 import timeAdjustmentRoutes from "./src/routes/timeAdjustmentRoutes.js";
+import adminRoutes from "./src/routes/adminRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import "./src/cron/leaveChecker.js";
@@ -52,6 +53,7 @@ app.use("/api/time-adjustments", timeAdjustmentRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/leave", leaveRoutes);
 app.use("/api/attendance", attendanceRoutes);
+app.use("/api/admins", adminRoutes);
 
 //use for testing database connection
 app.get("/test-db", async (req, res) => {

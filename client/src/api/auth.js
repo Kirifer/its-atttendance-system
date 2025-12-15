@@ -119,3 +119,18 @@ export const getAllUsers = async () => {
     throw new Error(message);
   }
 };
+
+// Get all admin users
+export const getAllAdminUsers = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await API.get("/auth/admins", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.admins || [];
+  } catch (err) {
+    let message = "Error fetching admins";
+    if (err.response?.data?.message) message = err.response.data.message;
+    throw new Error(message);
+  }
+};

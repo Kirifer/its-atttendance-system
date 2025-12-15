@@ -23,9 +23,11 @@ import {
   validateUpdateUserInfo,
 } from "../middlewares/validateUser.js";
 // Get all users except admin routing
-import { getAllUsers } from "../controllers/authController.js";
-// Enable expiry helper
-import { deleteExpiredSched } from "../utils/deleteExpiredSched.js";
+import {
+  getAllUsers,
+  getAllAdminUsers,
+} from "../controllers/authController.js";
+
 //prisma
 import { PrismaClient } from "@prisma/client";
 
@@ -111,6 +113,10 @@ router.post("/login", validateLogin, async (req, res) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(400).json({ message: "User does not exist!" });
 
+    // Block resigned admins from logging in
+    if (user.resignedAt)
+      return res.status(403).json({ message: "This admin has been resigned." });
+
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(400).json({ message: "Incorrect password!" });
 
@@ -127,7 +133,7 @@ router.post("/login", validateLogin, async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
-        leave: user.onLeave 
+        leave: user.onLeave,
       },
     });
   } catch (err) {
@@ -204,15 +210,11 @@ router.post("/reset-password", validateResetPassword, async (req, res) => {
   }
 });
 
-// Get Logged in user data
+//------------------- Get Logged in user data -------------------
 router.get("/me", verifyToken, async (req, res) => {
   try {
-    const userId = req.user.id;
-
-    await deleteExpiredSched(userId, prisma);
-
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: req.user.id },
       select: {
         id: true,
         username: true,
@@ -220,14 +222,6 @@ router.get("/me", verifyToken, async (req, res) => {
         role: true,
         profilePic: true,
         onLeave: true,
-        useCustomSchedule: true, 
-        schedules: {
-          select: {
-            weekday: true,
-            startTime: true,
-            endTime: true,
-          },
-        },
       },
     });
 
@@ -237,7 +231,7 @@ router.get("/me", verifyToken, async (req, res) => {
   }
 });
 
-// Change password
+//------------------- Change password -------------------
 router.post(
   "/change-password",
   validateChangePassword,
@@ -287,11 +281,14 @@ router.post(
   }
 );
 
-// Update user info
+//------------------- Update user info -------------------
 router.put("/update", validateUpdateUserInfo, verifyToken, updateUserInfo);
 
-// Get all non-admin users
+//------------------- Get all non-admin users -------------------
 router.get("/users", verifyToken, getAllUsers);
+
+//------------------- Get all admin usres -------------------
+router.get("/admins", verifyToken, getAllAdminUsers);
 
 // Must be always below
 export default router;
