@@ -214,8 +214,10 @@ router.post("/reset-password", validateResetPassword, async (req, res) => {
 //------------------- Get Logged in user data -------------------
 router.get("/me", verifyToken, async (req, res) => {
   try {
+    const userId = req.user.id;
+
     const user = await prisma.user.findUnique({
-      where: { id: req.user.id },
+      where: { id: userId },
       select: {
         id: true,
         username: true,
@@ -225,6 +227,10 @@ router.get("/me", verifyToken, async (req, res) => {
         onLeave: true,
       },
     });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     const todaySchedule = await getTodaySchedule(userId, prisma);
 
@@ -238,10 +244,11 @@ router.get("/me", verifyToken, async (req, res) => {
         : null,
     });
   } catch (err) {
-    console.error(err);
+    console.error("GET /auth/me error:", err);
     res.status(500).json({ message: "Cannot fetch user" });
   }
 });
+
 
 //------------------- Change password -------------------
 router.post(
