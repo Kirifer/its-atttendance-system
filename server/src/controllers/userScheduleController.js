@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 export const setUserSchedule = async (req, res) => {
     try {
-        const { userId, weekday, startTime, endTime } = req.body;
+        const { userId, weekday, startTime, endTime, validUntil } = req.body;
 
         if (req.user.role !== "ADMIN") {
             return res.status(403).json({ message: "Admin only" });
@@ -13,6 +13,9 @@ export const setUserSchedule = async (req, res) => {
             return res.status(400).json({ message: "Invalid weekday (0-6)" });
         }
 
+        const expiry = new Date(validUntil);
+        expiry.setHours(24, 59, 59, 999)
+        
         const schedule = await prisma.userSchedule.upsert({
             where: { userId_weekday: { userId, weekday } },
             update: { startTime, endTime },
