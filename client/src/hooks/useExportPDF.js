@@ -10,50 +10,115 @@ export default function useExportPDF() {
 
     const doc = new jsPDF({ orientation: "landscape" });
 
-    const columnsToInclude = Object.keys(records[0]).filter(
-      (col) =>
-        ![
-          "rawDate",
-          "rawTimeIn",
-          "rawTimeOut",
-          "rawLunchOut",
-          "rawLunchIn",
-          "id",
-          "Lunch Tardy",
-          "Tardiness",
-        ].includes(col)
-    );
+    const internEmail = records[0]?.Intern || "";
 
-    const tableBody = records.map((record) =>
-      columnsToInclude.map((col) => record[col])
-    );
-
-    const columnStyles = {};
-    columnsToInclude.forEach((col, idx) => {
-      if (col === "HOURS" || col === "TOTAL") {
-        columnStyles[idx] = { halign: "right" };
-      } else {
-        columnStyles[idx] = { halign: "left" };
-      }
-    });
+    //  CONTENT 1: HEADER DETAILS
 
     autoTable(doc, {
-      head: [columnsToInclude],
-      body: tableBody,
-      startY: 25,
+      startY: 10,
+      theme: "grid",
+      tableWidth: 270,
+      body: [
+        [
+          { content: "Intern Email:", styles: { fontStyle: "bold" } },
+          { content: internEmail },
+          { content: "Department:", styles: { fontStyle: "bold" } },
+          { content: "—" },
+        ],
+        [
+          { content: "Position:", styles: { fontStyle: "bold" } },
+          { content: "—" },
+          { content: "Supervisor:", styles: { fontStyle: "bold" } },
+          { content: "—" },
+        ],
+      ],
       styles: {
-        fontSize: 10,
-        cellPadding: 2,
-        overflow: "linebreak", 
+        fontSize: 8,
+        cellPadding: 3,
       },
-      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-      bodyStyles: { valign: "middle" },
-      columnStyles,
+      columnStyles: {
+        0: { cellWidth: 45 },
+        1: { cellWidth: 90 },
+        2: { cellWidth: 45 },
+        3: { cellWidth: 90 },
+      },
+    });
+
+    let currentY = doc.lastAutoTable.finalY + 10;
+
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("Daily Time Records", doc.internal.pageSize.getWidth() / 2, currentY, {
+      align: "center",
+    });
+
+    currentY += 5;
+
+    const headers = [
+      "Date",
+      "Time In",
+      "Time Out",
+      "Lunch Out",
+      "Lunch In",
+      "Time Out",
+      "Days",
+      "HOURS",
+      "TOTAL",
+    ];
+
+    const body = records.map((r) => [
+      r.Date,
+      r["Time In"],
+      r["Time Out"],
+      r["Lunch Out"],
+      r["Lunch In"],
+      r["Time Out"],
+      r.DAYS,
+      r.HOURS,
+      r.TOTAL,
+    ]);
+
+    autoTable(doc, {
+      startY: currentY,
+      head: [
+        [
+          {
+            content: `Intern Email: ${internEmail}`,
+            colSpan: headers.length,
+            styles: {
+              fillColor: [41, 128, 185],
+              textColor: 255,
+              fontStyle: "bold",
+              halign: "left",
+            },
+          },
+        ],
+        headers,
+      ],
+
+      body,
+
+      styles: {
+        fontSize: 11,
+        cellPadding: 3,
+        valign: "middle",
+      },
+
+      headStyles: {
+        fillColor: [41, 128, 185], 
+        textColor: 255,
+        fontStyle: "bold",
+      },
+
+      columnStyles: {
+        6: { halign: "left" },
+        7: { halign: "left" },
+        8: { halign: "left" },
+      },
+
       tableWidth: "auto",
     });
 
-    doc.setFontSize(14);
-    doc.text("Timesheet Report (Filtered)", 14, 15);
 
     doc.save("timesheet_filtered.pdf");
   };
