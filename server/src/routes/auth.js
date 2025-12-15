@@ -31,6 +31,7 @@ import {
 //prisma
 import { PrismaClient } from "@prisma/client";
 import { getTodaySchedule } from "../utils/getTodaySchedule.js";
+import { getAllUsersWithRoles } from "../controllers/authController.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -300,6 +301,7 @@ router.post(
   }
 );
 
+
 //------------------- Update user info -------------------
 router.put("/update", validateUpdateUserInfo, verifyToken, updateUserInfo);
 
@@ -308,6 +310,8 @@ router.get("/users", verifyToken, getAllUsers);
 
 //------------------- Get all admin usres -------------------
 router.get("/admins", verifyToken, getAllAdminUsers);
+
+router.get("/all-users", verifyToken, getAllUsersWithRoles);
 
 // Must be always below
 export default router;
