@@ -123,14 +123,16 @@ model TimeAdjustment {
   createdAt  DateTime @default(now())
 }
 
-model UserSchedule { 
-  id          String    @id @default(uuid()) 
-  userId      String
-  user        User      @relation(fields: [userId], references: [id]) 
-  weekday     Int       // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  startTime   String    // "07:00" 
-  endTime     String    // "16:00" 
-  validUntil  DateTime
-  
-  @@unique([userId, weekday])
+model UserSchedule {
+  id        String   @id @default(uuid())
+  userId    String
+  weekday   Int
+  startTime String
+  endTime   String
+
+  scheduleDate DateTime? 
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, weekday, scheduleDate])
 }
