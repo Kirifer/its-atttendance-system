@@ -1,13 +1,14 @@
-import "../styles/AttBtn.css";
-import { useTimeInOut } from "../hooks/useTimeInOut";
-import { useLunchInOut } from "../hooks/useLunchInOut";
+import "../../styles/AttBtn.css";
+import { useTimeInOut } from "../../hooks/useTimeInOut";
+import { useLunchInOut } from "../../hooks/useLunchInOut";
 
 function AttBtn({ userId, onAttendanceChange, reload }) {
   const {
     role,
     isTimedIn,
     handleTimeIn,
-    handleTimeOut
+    handleTimeOut,
+    onLeave
   } = useTimeInOut(userId, onAttendanceChange);
 
   const {
@@ -27,7 +28,7 @@ function AttBtn({ userId, onAttendanceChange, reload }) {
           <button
             className="att__btn-ti"
             onClick={handleTimeIn}
-            disabled={isTimedIn}
+            disabled={isTimedIn || onLeave}
           >
             Time In
           </button>
@@ -37,7 +38,7 @@ function AttBtn({ userId, onAttendanceChange, reload }) {
           <button
             className="att__btn-lo"
             onClick={handleLunchOut}
-            disabled={!canLunchOut}
+            disabled={!canLunchOut || onLeave}
           >
             Out for Lunch
           </button>
@@ -47,7 +48,7 @@ function AttBtn({ userId, onAttendanceChange, reload }) {
           <button
             className="att__btn-li"
             onClick={handleLunchIn}
-            disabled={!canLunchIn}
+            disabled={!canLunchIn || onLeave}
           >
             Back from Lunch
           </button>
@@ -57,7 +58,7 @@ function AttBtn({ userId, onAttendanceChange, reload }) {
           <button
             className="att__btn-to"
             onClick={handleTimeOut}
-            disabled={!isTimedIn}
+            disabled={!isTimedIn || onLeave}
           >
             Time Out
           </button>

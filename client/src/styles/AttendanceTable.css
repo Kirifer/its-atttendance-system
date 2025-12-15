@@ -1,7 +1,22 @@
 .attendance_body {
+  margin: 0 30px 20px;
+}
+
+.attendance_container {
+  background-color: rgb(255, 255, 255);
+  margin: 20px auto;
   width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15), 0 6px 20px 0 rgba(0, 0, 0, 0.12);
+  overflow-x: auto;
+}
+
+.attendance_tbl {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  table-layout: auto;
 }
 
 .attendance_top_bar {
@@ -17,6 +32,12 @@
   gap: 10px;
   width: auto;
   margin: 0;
+}
+
+.attendance_filter-custom-range {
+  margin-left: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 .attendance_filter_btn,
@@ -60,17 +81,6 @@
   background-color: #222323;
 }
 
-.attendance_container {
-  background-color: rgb(255, 255, 255);
-  margin: 20px auto;
-  max-width: 1440px;
-  width: 100%;
-  border: 1px solid #d9d9d9;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15), 0 6px 20px 0 rgba(0, 0, 0, 0.12);
-  overflow-x: auto;
-}
-
 .attendance_head {
   color: #1a5dac;
   font-family: Arial, Helvetica, sans-serif;
@@ -83,20 +93,14 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.attendance_tbl {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
 .attendance_tbl th,
 .attendance_tbl td {
   font-family: Arial, Helvetica, sans-serif;
   font-size: large;
   text-align: left;
-  padding: 0.8rem ;
+  padding: 0.8rem;
   vertical-align: top;
-  word-wrap: break-word;
+
 }
 
 .attendance_tbl th {
@@ -137,11 +141,33 @@
 
 
 @media (max-width: 1279px) {
-  .attendance_tbl th, .attendance_tbl td {
+  .attendance_body {
+    margin: 0 30px 20px;
+  }
+
+  .attendance_container {
+    background-color: rgb(255, 255, 255);
+    margin: 20px auto;
+    width: 100%;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15), 0 6px 20px 0 rgba(0, 0, 0, 0.12);
+    overflow-x: auto;
+  }
+
+  .attendance_tbl {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    table-layout: auto;
+  }
+
+  .attendance_tbl th,
+  .attendance_tbl td {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.9rem;
     text-align: left;
-    padding: 0.8rem ;
+    padding: 0.8rem;
     vertical-align: top;
     word-wrap: break-word;
   }
@@ -153,7 +179,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
-    margin-left: 10px;
+    margin-left: 30px;
   }
 
   .attendance_export_bar {
@@ -176,10 +202,20 @@
     transition: 0.2s ease;
   }
 
+  .attendance_body {
+    width: 100%;
+    margin: auto;
+  }
+
+  .attendance_tbl {
+    min-width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+  }
+
   .attendance_container {
     background-color: rgb(255, 255, 255);
-    max-width: 1440px;
-    width: 100%;
+    width: 90%;
     border: 1px solid #d9d9d9;
     border-radius: 5px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15),
@@ -188,10 +224,9 @@
   }
 
   .attendance_head {
-    padding-top: 22px;
-    margin-left: 10px;
     color: #1a5dac;
     font-family: Arial, Helvetica, sans-serif;
+    margin-left: 30px;
   }
 
   .attendance_tbl th {
@@ -199,7 +234,7 @@
   }
 
   .attendance_tbl tr,
- .attendance_tbl td {
+  .attendance_tbl td {
     display: block;
     width: 100%;
   }
@@ -209,12 +244,13 @@
     border-bottom: 1px solid #ccc;
     padding: 0.5rem 0;
     border-radius: 5px;
+
   }
 
   .attendance_tbl td {
     text-align: left;
     font-size: 1.1rem;
-    padding-left: 40%;
+    padding-left: 45%;
     padding-top: 0.3rem;
     padding-bottom: 0.3rem;
     position: relative;
@@ -224,10 +260,31 @@
   .attendance_tbl td::before {
     content: attr(data-label);
     position: absolute;
-    left: 10px; /* small left padding for label */
-    width: 35%; /* enough space for label */
+    left: 10px;
     padding-left: 0.5rem;
     font-weight: bold;
     white-space: nowrap;
+  }
+
+}
+
+@media (max-width: 627px) {
+  .attendance_filter_bar {
+    flex-direction: column;     
+    align-items: flex-start;
+    gap: 5px;       
+    width: 100%;
+  }
+
+  .attendance_filter-custom-range {
+    width: 50%;
+    display: flex;
+    flex-direction: column;  
+    gap: 6px;                  
+    margin: 0;
+  }
+
+  .attendance_filter-custom-range input {
+    width: 100%;                
   }
 }

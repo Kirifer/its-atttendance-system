@@ -7,19 +7,17 @@ import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./components/ProtectedRoute";
 // Styling
 import "./App.css";
+import Approvals from "./screens/Approvals";
 import Dashboard from "./screens/Dashboard";
 import ForgotPassword from "./screens/ForgotPassword";
 import Login from "./screens/Login";
 import Logs from "./screens/Logs";
 import ResetPassword from "./screens/ResetPassword";
-import Settings from "./screens/Settings";
 import Signup from "./screens/Signup";
 import Timeoff from "./screens/Timeoff";
 import Timesheet from "./screens/Timesheet";
 import UserInfo from "./screens/UserInfo";
 import UserRequests from "./screens/UserRequests";
-import TimeoffAdmin from "./screens/TimeoffAdmin";
-import ViewRequestsAdmin from "./screens/ViewRequestsAdmin";
 
 function App() {
   useEffect(() => {
@@ -43,17 +41,17 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/logs" element={<Logs />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route
-          path="/settings"
+          path="/approvals"
           element={
-            <ProtectedRoute>
-              <Settings />
+            <ProtectedRoute adminOnly={true}>
+              <Approvals />
             </ProtectedRoute>
           }
         />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/logs" element={<Logs />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/sign-up" element={<Signup />} />
         <Route path="/time-off" element={<Timeoff />} />
         <Route
@@ -77,22 +75,6 @@ function App() {
           element={
             <ProtectedRoute>
               <UserRequests />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/time-off-admin"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <TimeoffAdmin />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/view-requests-admin"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <ViewRequestsAdmin />
             </ProtectedRoute>
           }
         />

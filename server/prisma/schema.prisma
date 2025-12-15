@@ -29,6 +29,9 @@ model User {
   reset_token        String?
   reset_token_expiry DateTime?
   onLeave            Boolean   @default(false) 
+  totalOJTHours      Float     @default(0)
+  remainingWorkHours Float     @default(0)
+
   leaves      Leave[]
   attendance  Attendance[]
   timeAdjustments TimeAdjustment[]
@@ -109,13 +112,14 @@ model Attendance {
 }
 
 model TimeAdjustment {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  type      String
-  details   String
-  status    String   @default("pending")
-  createdAt DateTime @default(now())
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  type       String
+  details    String
+  attachment String?
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
 }
 
 model UserSchedule { 

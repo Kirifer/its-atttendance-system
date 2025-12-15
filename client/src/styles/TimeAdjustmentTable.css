@@ -1,10 +1,10 @@
-.leave-table-container {
+.time-table-container {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-.leave-table {
+.time-table {
   min-width: 800px; /* ensures table stays wide */
   border-collapse: collapse;
   background: white;
@@ -15,21 +15,21 @@
 }
 
 /* Table headers */
-.leave-table th {
+.time-table th {
   color: black;
   padding: 12px;
   text-align: left;
   white-space: nowrap;
 }
 
-.leave-table td {
+.time-table td {
   padding: 12px;
   border-bottom: 1px solid #8b8b8b;
   white-space: nowrap;
   display: table-cell;
 }
 
-.leave-table__actions .material-symbols-outlined {
+.time-table__actions .material-symbols-outlined {
   cursor: pointer;
   font-size: 24px;
   margin-right: 8px;
@@ -37,61 +37,61 @@
   transition: 0.2s;
 }
 
-.leave-table__actions .material-symbols-outlined:hover {
+.time-table__actions .material-symbols-outlined:hover {
   opacity: 0.7;
 }
 
-.leave-table__approve {
+.time-table__approve {
   color: #4caf50;
 }
 
-.leave-table__reject {
+.time-table__reject {
   color: #ff9800;
 }
 
-.leave-table__delete {
+.time-table__delete {
   color: #d9534f;
 }
 
-.leave-table__status {
+.time-table__status {
   font-weight: bold;
   text-transform: uppercase;
 }
 
-.leave-table__status--pending {
+.time-table__status--pending {
   color: #d2a516;
 }
 
-.leave-table__status--approved {
+.time-table__status--approved {
   color: #54cc58;
 }
 
-.leave-table__status--rejected {
+.time-table__status--rejected {
   color: #d40707;
 }
 
 /* Responsive adjustments for mobile */
 @media (max-width: 600px) {
-  .leave-table th,
-  .leave-table td {
+  .time-table th,
+  .time-table td {
     padding: 8px;
     font-size: 14px;
   }
 
-  .leave-table__actions .material-symbols-outlined {
+  .time-table__actions .material-symbols-outlined {
     font-size: 20px;
     margin-right: 6px;
   }
 }
 
-.leave-table__search {
+.time-table__search {
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
 }
 
-.leave-table__dropdown,
-.leave-table__input {
+.time-table__dropdown,
+.time-table__input {
   padding: 8px 10px;
   border: 1px solid #ddd;
   border-radius: 6px;

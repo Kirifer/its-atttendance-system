@@ -15,7 +15,17 @@ const fileTimeAdjustment = async (req, res) => {
     if (!type || !details)
       return res.status(400).json({ message: "Missing fields." });
 
-    const request = await createTimeAdjustment(userId, type, details);
+    let attachmentPath = null;
+    if (req.file) {
+      attachmentPath = "/uploads/" + req.file.filename;
+    }
+
+    const request = await createTimeAdjustment(
+      userId,
+      type,
+      details,
+      attachmentPath
+    );
 
     res.status(201).json({
       message: "Time adjustment request filed",
@@ -44,6 +54,7 @@ const fetchTimeAdjustments = async (req, res) => {
       details: req.details,
       status: req.status,
       createdAt: req.createdAt,
+      attachment: req.attachment,
       user: req.user ? { id: req.user.id, username: req.user.username } : null,
     }));
 
@@ -98,9 +109,33 @@ const updateTimeAdjustmentStatus = async (req, res) => {
   }
 };
 
+// Delete time adjustment submitted request
+const deleteTimeAdjustment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const isAdmin = req.user.role === "ADMIN";
+
+    if (!isAdmin) return res.status(403).json({ message: "Unauthorized" });
+
+    const existing = await prisma.timeAdjustment.findUnique({ where: { id } });
+    if (!existing)
+      return res
+        .status(404)
+        .json({ message: "Time adjustment request not found" });
+
+    await prisma.timeAdjustment.delete({ where: { id } });
+
+    res.status(200).json({ message: "Time adjustment deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to delete time adjustment" });
+  }
+};
+
 module.exports = {
   fileTimeAdjustment,
   fetchTimeAdjustments,
   fetchMyTimeAdjustments,
   updateTimeAdjustmentStatus,
+  deleteTimeAdjustment,
 };

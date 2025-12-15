@@ -1,0 +1,71 @@
+.user-time__main {
+  border-radius: 10px;
+  padding: 30px;
+  width: 90%;
+  margin-right: 100px;
+  margin: 50px auto;
+  margin-top: 0px;
+  margin-bottom: 140px;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-time-title_h3 {
+  color: #1a5dac;
+  margin-top: 50px;
+  margin-bottom: 30px;
+  font-size: 30px;
+}
+
+.user-time__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* x button */
+.x-button {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 5px 10px;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.x-button:hover {
+  color: red;
+  transform: scale(1.1);
+}
+
+.x-button:active:hover {
+  color: rgb(163, 0, 0);
+  transform: scale(0.98);
+}
+
+/* Responsive adjustments for mobile */
+
+@media (max-width: 600px) {
+  .x-button {
+    top: 15px;
+    right: 10px;
+    font-size: 20px;
+    padding: 4px 8px;
+    gap: 6px;
+  }
+
+  .x-button:hover {
+    transform: scale(1.05);
+  }
+
+  .x-button:active:hover {
+    transform: scale(0.95);
+  }
+}

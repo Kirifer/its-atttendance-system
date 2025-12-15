@@ -6,6 +6,7 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
+
 router.post("/time-in", verifyToken, timeIn);
 router.post("/lunch-out", verifyToken, lunchOut)
 router.post("/lunch-in", verifyToken, lunchIn)

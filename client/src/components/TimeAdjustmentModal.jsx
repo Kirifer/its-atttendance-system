@@ -1,12 +1,29 @@
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import "../styles/TimeAdjustmentModal.css";
 import API from "../api/api";
+import { showToast } from "./Notification/toast";
 
 const TimeAdjustmentModal = ({ isOpen, onClose, refreshRequests }) => {
   const [type, setType] = useState("");
   const [details, setDetails] = useState("");
+  const [attachment, setAttachment] = useState(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true);
+      requestAnimationFrame(() => {
+        setIsAnimating(true);
+      });
+    } else {
+      setIsAnimating(false);
+      const timer = setTimeout(() => setIsVisible(false), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!isVisible && !isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,27 +34,39 @@ const TimeAdjustmentModal = ({ isOpen, onClose, refreshRequests }) => {
     }
 
     try {
-      await API.post(
-        "/time-adjustments",
-        { type, details },
-        { headers: { "Content-Type": "application/json" } }
-      );
-      alert("Request submitted successfully!");
+      const formData = new FormData();
+      formData.append("type", type);
+      formData.append("details", details);
+      if (attachment) formData.append("attachment", attachment);
+
+      await API.post("/time-adjustments", formData);
+
+      showToast({
+        message: "Request submitted successfully!",
+        type: "success",
+        color: "#ffffff",
+      });
+
       setType("");
       setDetails("");
+      setAttachment(null);
       onClose();
 
       if (refreshRequests) {
         refreshRequests();
       }
     } catch (err) {
-      alert("Failed to submit request.");
+      showToast({
+        message: "Failed to submit request.",
+        type: "error",
+        color: "#ffffff",
+      });
       console.log(err);
     }
   };
 
   return (
-    <div className="modal-overlay">
+    <div className={`modal-overlay ${isAnimating ? "show" : ""}`}>
       <div className="modal-content">
         <h2>File Time Adjustment Request</h2>
 
@@ -58,6 +87,15 @@ const TimeAdjustmentModal = ({ isOpen, onClose, refreshRequests }) => {
               value={details}
               onChange={(e) => setDetails(e.target.value)}
               placeholder="Provide details for your request"
+            />
+          </label>
+
+          {/* Attachment */}
+          <label>
+            Attachment (optional)
+            <input
+              type="file"
+              onChange={(e) => setAttachment(e.target.files[0])}
             />
           </label>
 

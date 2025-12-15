@@ -22,6 +22,8 @@ import {
   validateChangePassword,
   validateUpdateUserInfo,
 } from "../middlewares/validateUser.js";
+// Get all users except admin routing
+import { getAllUsers } from "../controllers/authController.js";
 
 //prisma
 import { PrismaClient } from "@prisma/client";
@@ -124,6 +126,7 @@ router.post("/login", validateLogin, async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
+        leave: user.onLeave 
       },
     });
   } catch (err) {
@@ -211,6 +214,7 @@ router.get("/me", verifyToken, async (req, res) => {
         email: true,
         role: true,
         profilePic: true,
+        onLeave: true,  
       },
     });
 
@@ -272,6 +276,9 @@ router.post(
 
 // Update user info
 router.put("/update", validateUpdateUserInfo, verifyToken, updateUserInfo);
+
+// Get all non-admin users
+router.get("/users", verifyToken, getAllUsers);
 
 // Must be always below
 export default router;

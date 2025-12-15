@@ -195,3 +195,20 @@
   }
 
 }
+
+.att__onleave-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background: #bbbbbb;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.att__onleave-text {
+  font-size: 22px;
+  font-weight: bold;
+  color: #555;
+  letter-spacing: 1px;
+}

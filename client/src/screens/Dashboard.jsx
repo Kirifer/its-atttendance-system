@@ -1,13 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "../styles/Dashboard.css";
-import AttBtn from "../components/AttBtn.jsx";
+import AttBtn from "../components/Dashboard/AttBtn.jsx";
 import DashboardLayout from "../components/DashboardLayout";
 import Clock from "../components/Dashboard/Clock.jsx";
 import LogsCard from "../components/Dashboard/LogsCard.jsx";
 import FiledLeavesCard from "../components/Dashboard/FiledLeavesCard.jsx";
 import Calendar from "../components/Dashboard/Calendar.jsx";
 import UserStatusCard from "../components/Dashboard/UserStatusCard.jsx";
+import EditUserSchedule from "../components/EditUserSchedule.jsx";
 
 function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -42,9 +43,10 @@ function Dashboard() {
                   reload={reload}
                 />
               )}
+           
             </div>
           </div>
-
+                 <EditUserSchedule />
           <div className="dashboard__container__two">
             <div className="dashboard__left__two">
               <FiledLeavesCard />

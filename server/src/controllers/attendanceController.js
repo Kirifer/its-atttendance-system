@@ -3,6 +3,7 @@ import { autoLunchTardy } from "../utils/autoLunchTardy.js";
 import { getWorkSchedule } from "../utils/workSchedule.js";
 import { countWorkDays } from "../utils/countWorkDays.js";
 import { updateAttStatus } from "../utils/updateAttStatus.js";
+import { recalculateHours } from "../utils/hoursOJT/recalculateHours.js";
 
 const prisma = new PrismaClient();
 
@@ -321,33 +322,30 @@ export const getAllAttendance = async (req, res) => {
 export const updateAttendance = async (req, res) => {
   try {
     const { id } = req.params;
-    const { timeIn, timeOut, lunchOut, lunchIn } = req.body;
+    const { timeIn, timeOut, lunchOut, lunchIn, status } = req.body;
 
-    const attendance = await prisma.attendance.findUnique({
-      where: { id },
-    });
+    const attendance = await prisma.attendance.findUnique({ where: { id } });
+    if (!attendance) return res.status(404).json({ message: "Attendance not found" });
 
-    if (!attendance) {
-      return res.status(404).json({ message: "Attendance not found" });
+    let validatedStatus = attendance.status;
+    if (status && Object.keys(AttendanceStatus).includes(status)) {
+      validatedStatus = status;
     }
 
-    const updated = await updateAttStatus(
-      attendance,
-      timeIn,
-      timeOut,
-      lunchOut,
-      lunchIn
-    );
+    await updateAttStatus(attendance, timeIn, timeOut, lunchOut, lunchIn, validatedStatus);
+
+    const updatedHours = await recalculateHours(id);
 
     res.json({
       message: "Attendance updated by admin",
-      updated,
+      updated: updatedHours,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error updating attendance:", error);
     res.status(500).json({ message: "Error updating attendance" });
   }
 };
+
 
 export const deleteAttendance = async (req, res) => {
   try {

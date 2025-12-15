@@ -3,18 +3,11 @@ import { updateAttendance } from "../api/attendance";
 import "../styles/EditAttendancePopup.css";
 
 export default function EditAttendancePopup({ record, onClose, onSave }) {
-  const [timeIn, setTimeIn] = useState(
-    record["Time In"] !== "-" ? record["Time In"] : ""
-  );
-  const [timeOut, setTimeOut] = useState(
-    record["Time Out"] !== "-" ? record["Time Out"] : ""
-  );
-  const [lunchOut, setLunchOut] = useState(
-    record["Lunch Out"] !== "-" ? record["Lunch Out"] : ""
-  );
-  const [lunchIn, setLunchIn] = useState(
-    record["Lunch In"] !== "-" ? record["Lunch In"] : ""
-  );
+  const [timeIn, setTimeIn] = useState(record["Time In"] !== "-" ? record["Time In"] : "");
+  const [lunchOut, setLunchOut] = useState(record["Lunch Out"] !== "-" ? record["Lunch Out"] : "");
+  const [lunchIn, setLunchIn] = useState(record["Lunch In"] !== "-" ? record["Lunch In"] : "");
+  const [timeOut, setTimeOut] = useState(record["Time Out"] !== "-" ? record["Time Out"] : "");
+  const [status, setStatus] = useState(record.status || "PRESENT"); // default enum value
 
   const handleSave = async () => {
     try {
@@ -32,6 +25,7 @@ export default function EditAttendancePopup({ record, onClose, onSave }) {
         timeOut: formatTime(timeOut),
         lunchOut: formatTime(lunchOut),
         lunchIn: formatTime(lunchIn),
+        status, // ✅ include status
       });
 
       onSave();
@@ -48,33 +42,24 @@ export default function EditAttendancePopup({ record, onClose, onSave }) {
         <h2>Edit Attendance</h2>
 
         <label>Time In:</label>
-        <input
-          type="time"
-          value={timeIn}
-          onChange={(e) => setTimeIn(e.target.value)}
-        />
-        
+        <input type="time" value={timeIn} onChange={(e) => setTimeIn(e.target.value)} />
+
         <label>Lunch Out:</label>
-        <input
-          type="time"
-          value={lunchOut}
-          onChange={(e) => setLunchOut(e.target.value)}
-        />
+        <input type="time" value={lunchOut} onChange={(e) => setLunchOut(e.target.value)} />
 
         <label>Lunch In:</label>
-        <input
-          type="time"
-          value={lunchIn}
-          onChange={(e) => setLunchIn(e.target.value)}
-        />
+        <input type="time" value={lunchIn} onChange={(e) => setLunchIn(e.target.value)} />
 
         <label>Time Out:</label>
-        <input
-          type="time"
-          value={timeOut}
-          onChange={(e) => setTimeOut(e.target.value)}
-        />
+        <input type="time" value={timeOut} onChange={(e) => setTimeOut(e.target.value)} />
 
+        <label>Status:</label>
+        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+          <option value="PRESENT">Present</option>
+          <option value="TARDY">Tardy</option>
+          <option value="ABSENT">Absent</option>
+          <option value="ON_LEAVE">On Leave</option>
+        </select>
 
         <div className="attendance_popup_buttons">
           <button onClick={handleSave}>Save</button>
