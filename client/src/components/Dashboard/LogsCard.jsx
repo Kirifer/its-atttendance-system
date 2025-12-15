@@ -45,7 +45,11 @@ function LogsCard({ userName = "User", reload }) {
   return (
     <div className="logs-card">
       <div className="logs-card__header">
-        <span>9:00 AM - 6:00 PM</span>
+        <span>
+          {user?.todaySchedule
+            ? `${user.todaySchedule.startTime} - ${user.todaySchedule.endTime}`
+            : "No schedule today"}
+        </span>
         <span>{userName}</span>
       </div>
       <div className="logs-card__body">
