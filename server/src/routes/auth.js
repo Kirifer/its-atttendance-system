@@ -212,7 +212,7 @@ router.get("/me", verifyToken, async (req, res) => {
     await deleteExpiredSched(userId, prisma);
 
     const user = await prisma.user.findUnique({
-      where: { id:userId },
+      where: { id: userId },
       select: {
         id: true,
         username: true,
