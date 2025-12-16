@@ -26,11 +26,23 @@ function Dashboard() {
           <div className="dashboard__containerone">
             <div className="dashboard__left">
               <Clock format="HH:mm:ss" />
-              <AttBtn
-                userId={user.id}
-                reload={reload}
-                onAttendanceChange={() => setReload((r) => !r)}
-              />
+              {user.role === "ADMIN" ? (
+                <div className="custom_schedule_wrapper">
+                  <EditUserSchedule userSchedule={userSchedule} user={user} />  
+                  <button
+                    className="custom_schedule_btn"
+                    onClick={userSchedule.openSchedule}
+                  >
+                    Set Custom Schedule
+                  </button>
+                </div>
+              ) : (
+                <AttBtn
+                  userId={user.id}
+                  reload={reload}
+                  onAttendanceChange={() => setReload((r) => !r)}
+                />
+              )}
             </div>
 
             <div className="dashboard__right">
@@ -49,14 +61,6 @@ function Dashboard() {
 
             </div>
           </div>
-
-          {user?.role === "ADMIN" && (
-            <button className="attendance_edit_btn" onClick={userSchedule.openSchedule}>
-              Configure Custom Schedule
-            </button>
-          )}
-
-          <EditUserSchedule userSchedule={userSchedule} user={user} />
 
           <div className="dashboard__container__two">
             <div className="dashboard__left__two">

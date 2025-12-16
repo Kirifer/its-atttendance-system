@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import useUserSchedule from "../hooks/useUserSchedule";
 import { getAllUsers } from "../api/auth";
 import "../styles/EditUserSchedule.css";
 
-export default function EditUserSchedule({ userSchedule }) {
+export default function EditUserSchedule({ userSchedule, user }) {
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [timeIn, setTimeIn] = useState("09:00");
@@ -21,14 +20,19 @@ export default function EditUserSchedule({ userSchedule }) {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const allUsers = await getAllUsers();
-      setUsers(allUsers);
-      if (allUsers.length > 0) setSelectedUserId(allUsers[0].id);
+      try {
+        if (user.role !== "ADMIN") return; 
+        const allUsers = await getAllUsers();
+        setUsers(allUsers);
+        if (allUsers.length > 0) setSelectedUserId(allUsers[0].id);
+      } catch (err) {
+        console.warn("Fetching users skipped for non-admin", err.message);
+      }
     };
     fetchUsers();
-  }, []);
+  }, [user]);
 
-  if (!showSchedule) return null; 
+  if (!showSchedule) return null;
 
   const handleSave = async () => {
     if (!selectedUserId || !date) {
@@ -57,7 +61,6 @@ export default function EditUserSchedule({ userSchedule }) {
     <div className="custom_schedule_overlay">
       <div className="custom_schedule">
         <h2>Configure Custom Schedule</h2>
-
         <label>User Email</label>
         <select
           value={selectedUserId}
