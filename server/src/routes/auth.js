@@ -34,6 +34,8 @@ import { getTodaySchedule } from "../utils/getTodaySchedule.js";
 import { deleteExpiredSched } from "../utils/deleteExpiredSched.js";
 import { getAllUsersWithRoles } from "../controllers/authController.js";
 
+import { getWorkSchedule } from "../utils/workSchedule.js";
+
 const router = express.Router();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
@@ -237,17 +239,17 @@ router.get("/me", verifyToken, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const todaySchedule = await getTodaySchedule(userId, prisma);
+    const workSchedule = await getWorkSchedule(userId);
 
     res.json({
-      ...user,
-      todaySchedule: todaySchedule
-        ? {
-            startTime: todaySchedule.startTime,
-            endTime: todaySchedule.endTime,
-          }
-        : null,
-    });
+  ...user,
+  todaySchedule: workSchedule
+    ? {
+        startTime: workSchedule.start.toTimeString().slice(0, 5),
+        endTime: workSchedule.end.toTimeString().slice(0, 5),
+      }
+    : null,
+});
   } catch (err) {
     console.error("GET /auth/me error:", err);
     res.status(500).json({ message: "Cannot fetch user" });
