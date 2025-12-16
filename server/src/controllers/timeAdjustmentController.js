@@ -121,7 +121,6 @@ const updateTimeAdjustmentStatus = async (req, res) => {
       include: { user: true },
     });
 
-    // 🔥 TRIGGER SCHEDULE UPDATE
     if (
       normalizedStatus === "approved" &&
       request.type === "change_shift"

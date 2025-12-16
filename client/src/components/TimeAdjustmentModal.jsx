@@ -95,49 +95,48 @@ const TimeAdjustmentModal = ({ isOpen, onClose, refreshRequests }) => {
         <form onSubmit={handleSubmit}>
           <label>Type of Adjustment</label>
           <select value={type} onChange={(e) => setType(e.target.value)}>
-  <option value="">-- Select Type --</option>
-  <option value="change_log">Change Log Request</option>
-  <option value="change_shift">Change Shift Schedule</option>
-  <option value="offset_hours">Offset Extended Hours</option>
-  <option value="overtime">Overtime</option>
-  <option value="undertime">Undertime</option>
-</select>
+            <option value="">-- Select Type --</option>
+            <option value="change_log">Change Log Request</option>
+            <option value="change_shift">Change Shift Schedule</option>
+            <option value="offset_hours">Offset Extended Hours</option>
+            <option value="overtime">Overtime</option>
+            <option value="undertime">Undertime</option>
+          </select>
 
-{/* 🔥 Change Shift extra fields */}
-{type === "change_shift" && (
-  <>
-    <label>
-      Shift Date
-      <input
-        type="date"
-        value={shiftDate}
-        onChange={(e) => setShiftDate(e.target.value)}
-        required
-      />
-    </label>
+          {type === "change_shift" && (
+            <>
+              <label>
+                Shift Date
+                <input
+                  type="date"
+                  value={shiftDate}
+                  onChange={(e) => setShiftDate(e.target.value)}
+                  required
+                />
+              </label>
 
-    <label>
-      Time In
-      <input
-        type="time"
-        value={startTime}
-        onChange={(e) => setStartTime(e.target.value)}
-        required
-      />
-    </label>
+              <label>
+                Time In
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  required
+                />
+              </label>
 
-    <label>
-      Time Out
-      <input
-        type="time"
-        value={endTime}
-        onChange={(e) => setEndTime(e.target.value)}
-        required
-      />
-    </label>
-  </>
-)}
-          
+              <label>
+                Time Out
+                <input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  required
+                />
+              </label>
+            </>
+          )}
+                  
           
 
           <label>
