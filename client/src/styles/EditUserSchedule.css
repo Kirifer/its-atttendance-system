@@ -1,0 +1,109 @@
+.custom_schedule_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.custom_schedule {
+  background: #fff;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 380px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.25s ease-in-out;
+  font-family: "Inter", sans-serif;
+  box-sizing: border-box;
+}
+
+.custom_schedule h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  color: #333;
+}
+
+.custom_schedule label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.custom_schedule input,
+.custom_schedule select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 16px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s;
+  box-sizing: border-box;
+}
+
+.custom_schedule input:focus,
+.custom_schedule select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.custom_schedule_buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.custom_schedule_buttons button {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.custom_schedule_buttons button:first-child {
+  background: #007bff;
+  color: #fff;
+}
+
+.custom_schedule_buttons button:first-child:hover {
+  background: #0066d3;
+}
+
+.custom_schedule_buttons button:last-child {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.custom_schedule_buttons button:last-child:hover {
+  background: #e0e0e0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
