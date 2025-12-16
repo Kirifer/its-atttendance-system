@@ -147,9 +147,7 @@ export const changeUserRole = async (userId, role) => {
     );
     return res.data;
   } catch (err) {
-    throw new Error(
-      err.response?.data?.message || "Failed to change role"
-    );
+    throw new Error(err.response?.data?.message || "Failed to change role");
   }
 };
 
@@ -166,4 +164,10 @@ export const getAllUsersWithRoles = async () => {
     else if (err.message) message = err.message;
     throw new Error(message);
   }
+};
+
+// otp
+export const verifyOtp = async (email, otp) => {
+  const res = await API.post("/auth/verify-otp", { email, otp });
+  return res.data;
 };
