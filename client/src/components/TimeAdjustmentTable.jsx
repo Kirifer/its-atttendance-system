@@ -201,9 +201,24 @@ function TimeAdjustmentTable() {
                         ? req.id
                         : req.id.substring(0, 8) + "..."}
                     </td>
+                    <td>
+                      <div>
+                        <strong>{typeLabels[req.type] || req.type}</strong>
 
-                    {/* Table Headers */}
-                    <td>{typeLabels[req.type] || req.type}</td>
+                        {req.type === "change_shift" &&
+                          req.shiftDate &&
+                          req.startTime &&
+                          req.endTime && (
+                            <div className="time-table__shift-info">
+                              <small>
+                                {new Date(req.shiftDate).toLocaleDateString()} <br />
+                                {req.startTime} – {req.endTime}
+                              </small>
+                            </div>
+                          )}
+                      </div>
+                    </td>
+
                     <td
                       style={{
                         whiteSpace: "normal",

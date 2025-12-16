@@ -49,6 +49,22 @@ function LeaveForm({ onSubmit }) {
     return;
   }
 
+  if (formData.attachment) {
+  const allowedTypes = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/jpg",
+    "image/webp",
+  ];
+
+  if (!allowedTypes.includes(formData.attachment.type)) {
+    setError("Attachment must be a PDF or an image file.");
+    setSuccess("");
+    return;
+  }
+}
+
   try {
     // Create FormData
     const submissionData = new FormData();
@@ -168,6 +184,7 @@ function LeaveForm({ onSubmit }) {
           <input
             type="file"
             name="attachment"
+            accept=".pdf,image/*"
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, attachment: e.target.files[0] }))
             }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { forgotPassword } from "../api/auth";
+import { forgotPassword, verifyOtp } from "../api/auth";
 import "../styles/ForgotPassword.css";
 import API from "../api/api";
 
@@ -8,6 +8,9 @@ function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  // otp
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState("email");
 
   const navigate = useNavigate();
 
@@ -15,13 +18,13 @@ function ForgotPassword() {
     e.preventDefault();
     try {
       const res = await forgotPassword(email); // use service function
-      setMessage(res.resetUrl || res.message); // DEV mode shows reset link
+      setMessage(res.message || "The OTP has been sent to your email."); // DEV mode shows reset link
       setIsError(false);
+      setStep("otp");
       if (res.resetUrl) {
         console.log("Password reset link:", res.resetUrl);
       }
     } catch (err) {
-      console.error(err);
       setMessage(err.message || "An error occurred. Please try again.");
       setIsError(true);
 
@@ -30,6 +33,22 @@ function ForgotPassword() {
         setIsError(false);
       }, 5000);
     }
+  };
+
+  // handle otp
+  const handleVerifyOtp = async () => {
+    try {
+      const res = await verifyOtp(email, otp);
+      navigate(res.resetUrl.replace(process.env.REACT_APP_API_URL, ""));
+    } catch (err) {
+      setMessage(err.message || "Invalid OTP.");
+      setIsError(true);
+    }
+
+    setTimeout(() => {
+      setMessage("");
+      setIsError(false);
+    }, 5000);
   };
 
   return (
@@ -46,7 +65,7 @@ function ForgotPassword() {
           </button>
         </div>
 
-        {/* JSON */}
+        {/* OTP */}
         {message && (
           <p
             style={{
@@ -55,29 +74,49 @@ function ForgotPassword() {
               color: isError ? "red" : "green",
             }}
           >
-            {message.includes("reset-password") ? (
-              <a href={message}>{message}</a>
-            ) : (
-              message
-            )}
+            {message}
           </p>
         )}
 
-        <div>
-          <input
-            className="text-box"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            required
-          />
-        </div>
+        {step === "email" && (
+          <div>
+            <input
+              className="text-box"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+            />
+            <button
+              type="button"
+              className="forgot-password-button"
+              onClick={handleSubmit}
+            >
+              Submit
+            </button>
+          </div>
+        )}
 
-        {/* Buttons */}
-        <button type="submit" className="forgot-password-button">
-          Submit
-        </button>
+        {step === "otp" && (
+          <div>
+            <input
+              className="text-box"
+              type="text"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="Enter OTP"
+              required
+            />
+            <button
+              type="button"
+              className="forgot-password-button"
+              onClick={handleVerifyOtp}
+            >
+              Verify OTP
+            </button>
+          </div>
+        )}
       </form>
     </div>
   );

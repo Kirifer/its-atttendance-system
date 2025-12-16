@@ -9,6 +9,9 @@ const TimeAdjustmentModal = ({ isOpen, onClose, refreshRequests }) => {
   const [attachment, setAttachment] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [shiftDate, setShiftDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
 
   useEffect(() => {
     if (isOpen) {
@@ -26,44 +29,63 @@ const TimeAdjustmentModal = ({ isOpen, onClose, refreshRequests }) => {
   if (!isVisible && !isOpen) return null;
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!type || !details) {
-      alert("Please select type and provide details.");
+  if (!type || !details) {
+    alert("Please select type and provide details.");
+    return;
+  }
+
+  // 🔒 Extra validation for change shift
+  if (type === "change_shift") {
+    if (!shiftDate || !startTime || !endTime) {
+      alert("Please provide shift date, time in, and time out.");
       return;
     }
+  }
 
-    try {
-      const formData = new FormData();
-      formData.append("type", type);
-      formData.append("details", details);
-      if (attachment) formData.append("attachment", attachment);
+  try {
+    const formData = new FormData();
+    formData.append("type", type);
+    formData.append("details", details);
 
-      await API.post("/time-adjustments", formData);
-
-      showToast({
-        message: "Request submitted successfully!",
-        type: "success",
-        color: "#ffffff",
-      });
-
-      setType("");
-      setDetails("");
-      setAttachment(null);
-      onClose();
-
-      if (refreshRequests) {
-        refreshRequests();
-      }
-    } catch (err) {
-      showToast({
-        message: "Failed to submit request.",
-        type: "error",
-        color: "#ffffff",
-      });
-      console.log(err);
+    if (type === "change_shift") {
+      formData.append("shiftDate", shiftDate);
+      formData.append("startTime", startTime);
+      formData.append("endTime", endTime);
     }
-  };
+
+    if (attachment) {
+      formData.append("attachment", attachment);
+    }
+
+    await API.post("/time-adjustments", formData);
+
+    showToast({
+      message: "Request submitted successfully!",
+      type: "success",
+      color: "#ffffff",
+    });
+
+    setType("");
+    setDetails("");
+    setAttachment(null);
+    setShiftDate("");
+    setStartTime("");
+    setEndTime("");
+
+    onClose();
+    refreshRequests?.();
+  } catch (err) {
+    showToast({
+      message: "Failed to submit request.",
+      type: "error",
+      color: "#ffffff",
+    });
+    console.log(err);
+  }
+};
+
 
   return (
     <div className={`modal-overlay ${isAnimating ? "show" : ""}`}>
@@ -80,6 +102,42 @@ const TimeAdjustmentModal = ({ isOpen, onClose, refreshRequests }) => {
             <option value="overtime">Overtime</option>
             <option value="undertime">Undertime</option>
           </select>
+
+          {type === "change_shift" && (
+            <>
+              <label>
+                Shift Date
+                <input
+                  type="date"
+                  value={shiftDate}
+                  onChange={(e) => setShiftDate(e.target.value)}
+                  required
+                />
+              </label>
+
+              <label>
+                Time In
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  required
+                />
+              </label>
+
+              <label>
+                Time Out
+                <input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  required
+                />
+              </label>
+            </>
+          )}
+                  
+          
 
           <label>
             Details / Reason

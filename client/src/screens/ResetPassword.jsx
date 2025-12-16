@@ -86,7 +86,7 @@ function ResetPassword() {
           message="Reset password successful! You can now proceed to log in."
           onClose={() => {
             setShowSuccessPopup(false);
-            navigate("/login");
+            navigate("/");
           }}
         />
       )}

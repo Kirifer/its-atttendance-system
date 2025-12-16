@@ -9,10 +9,13 @@ import FiledLeavesCard from "../components/Dashboard/FiledLeavesCard.jsx";
 import Calendar from "../components/Dashboard/Calendar.jsx";
 import UserStatusCard from "../components/Dashboard/UserStatusCard.jsx";
 import EditUserSchedule from "../components/EditUserSchedule.jsx";
+import useUserSchedule from "../hooks/useUserSchedule.js"
 
 function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [reload, setReload] = useState(false);
+
+  const userSchedule = useUserSchedule();
 
   const navigate = useNavigate();
 
@@ -23,11 +26,23 @@ function Dashboard() {
           <div className="dashboard__containerone">
             <div className="dashboard__left">
               <Clock format="HH:mm:ss" />
-              <AttBtn
-                userId={user.id}
-                reload={reload}
-                onAttendanceChange={() => setReload((r) => !r)}
-              />
+              {user.role === "ADMIN" ? (
+                <div className="custom_schedule_wrapper">
+                  <EditUserSchedule userSchedule={userSchedule} user={user} />  
+                  <button
+                    className="custom_schedule_btn"
+                    onClick={userSchedule.openSchedule}
+                  >
+                    Set Custom Schedule
+                  </button>
+                </div>
+              ) : (
+                <AttBtn
+                  userId={user.id}
+                  reload={reload}
+                  onAttendanceChange={() => setReload((r) => !r)}
+                />
+              )}
             </div>
 
             <div className="dashboard__right">
@@ -43,10 +58,10 @@ function Dashboard() {
                   reload={reload}
                 />
               )}
-           
+
             </div>
           </div>
-                 <EditUserSchedule />
+
           <div className="dashboard__container__two">
             <div className="dashboard__left__two">
               <FiledLeavesCard />

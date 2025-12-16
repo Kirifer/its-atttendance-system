@@ -9,7 +9,7 @@ export const getWorkSchedule = async (userId, date = new Date()) => {
     }
 
     const custom = await prisma.userSchedule.findFirst({
-        where: { userId, weekday: day },
+        where: { userId, weekday: day, scheduleDate: {gte: new Date()} },
     });
 
     if (custom) {

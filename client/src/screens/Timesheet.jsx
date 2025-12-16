@@ -60,19 +60,21 @@ function Timesheet() {
       <div className="dashboard-main" style={{ position: "relative" }}>
         {!isAdmin && (
           <div className="time-adjustment-buttons">
-            <button
-              className="time-adjustment-box"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <span class="material-symbols-outlined">add</span>
-            </button>
+            <div className="time-adjustment-container">
+              <button
+                className="time-adjustment-box circle"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <span className="material-symbols-outlined">add</span>
+              </button>
+            </div>
 
             <a
               href="/my-requests"
               className="time-adjustment-box"
               style={{ textDecoration: "none", textAlign: "center" }}
             >
-              View my requests
+              My Requests
             </a>
           </div>
         )}
