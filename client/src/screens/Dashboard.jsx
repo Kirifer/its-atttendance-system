@@ -56,7 +56,7 @@ function Dashboard() {
             </button>
           )}
 
-          <EditUserSchedule userSchedule={userSchedule} />
+          <EditUserSchedule userSchedule={userSchedule} user={user} />
 
           <div className="dashboard__container__two">
             <div className="dashboard__left__two">
