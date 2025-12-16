@@ -9,10 +9,13 @@ import FiledLeavesCard from "../components/Dashboard/FiledLeavesCard.jsx";
 import Calendar from "../components/Dashboard/Calendar.jsx";
 import UserStatusCard from "../components/Dashboard/UserStatusCard.jsx";
 import EditUserSchedule from "../components/EditUserSchedule.jsx";
+import useUserSchedule from "../hooks/useUserSchedule.js"
 
 function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [reload, setReload] = useState(false);
+
+  const userSchedule = useUserSchedule();
 
   const navigate = useNavigate();
 
@@ -43,10 +46,18 @@ function Dashboard() {
                   reload={reload}
                 />
               )}
-           
+
             </div>
           </div>
-                 <EditUserSchedule />
+
+          {user?.role === "ADMIN" && (
+            <button className="attendance_edit_btn" onClick={userSchedule.openSchedule}>
+              Configure Custom Schedule
+            </button>
+          )}
+
+          <EditUserSchedule userSchedule={userSchedule} />
+
           <div className="dashboard__container__two">
             <div className="dashboard__left__two">
               <FiledLeavesCard />
