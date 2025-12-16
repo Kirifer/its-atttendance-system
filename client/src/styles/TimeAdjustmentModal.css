@@ -116,6 +116,37 @@
   transition: ease-in-out 0.3s;
 }
 
+.time-adjustment-container {
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+}
+
+.time-adjustment-box.circle {
+  width: 50px;           
+  height: 50px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0077ff;
+  color: #fff;
+  cursor: pointer;
+  transition: ease-in-out 0.3s;
+  border: none;           
+}
+
+.time-adjustment-box.circle:hover {
+  background-color: #005ec9;
+  transform: scale(1.05);
+}
+
+.time-adjustment-box.circle:active {
+  background-color: #004ca3;
+  transform: scale(0.95);
+}
+
 .time-adjustment-box:hover {
   background-color: #005ec9;
   transform: scale(1.01);
