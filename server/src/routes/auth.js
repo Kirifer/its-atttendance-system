@@ -164,25 +164,80 @@ export const verifyToken = (req, res, next) => {
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
-
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(400).json({ message: "User does not exist!" });
 
-    const token = crypto.randomBytes(32).toString("hex");
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    await prisma.user.update({
-      where: { email },
-      data: {
-        reset_token: token,
-        reset_token_expiry: new Date(Date.now() + 3600 * 1000),
+    if (user) {
+      const otpHash = await bcrypt.hash(otp, 10);
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          otp_hash: otpHash,
+          otp_expiry: new Date(Date.now() + 5 * 60 * 1000),
+        },
+      });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
+    });
+
+    await transporter.sendMail({
+      to: email,
+      subject: "Password Reset OTP",
+      html: `
+        <h2>Password Reset</h2>
+        <p>Your OTP is:</p>
+        <h1>${otp}</h1>
+        <p>This expires in 5 minutes.</p>
+      `,
     });
 
     // Add this to your .env
     // FRONTEND_URL=http://localhost:5000
-    const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5000";
-    const resetUrl = `${FRONTEND_URL}/reset-password/${token}`;
-    res.json({ message: "DEV mode: password reset link", resetUrl });
+    res.json({ message: "OTP sent to your email." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ------------------- OTP -------------------
+router.post("/verify-otp", async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user || !user.otp_hash || user.otp_expiry < new Date()) {
+      return res.status(400).json({ message: "Invalid or expired OTP." });
+    }
+
+    const valid = await bcrypt.compare(otp, user.otp_hash);
+    if (!valid) {
+      return res.status(400).json({ message: "Invalid OTP." });
+    }
+
+    const resetUUID = crypto.randomUUID();
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        otp_hash: null,
+        otp_expiry: null,
+        reset_uuid: resetUUID,
+        reset_uuid_expiry: new Date(Date.now() + 10 * 60 * 1000),
+      },
+    });
+
+    res.json({
+      resetUrl: `${process.env.FRONTEND_URL}/reset-password/${resetUUID}`,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -195,20 +250,29 @@ router.post("/reset-password", validateResetPassword, async (req, res) => {
     const { token, newPassword } = req.body;
 
     const user = await prisma.user.findFirst({
-      where: { reset_token: token, reset_token_expiry: { gt: new Date() } },
+      where: {
+        reset_uuid: token,
+        reset_uuid_expiry: { gt: new Date() },
+      },
     });
 
     if (!user)
-      return res.status(400).json({ message: "Invalid or expired token" });
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired reset link." });
 
     const hashed = await bcrypt.hash(newPassword, 10);
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { password: hashed, reset_token: null, reset_token_expiry: null },
+      data: {
+        password: hashed,
+        reset_uuid: null,
+        reset_uuid_expiry: null,
+      },
     });
 
-    res.json({ message: "Password has been reset successfully" });
+    res.json({ message: "Password has been reset successfully." });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });
@@ -242,20 +306,19 @@ router.get("/me", verifyToken, async (req, res) => {
     const workSchedule = await getWorkSchedule(userId);
 
     res.json({
-  ...user,
-  todaySchedule: workSchedule
-    ? {
-        startTime: workSchedule.start.toTimeString().slice(0, 5),
-        endTime: workSchedule.end.toTimeString().slice(0, 5),
-      }
-    : null,
-});
+      ...user,
+      todaySchedule: workSchedule
+        ? {
+            startTime: workSchedule.start.toTimeString().slice(0, 5),
+            endTime: workSchedule.end.toTimeString().slice(0, 5),
+          }
+        : null,
+    });
   } catch (err) {
     console.error("GET /auth/me error:", err);
     res.status(500).json({ message: "Cannot fetch user" });
   }
 });
-
 
 //------------------- Change password -------------------
 router.post(
@@ -306,7 +369,6 @@ router.post(
     }
   }
 );
-
 
 //------------------- Update user info -------------------
 router.put("/update", validateUpdateUserInfo, verifyToken, updateUserInfo);

@@ -36,7 +36,11 @@ model User {
   leaves      Leave[]
   attendance  Attendance[]
   timeAdjustments TimeAdjustment[]
-  schedules   UserSchedule[]    
+  schedules   UserSchedule[]
+  otp_hash          String?
+  otp_expiry        DateTime?
+  reset_uuid        String?
+  reset_uuid_expiry DateTime?    
 }
 
 enum LeaveStatus {
