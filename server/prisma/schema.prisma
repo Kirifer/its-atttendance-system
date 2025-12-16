@@ -121,6 +121,9 @@ model TimeAdjustment {
   attachment String?
   status     String   @default("pending")
   createdAt  DateTime @default(now())
+  shiftDate  DateTime?
+  startTime  String?
+  endTime    String?
 }
 
 model UserSchedule {
