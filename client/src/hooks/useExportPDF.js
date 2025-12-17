@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getAllUsersWithRoles, getTimesheetMeta } from "../api/auth";
+import { getUserOjtHours } from "../api/ojtHours";
 
 export default function useExportPDF() {
   const [allUsers, setAllUsers] = useState([]);
@@ -43,6 +44,16 @@ export default function useExportPDF() {
     const position = matchedUser?.position ?? "—";
     const supervisor = matchedUser?.supervisor ?? "—";
 
+    let remainingHours = 0;
+    if (matchedUser?.id) {
+      try {
+        const ojtData = await getUserOjtHours(matchedUser.id);
+        remainingHours = ojtData.remainingWorkHours ?? 0;
+      } catch (err) {
+        console.error("Failed to fetch remaining work hours", err);
+      }
+    }
+
     const doc = new jsPDF({
       orientation: "landscape",
       unit: "mm",
@@ -71,30 +82,30 @@ export default function useExportPDF() {
       r.TOTAL,
     ]);
 
-    const totalHoursSpent = records
-      .reduce((sum, r) => {
-        const hours = parseFloat(String(r.TOTAL).replace(" hrs", ""));
-        return isNaN(hours) ? sum : sum + hours;
-      }, 0)
-      .toFixed(2);
+    const totalHoursSpent = records.reduce((sum, r) => {
+      const hours = typeof r.TOTAL === "string" ? parseFloat(r.TOTAL.replace(" hrs", "")) : Number(r.TOTAL);
+      return isNaN(hours) ? sum : sum + hours;
+    }, 0).toFixed(2);
 
     const totalRow = Array(headers.length).fill("");
     totalRow[6] = "Total Hours Spent";
     totalRow[7] = `${totalHoursSpent} hrs`;
 
-    body.push(totalRow);
+    const remainingRow = Array(headers.length).fill("");
+    remainingRow[6] = "Remaining Work Hours";
+    remainingRow[7] = `${remainingHours} hrs`;
+
+    body.push(totalRow, remainingRow);
 
     const didParseCell = (data) => {
-      if (data.row.index === body.length - 1) {
-        if (data.column.index === 4 || data.column.index === 6) {
-          data.cell.styles.fontStyle = "bold";
-        }
+      if (data.row.index >= body.length - 2 && (data.column.index === 6 || data.column.index === 7)) {
+        data.cell.styles.fontStyle = "bold";
       }
     };
 
     const ROWS_PER_PAGE = 12;
-    const dataRows = body.slice(0, body.length - 1);
-    const totalOnlyRow = body.slice(body.length - 1);
+    const dataRows = body.slice(0, body.length - 2);
+    const totalOnlyRow = body.slice(body.length - 2);
 
     const chunkedBodies = [];
     for (let i = 0; i < dataRows.length; i += ROWS_PER_PAGE) {
