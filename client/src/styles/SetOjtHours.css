@@ -57,7 +57,9 @@
   color: #333;
 }
 
-.set_ojthours_view_link {
+/* not used for now but plzzzz dont remove plzz ty */
+
+/* .set_ojthours_view_link {
   font-size: 13px;
   color: #007bff;
   text-decoration: none;
@@ -66,7 +68,7 @@
 
 .set_ojthours_view_link:hover {
   text-decoration: underline;
-}
+} */
 
 .set_ojthours_popup label {
   display: block;

@@ -49,9 +49,6 @@ export default function SetOjtHours() {
           <div className="set_ojthours_popup">
             <div className="set_ojthours_header">
               <h2>Set Intern Hours</h2>
-              <Link to="/intern-hours" className="set_ojthours_view_link">
-                View Intern Hours
-              </Link>
             </div>
 
             {error && <p className="set_ojthours_error">{error}</p>}

@@ -18,7 +18,6 @@ import Timeoff from "./screens/Timeoff";
 import Timesheet from "./screens/Timesheet";
 import UserInfo from "./screens/UserInfo";
 import UserRequests from "./screens/UserRequests";
-import ViewInternHours from "./screens/ViewInternHours";
 
 function App() {
   useEffect(() => {
@@ -76,14 +75,6 @@ function App() {
           element={
             <ProtectedRoute>
               <UserRequests />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/intern-hours"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <ViewInternHours />
             </ProtectedRoute>
           }
         />
