@@ -143,5 +143,83 @@ router.get("/all-users", authMiddleware, adminOnly, async (req, res) => {
   }
 });
 
+// GET /api/admins/ojt/:userId
+router.get("/ojt/:userId", authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        totalOJTHours: true,
+        remainingWorkHours: true,
+        role: true,
+      },
+    });
+
+    if (!user)
+      return res.status(404).json({ message: "User not found." });
+
+    if (user.role !== "USER")
+      return res.status(400).json({ message: "Not an intern user." });
+
+    res.json({
+      totalOJTHours: user.totalOJTHours ?? 0,
+      remainingWorkHours: user.remainingWorkHours ?? 0,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch OJT hours." });
+  }
+});
+
+// PUT /api/admins/ojt/:userId
+router.put("/ojt/:userId", authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { totalOJTHours } = req.body;
+
+    if (
+      !Number.isInteger(totalOJTHours) ||
+      totalOJTHours <= 0
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Total OJT hours must be a positive integer." });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user)
+      return res.status(404).json({ message: "User not found." });
+
+    if (user.role !== "USER")
+      return res.status(400).json({ message: "Not an intern user." });
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        totalOJTHours,
+      },
+      select: {
+        totalOJTHours: true,
+        remainingWorkHours: true,
+      },
+    });
+
+    res.json({
+      message: "OJT hours updated successfully.",
+      totalOJTHours: updatedUser.totalOJTHours,
+      remainingWorkHours: updatedUser.remainingWorkHours ?? 0,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to update OJT hours." });
+  }
+});
 
 export default router;

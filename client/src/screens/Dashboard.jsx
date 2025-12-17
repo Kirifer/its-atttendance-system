@@ -10,6 +10,7 @@ import Calendar from "../components/Dashboard/Calendar.jsx";
 import UserStatusCard from "../components/Dashboard/UserStatusCard.jsx";
 import EditUserSchedule from "../components/EditUserSchedule.jsx";
 import useUserSchedule from "../hooks/useUserSchedule.js"
+import SetOjtHours from "../components/SetOjtHours.jsx";
 
 function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -35,7 +36,8 @@ function Dashboard() {
                   >
                     Set Custom Schedule
                   </button>
-                </div>
+                  <SetOjtHours />
+                </div>          
               ) : (
                 <AttBtn
                   userId={user.id}
@@ -44,7 +46,7 @@ function Dashboard() {
                 />
               )}
             </div>
-
+                
             <div className="dashboard__right">
               {user.role === "ADMIN" ? (
                 <UserStatusCard reload={reload} />
@@ -58,10 +60,9 @@ function Dashboard() {
                   reload={reload}
                 />
               )}
-
             </div>
           </div>
-
+               
           <div className="dashboard__container__two">
             <div className="dashboard__left__two">
               <FiledLeavesCard />

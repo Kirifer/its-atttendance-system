@@ -1,12 +1,4 @@
-.custom_schedule_wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin: 0 90px;
-  gap: 20px;
-}
-
-.custom_schedule_btn {
+.set_ojthours_btn {
   padding: 10px 16px;
   background: #1a5dac;
   color: #fff;
@@ -19,11 +11,11 @@
   white-space: nowrap;
 }
 
-.custom_schedule_btn:hover {
+.set_ojthours_btn:hover {
   background: #0066d3;
 }
 
-.custom_schedule_overlay {
+.set_ojthours_overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -37,10 +29,9 @@
   z-index: 999;
   padding: 10px;
   box-sizing: border-box;
-  overflow-y: auto; 
 }
 
-.custom_schedule {
+.set_ojthours_popup {
   background: #fff;
   padding: 28px 24px;
   width: 100%;
@@ -50,50 +41,104 @@
   animation: fadeIn 0.25s ease-in-out;
   font-family: "Inter", sans-serif;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
-.custom_schedule h2 {
-  margin-bottom: 20px;
-  font-size: 20px;
+.set_ojthours_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.set_ojthours_header h2 {
+  font-size: 18px;
   font-weight: 600;
-  text-align: center;
   color: #333;
 }
 
-.custom_schedule label {
+/* not used for now but plzzzz dont remove plzz ty */
+
+/* .set_ojthours_view_link {
+  font-size: 13px;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.set_ojthours_view_link:hover {
+  text-decoration: underline;
+} */
+
+.set_ojthours_popup label {
   display: block;
   font-weight: 500;
   margin-bottom: 6px;
   color: #555;
 }
 
-.custom_schedule input,
-.custom_schedule select {
+.set_ojthours_popup input {
   width: 100%;
+  max-width: 100%;
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  margin-bottom: 16px;
-  font-size: 15px;
+  margin-bottom: 14px;
+  font-size: 14px;
   outline: none;
-  transition: 0.2s;
   box-sizing: border-box;
 }
 
-.custom_schedule input:focus,
-.custom_schedule select:focus {
+.set_ojthours_popup input:focus {
   border-color: #007bff;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
 
-.custom_schedule_buttons {
+.set_ojthours_user_list {
+  list-style: none;
+  padding: 0;
+  margin: -6px 0 14px 0;
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.set_ojthours_user_list li {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.set_ojthours_user_list li:hover {
+  background: #f2f6ff;
+}
+
+.set_ojthours_remaining {
+  font-size: 13px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.set_ojthours_error {
+  font-size: 13px;
+  color: #d9534f;
+  margin-bottom: 10px;
+}
+
+.set_ojthours_success {
+  font-size: 13px;
+  color: green;
+  margin-bottom: 10px;
+}
+
+.set_ojthours_buttons {
   display: flex;
   gap: 12px;
-  justify-content: space-between;
   margin-top: 12px;
 }
 
-.custom_schedule_buttons button {
+.set_ojthours_buttons button {
   flex: 1;
   padding: 10px 0;
   border-radius: 8px;
@@ -101,24 +146,22 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  transition: 0.2s;
 }
 
-.custom_schedule_buttons button:first-child {
+.set_ojthours_buttons button:first-child {
   background: #007bff;
   color: #fff;
 }
 
-.custom_schedule_buttons button:first-child:hover {
+.set_ojthours_buttons button:first-child:hover {
   background: #0066d3;
 }
 
-.custom_schedule_buttons button:last-child {
+.set_ojthours_buttons button:last-child {
   background: #f0f0f0;
-  color: #333;
 }
 
-.custom_schedule_buttons button:last-child:hover {
+.set_ojthours_buttons button:last-child:hover {
   background: #e0e0e0;
 }
 
