@@ -25,6 +25,9 @@ model User {
   password           String
   profilePic         String?
   role               Role      @default(USER)
+  position           String?
+  department         String?
+  supervisor         String?
   useCustomSchedule  Boolean   @default(false)
   created_at         DateTime  @default(now())
   reset_token        String?
