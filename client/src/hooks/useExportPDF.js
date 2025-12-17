@@ -59,6 +59,19 @@ export default function useExportPDF() {
       }
     };
 
+    const ROWS_PER_PAGE = 12;
+    const dataRows = body.slice(0, body.length - 1);
+    const totalOnlyRow = body.slice(body.length - 1);
+
+    const chunkedBodies = [];
+    for (let i = 0; i < dataRows.length; i += ROWS_PER_PAGE) {
+      chunkedBodies.push(dataRows.slice(i, i + ROWS_PER_PAGE));
+    }
+
+    // Append total row to the LAST page only
+    chunkedBodies[chunkedBodies.length - 1].push(...totalOnlyRow);
+
+
     const footer = () => {
       const pageHeight = doc.internal.pageSize.getHeight();
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -118,37 +131,46 @@ export default function useExportPDF() {
 
     currentY += 8;
 
-    autoTable(doc, {
-      startY: currentY,
-      head: [
-        [
-          {
-            content: `Intern Email: ${internEmail}`,
-            colSpan: headers.length,
-            styles: {
-              fillColor: [41, 128, 185],
-              textColor: 255,
-              fontStyle: "bold",
-              halign: "left",
+    chunkedBodies.forEach((pageBody, index) => {
+      if (index > 0) {
+        doc.addPage();
+      }
+
+      let startY = index === 0 ? currentY : 20;
+
+      autoTable(doc, {
+        startY,
+        head: [
+          [
+            {
+              content: `Intern Email: ${internEmail}`,
+              colSpan: headers.length,
+              styles: {
+                fillColor: [41, 128, 185],
+                textColor: 255,
+                fontStyle: "bold",
+                halign: "left",
+              },
             },
-          },
+          ],
+          headers,
         ],
-        headers,
-      ],
-      body,
-      styles: {
-        fontSize: 11,
-        cellPadding: 3,
-        valign: "middle",
-      },
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: 255,
-        fontStyle: "bold",
-      },
-      didParseCell,
-      didDrawPage: footer,
+        body: pageBody,
+        styles: {
+          fontSize: 11,
+          cellPadding: 3,
+          valign: "middle",
+        },
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+          fontStyle: "bold",
+        },
+        didParseCell,
+        didDrawPage: footer,
+      });
     });
+
 
     const pageHeight = doc.internal.pageSize.getHeight();
     const marginBottom = 20;
@@ -159,7 +181,7 @@ export default function useExportPDF() {
 
     // Remaining space on the page
     const remainingSpace = pageHeight - signY - marginBottom;
-    
+
     if (remainingSpace < signatureBlockHeight) {
       doc.addPage();
       signY = 40; // top padding on new page
