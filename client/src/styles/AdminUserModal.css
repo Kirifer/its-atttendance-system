@@ -1,0 +1,128 @@
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 16px; 
+}
+
+.admin-modal {
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  padding: 22px 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.18);
+  animation: modalFadeIn 0.2s ease-out;
+  box-sizing: border-box; 
+  overflow: hidden; 
+}
+
+
+.admin-modal h2 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+
+.admin-modal label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+  margin-top: 12px;
+  display: block;
+}
+
+.admin-modal input {
+  width: 100%;
+  padding: 9px 10px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box; 
+}
+
+.admin-modal input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.admin-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+
+.admin-modal__actions button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.admin-modal__actions button:first-child {
+  background: #2563eb;
+  color: #fff;
+}
+
+.admin-modal__actions button:first-child:hover {
+  background: #1e4fd6;
+}
+
+.admin-modal__actions button:last-child {
+  background: #e5e7eb;
+  color: #111;
+}
+
+.admin-modal__actions button:last-child:hover {
+  background: #d1d5db;
+}
+
+.admin-modal__actions button:active {
+  transform: scale(0.97);
+}
+
+/* Animation */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Mobile tweaks */
+@media (max-width: 480px) {
+  .admin-modal {
+    padding: 18px 16px;
+  }
+
+  .admin-modal h2 {
+    font-size: 16px;
+  }
+
+  .admin-modal__actions {
+    flex-direction: column-reverse;
+  }
+
+  .admin-modal__actions button {
+    width: 100%;
+  }
+}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getAllUsersWithRoles, changeUserRole } from "../api/auth";
 import API from "../api/api";
 import "../styles/AdminCRUD.css";
+import "../styles/AdminUserModal.css";
 import { showToast } from "./Notification/toast";
 
 function AdminCRUD() {
@@ -11,18 +12,20 @@ function AdminCRUD() {
   const [query, setQuery] = useState("");
   const [filterType, setFilterType] = useState("username");
 
-  const currentUserId = localStorage.getItem("userId"); // optional: to prevent self edits
+  // modal state
+  const [showModal, setShowModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [saving, setSaving] = useState(false);
 
-  // Fetch all users
+  const currentUserId = localStorage.getItem("userId");
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      setError("");
       const data = await getAllUsersWithRoles();
       setUsers(data || []);
     } catch (err) {
-      console.error("Error fetching users:", err);
-      setError(err.message || "Failed to fetch users");
+      setError("Failed to fetch users");
     } finally {
       setLoading(false);
     }
@@ -32,135 +35,196 @@ function AdminCRUD() {
     fetchUsers();
   }, []);
 
-  // Resign admin
+  /* ================= ACTIONS ================= */
+
   const handleResign = async (id, username) => {
-    if (!window.confirm(`Are you sure you want to resign ${username}?`)) return;
+    if (!window.confirm(`Resign ${username}?`)) return;
     try {
-      const token = localStorage.getItem("token");
-      await API.put(`/admins/resign/${id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await API.put(`/admins/resign/${id}`);
       fetchUsers();
-      showToast({ message: `${username} has been resigned!`, type: "success", color: "#fff" });
+      showToast({ message: `${username} resigned`, type: "success", color: "#fff" });
     } catch (err) {
-      showToast({ message: err.response?.data?.message || err.message || "Failed to resign admin.", type: "error", color: "#fff" });
+      showToast({ message: "Failed to resign", type: "error", color: "#fff" });
     }
   };
 
-  // Reinstate admin
   const handleReinstate = async (id, username) => {
-    if (!window.confirm(`Are you sure you want to reinstate ${username}?`)) return;
+    if (!window.confirm(`Reinstate ${username}?`)) return;
     try {
-      const token = localStorage.getItem("token");
-      await API.put(`/admins/reinstate/${id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await API.put(`/admins/reinstate/${id}`);
       fetchUsers();
-      showToast({ message: `${username} has been reinstated!`, type: "success", color: "#fff" });
+      showToast({ message: `${username} reinstated`, type: "success", color: "#fff" });
     } catch (err) {
-      showToast({ message: err.response?.data?.message || err.message || "Failed to reinstate admin.", type: "error", color: "#fff" });
+      showToast({ message: "Failed to reinstate", type: "error", color: "#fff" });
     }
   };
 
-  // Change role
   const handleChangeRole = async (id, role, username) => {
-    if (!window.confirm(`Are you sure you want to change ${username}'s role to ${role}?`)) return;
+    if (!window.confirm(`Change ${username}'s role to ${role}?`)) return;
     try {
       await changeUserRole(id, role);
       fetchUsers();
-      showToast({ message: `${username}'s role updated to ${role}`, type: "success", color: "#fff" });
-    } catch (err) {
-      showToast({ message: err.message || "Failed to change role", type: "error", color: "#fff" });
+      showToast({ message: "Role updated", type: "success", color: "#fff" });
+    } catch {
+      showToast({ message: "Failed to change role", type: "error", color: "#fff" });
     }
   };
 
-  if (loading) return <div>Loading users...</div>;
-  if (error) return <div style={{ color: "red" }}>{error}</div>;
+  /* ================= MODAL ================= */
 
-  // Search/filter
-  const filteredUsers = users.filter(u => {
+  const openEditModal = (user) => {
+    setSelectedUser({
+      ...user,
+      department: user.department || "",
+      position: user.position || "",
+      supervisor: user.supervisor || "",
+    });
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedUser(null);
+  };
+
+  const handleSaveInfo = async () => {
+    try {
+      setSaving(true);
+      await API.put(`/admins/update-user-info/${selectedUser.id}`, {
+        department: selectedUser.department,
+        position: selectedUser.position,
+        supervisor: selectedUser.supervisor,
+      });
+      showToast({ message: "User info updated", type: "success", color: "#fff" });
+      closeModal();
+      fetchUsers();
+    } catch {
+      showToast({ message: "Failed to update user", type: "error", color: "#fff" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ================= FILTER ================= */
+
+  const filteredUsers = users.filter((u) => {
     const value = filterType === "username" ? u.username : u.email;
     return value.toLowerCase().includes(query.toLowerCase());
   });
 
+  if (loading) return <div>Loading users...</div>;
+  if (error) return <div style={{ color: "red" }}>{error}</div>;
+
   return (
-    <div className="crud-table-container">
-      {/* Search bar */}
-      <div className="crud-table__search">
-        <select
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-          className="crud-table__dropdown"
-        >
-          <option value="username">Username</option>
-          <option value="email">Email</option>
-        </select>
-        <input
-          type="text"
-          placeholder={`Search by ${filterType}...`}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="crud-table__input"
-        />
+    <>
+      <div className="crud-table-container">
+        <div className="crud-table__search">
+          <select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+            <option value="username">Username</option>
+            <option value="email">Email</option>
+          </select>
+          <input
+            placeholder={`Search by ${filterType}`}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+
+        <table className="crud-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredUsers.map((u) => (
+              <tr key={u.id}>
+                <td>{u.username}</td>
+                <td>{u.email}</td>
+                <td>{u.role}</td>
+                <td className={u.resignedAt ? "crud-table__status--rejected" : "crud-table__status--approved"}>
+                  {u.resignedAt ? "Resigned" : "Active"}
+                </td>
+
+                <td>
+                  {u.id !== currentUserId && (
+                    <>
+                      <button
+                        className="crud-table__actions crud-table__role"
+                        onClick={() =>
+                          handleChangeRole(u.id, u.role === "ADMIN" ? "USER" : "ADMIN", u.username)
+                        }
+                        disabled={u.resignedAt}
+                      >
+                        {u.role === "ADMIN" ? "Demote" : "Promote"}
+                      </button>
+
+                      <button
+                        className="crud-table__actions"
+                        onClick={() => openEditModal(u)}
+                      >
+                        Edit Info
+                      </button>
+
+                      {u.resignedAt ? (
+                        <button onClick={() => handleReinstate(u.id, u.username)}>Reinstate</button>
+                      ) : (
+                        <button onClick={() => handleResign(u.id, u.username)}>Resign</button>
+                      )}
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      <table className="crud-table">
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+      {/* ================= MODAL ================= */}
+      {showModal && (
+        <div className="admin-modal-backdrop">
+          <div className="admin-modal">
+            <h2>Edit User Info</h2>
 
-        <tbody>
-          {filteredUsers.map(u => (
-            <tr key={u.id}>
-              <td>{u.username}</td>
-              <td>{u.email}</td>
-              <td>{u.role}</td>
-              <td className={`crud-table__status ${u.resignedAt ? "crud-table__status--rejected" : "crud-table__status--approved"}`}>
-                {u.resignedAt ? "Resigned" : "Active"}
-              </td>
-              <td>
-                {/* Resign/Reinstate buttons only for admins */}
-                {u.id !== currentUserId && (
-                  u.resignedAt ? (
-                    <button
-                      className="crud-table__actions crud-table__approve"
-                      onClick={() => handleReinstate(u.id, u.username)}
-                    >
-                      Reinstate
-                    </button>
-                  ) : (
-                    <button
-                      className="crud-table__actions crud-table__reject"
-                      onClick={() => handleResign(u.id, u.username)}
-                    >
-                      Resign
-                    </button>
-                  )
-                )}
+            <label>Department</label>
+            <input
+              value={selectedUser.department}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, department: e.target.value })
+              }
+            />
 
+            <label>Position</label>
+            <input
+              value={selectedUser.position}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, position: e.target.value })
+              }
+            />
 
-                {/* Role change button */}
-                {u.id !== currentUserId && (
-                  <button
-                    className="crud-table__actions crud-table__role"
-                    onClick={() => handleChangeRole(u.id, u.role === "ADMIN" ? "USER" : "ADMIN", u.username)}
-                    disabled={u.resignedAt} // cannot promote resigned
-                  >
-                    {u.role === "ADMIN" ? "Demote to User" : "Promote to Admin"}
-                  </button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+            <label>Supervisor</label>
+            <input
+              value={selectedUser.supervisor}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, supervisor: e.target.value })
+              }
+            />
+
+            <div className="admin-modal__actions">
+              <button onClick={closeModal} disabled={saving}>Cancel</button>
+              <button onClick={handleSaveInfo} disabled={saving}>
+                {saving ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

@@ -133,6 +133,9 @@ router.get("/all-users", authMiddleware, adminOnly, async (req, res) => {
         email: true,
         role: true,
         resignedAt: true,
+        department: true,
+        position: true,
+        supervisor: true,
       },
       orderBy: { created_at: "asc" },
     });
