@@ -1,44 +1,53 @@
+import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { getAllUsersWithRoles } from "../api/auth";
+import { getAllUsersWithRoles, getTimesheetMeta } from "../api/auth";
 
 export default function useExportPDF() {
+  const [allUsers, setAllUsers] = useState([]);
+  const [usersLoaded, setUsersLoaded] = useState(false);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const users = await getAllUsersWithRoles();
+        setAllUsers(users);
+      } catch (err) {
+        console.error("Failed to fetch users", err);
+      } finally {
+        setUsersLoaded(true);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   const exportPDF = async (records) => {
     if (!records || !records.length) {
       alert("No filtered data available to export.");
       return;
     }
 
-    let department = "—";
-    let position = "—";
-    let supervisor = "—";
-
-    try {
-      const users = await getAllUsersWithRoles();
-
-      const internEmail = records[0]?.Intern;
-
-      const matchedUser = users.find(
-        (u) => u.email === internEmail
-      );
-
-      if (matchedUser) {
-        department = matchedUser.department || "—";
-        position = matchedUser.position || "—";
-        supervisor = matchedUser.supervisor || "—";
-      }
-    } catch (err) {
-      console.error("Failed to fetch user info for PDF:", err);
+    if (!usersLoaded) {
+      alert("Users are still loading. Please try again.");
+      return;
     }
 
+    const internEmail = records[0]?.Intern || "";
+
+    const matchedUser = allUsers.find(
+      (u) => u.email === internEmail
+    );
+
+    const department = matchedUser?.department ?? "—";
+    const position = matchedUser?.position ?? "—";
+    const supervisor = matchedUser?.supervisor ?? "—";
 
     const doc = new jsPDF({
       orientation: "landscape",
       unit: "mm",
       format: [297, 330],
     });
-
-    const internEmail = records[0]?.Intern || "";
 
     const headers = [
       "Date",
@@ -92,9 +101,7 @@ export default function useExportPDF() {
       chunkedBodies.push(dataRows.slice(i, i + ROWS_PER_PAGE));
     }
 
-    // Append total row to the LAST page only
     chunkedBodies[chunkedBodies.length - 1].push(...totalOnlyRow);
-
 
     const footer = () => {
       const pageHeight = doc.internal.pageSize.getHeight();
@@ -156,14 +163,10 @@ export default function useExportPDF() {
     currentY += 8;
 
     chunkedBodies.forEach((pageBody, index) => {
-      if (index > 0) {
-        doc.addPage();
-      }
-
-      let startY = index === 0 ? currentY : 20;
+      if (index > 0) doc.addPage();
 
       autoTable(doc, {
-        startY,
+        startY: index === 0 ? currentY : 20,
         head: [
           [
             {
@@ -180,57 +183,56 @@ export default function useExportPDF() {
           headers,
         ],
         body: pageBody,
-        styles: {
-          fontSize: 11,
-          cellPadding: 3,
-          valign: "middle",
-        },
+        styles: { fontSize: 11, cellPadding: 3 },
         headStyles: {
           fillColor: [41, 128, 185],
           textColor: 255,
-          fontStyle: "bold",
         },
         didParseCell,
         didDrawPage: footer,
       });
     });
 
+    let preparedByName = "—";
+    let preparedByPosition = "—";
+    let approvedByName = "—";
+    let approvedByPosition = "—";
 
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const marginBottom = 20;
-    const signatureBlockHeight = 65;
+    try {
+      if (!matchedUser?.id) throw new Error("Intern ID missing");
 
-    // Where the table actually ended
-    let signY = doc.lastAutoTable.finalY + 25;
+      const meta = await getTimesheetMeta(matchedUser.id);
 
-    // Remaining space on the page
-    const remainingSpace = pageHeight - signY - marginBottom;
+      preparedByName = meta.preparedBy?.username ?? "—";
+      preparedByPosition = meta.preparedBy?.position ?? "—";
 
-    if (remainingSpace < signatureBlockHeight) {
-      doc.addPage();
-      signY = 40; // top padding on new page
+      approvedByName = meta.approvedBy?.username ?? "—";
+      approvedByPosition = meta.approvedBy?.position ?? "—";
+    } catch (err) {
+      console.error("Failed to load timesheet metadata", err);
     }
 
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
+    const signY = doc.lastAutoTable.finalY + 35;
 
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
     doc.text("Prepared by:", 25, signY - 15);
     doc.line(25, signY + 8, 105, signY + 8);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Name", 25, signY + 18);
+    doc.text(preparedByName, 25, signY + 18);
+    doc.setFont("helvetica", "normal");
+    doc.text(preparedByPosition, 25, signY + 26);
 
     doc.setFont("helvetica", "normal");
-    doc.text("Role", 25, signY + 26);
-
+    doc.setFontSize(11);
     doc.text("Approved by:", 180, signY - 15);
     doc.line(180, signY + 8, 260, signY + 8);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Name", 180, signY + 18);
-
+    doc.text(approvedByName, 180, signY + 18);
     doc.setFont("helvetica", "normal");
-    doc.text("Role", 180, signY + 26);
+    doc.text(approvedByPosition, 180, signY + 26);
 
     doc.save("timesheet_filtered.pdf");
   };
