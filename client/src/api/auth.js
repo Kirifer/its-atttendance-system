@@ -171,3 +171,9 @@ export const verifyOtp = async (email, otp) => {
   const res = await API.post("/auth/verify-otp", { email, otp });
   return res.data;
 };
+
+export const getTimesheetMeta = async (userId) => {
+  const res = await API.get(`/admins/timesheet-meta/${userId}`);
+  return res.data;
+};
+

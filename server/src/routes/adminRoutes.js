@@ -1,6 +1,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import authMiddleware from "../middlewares/authMiddleware.js";
+import { getTimesheetMetadata } from "../utils/timesheetMetadata.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -255,6 +256,27 @@ router.put(
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Failed to update user information." });
+    }
+  }
+);
+
+router.get(
+  "/timesheet-meta/:userId",
+  authMiddleware,
+  adminOnly,
+  async (req, res) => {
+    try {
+      const internId = req.params.userId;
+      const adminId = req.user.id;
+
+      const metadata = await getTimesheetMetadata(internId, adminId);
+
+      res.json(metadata);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        message: err.message || "Failed to fetch timesheet metadata",
+      });
     }
   }
 );
