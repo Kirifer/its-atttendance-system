@@ -37,10 +37,10 @@ export const loginUser = async (email, password) => {
 };
 
 // Forgot password
-export const forgotPassword = async (email) => {
+export const forgotPassword = async (email, reason = "initial") => {
   try {
-    const response = await API.post("/auth/forgot-password", { email });
-    return response.data; // returns { resetUrl } in dev mode
+    const response = await API.post("/auth/forgot-password", { email, reason });
+    return response.data;
   } catch (err) {
     let message = "Error during password reset request";
     if (err.response?.data?.message) message = err.response.data.message;

@@ -35,6 +35,8 @@ import { deleteExpiredSched } from "../utils/deleteExpiredSched.js";
 import { getAllUsersWithRoles } from "../controllers/authController.js";
 
 import { getWorkSchedule } from "../utils/workSchedule.js";
+// otp
+import { verifyOtpController } from "../controllers/authController.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -163,7 +165,7 @@ export const verifyToken = (req, res, next) => {
 // ------------------- Forgot Password -------------------
 router.post("/forgot-password", async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, reason } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -175,9 +177,11 @@ router.post("/forgot-password", async (req, res) => {
         where: { id: user.id },
         data: {
           otp_hash: otpHash,
-          otp_expiry: new Date(Date.now() + 5 * 60 * 1000),
+          otp_expiry: new Date(Date.now() + 5 * 60 * 1000), // 5 mins expiry
         },
       });
+    } else {
+      return res.json({ message: "The OTP code has been sent to your email." });
     }
 
     const transporter = nodemailer.createTransport({
@@ -190,18 +194,22 @@ router.post("/forgot-password", async (req, res) => {
 
     await transporter.sendMail({
       to: email,
-      subject: "Password Reset OTP",
+      subject: "IT Squarehub Password Reset OTP",
       html: `
-        <h2>Password Reset</h2>
-        <p>Your OTP is:</p>
-        <h1>${otp}</h1>
-        <p>This expires in 5 minutes.</p>
+        <h3>Password Reset OTP Code</h3>
+        <p>Your OTP code is:</p>
+        <h1 style="color: #007bff;">${otp}</h1>
+        <p><strong>This code expires after 5 minutes.</strong></p>
+        <p>If you didn't request this, ignore this email.</p>
       `,
     });
 
-    // Add this to your .env
-    // FRONTEND_URL=http://localhost:5000
-    res.json({ message: "OTP sent to your email." });
+    res.json({
+      message:
+        reason === "resend"
+          ? "A new OTP code has been sent to your email."
+          : "The OTP code has been sent to your email.",
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -209,38 +217,26 @@ router.post("/forgot-password", async (req, res) => {
 });
 
 // ------------------- OTP -------------------
-router.post("/verify-otp", async (req, res) => {
+router.post("/verify-otp", verifyOtpController);
+
+// ------------------- Reset Password Route Security -------------------
+router.get("/validate-reset-token/:token", async (req, res) => {
   try {
-    const { email, otp } = req.body;
-    const user = await prisma.user.findUnique({ where: { email } });
-
-    if (!user || !user.otp_hash || user.otp_expiry < new Date()) {
-      return res.status(400).json({ message: "Invalid or expired OTP." });
-    }
-
-    const valid = await bcrypt.compare(otp, user.otp_hash);
-    if (!valid) {
-      return res.status(400).json({ message: "Invalid OTP." });
-    }
-
-    const resetUUID = crypto.randomUUID();
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        otp_hash: null,
-        otp_expiry: null,
-        reset_uuid: resetUUID,
-        reset_uuid_expiry: new Date(Date.now() + 10 * 60 * 1000),
+    const { token } = req.params;
+    const user = await prisma.user.findFirst({
+      where: {
+        reset_uuid: token,
+        reset_uuid_expiry: { gt: new Date() },
       },
     });
 
-    res.json({
-      resetUrl: `${process.env.FRONTEND_URL}/reset-password/${resetUUID}`,
-    });
+    if (!user) {
+      return res.status(400).json({ isValid: false });
+    }
+
+    res.json({ isValid: true });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ isValid: false });
   }
 });
 
