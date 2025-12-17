@@ -145,3 +145,35 @@ router.get("/all-users", authMiddleware, adminOnly, async (req, res) => {
 
 
 export default router;
+
+router.put(
+  "/update-user-info/:id",
+  authMiddleware,
+  adminOnly,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { department, position, supervisor } = req.body;
+      const user = await prisma.user.findUnique({ where: { id } });
+      if (!user) {
+        return res.status(404).json({ message: "User not found." });
+      }
+
+      await prisma.user.update({
+        where: { id },
+        data: {
+          department: department ?? user.department,
+          position: position ?? user.position,
+          supervisor: supervisor ?? user.supervisor,
+        },
+      });
+
+      res.json({
+        message: "User information updated successfully.",
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Failed to update user information." });
+    }
+  }
+);
