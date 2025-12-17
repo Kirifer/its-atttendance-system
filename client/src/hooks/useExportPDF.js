@@ -1,12 +1,36 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { getAllUsersWithRoles } from "../api/auth";
 
 export default function useExportPDF() {
-  const exportPDF = (records) => {
+  const exportPDF = async (records) => {
     if (!records || !records.length) {
       alert("No filtered data available to export.");
       return;
     }
+
+    let department = "—";
+    let position = "—";
+    let supervisor = "—";
+
+    try {
+      const users = await getAllUsersWithRoles();
+
+      const internEmail = records[0]?.Intern;
+
+      const matchedUser = users.find(
+        (u) => u.email === internEmail
+      );
+
+      if (matchedUser) {
+        department = matchedUser.department || "—";
+        position = matchedUser.position || "—";
+        supervisor = matchedUser.supervisor || "—";
+      }
+    } catch (err) {
+      console.error("Failed to fetch user info for PDF:", err);
+    }
+
 
     const doc = new jsPDF({
       orientation: "landscape",
@@ -103,13 +127,13 @@ export default function useExportPDF() {
           { content: "Intern Email:", styles: { fontStyle: "bold" } },
           { content: internEmail },
           { content: "Department:", styles: { fontStyle: "bold" } },
-          { content: "—" },
+          { content: department },
         ],
         [
           { content: "Position:", styles: { fontStyle: "bold" } },
-          { content: "—" },
+          { content: position },
           { content: "Supervisor:", styles: { fontStyle: "bold" } },
-          { content: "—" },
+          { content: supervisor },
         ],
       ],
       styles: { textColor: 0, fontSize: 8, cellPadding: 3 },
