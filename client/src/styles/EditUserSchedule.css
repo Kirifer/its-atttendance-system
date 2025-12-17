@@ -2,8 +2,9 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-left: 180px;
+  margin-left: 90px;
   margin-right: 200px;
+  gap: 20px;
 }
 
 .custom_schedule_btn {
@@ -20,7 +21,7 @@
 }
 
 .custom_schedule_btn:hover {
-  background: #1a5dac;
+  background: #0066d3;
 }
 
 .custom_schedule_overlay {

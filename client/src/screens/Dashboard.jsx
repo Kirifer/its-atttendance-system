@@ -36,6 +36,7 @@ function Dashboard() {
                   >
                     Set Custom Schedule
                   </button>
+                  <SetOjtHours />
                 </div>          
               ) : (
                 <AttBtn
@@ -59,10 +60,9 @@ function Dashboard() {
                   reload={reload}
                 />
               )}
-
             </div>
           </div>
-               <SetOjtHours />
+               
           <div className="dashboard__container__two">
             <div className="dashboard__left__two">
               <FiledLeavesCard />

@@ -8,6 +8,7 @@
   font-size: 14px;
   font-weight: 500;
   transition: background 0.2s ease-in-out;
+  white-space: nowrap;
 }
 
 .set_ojthours_btn:hover {
