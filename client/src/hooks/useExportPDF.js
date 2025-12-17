@@ -151,11 +151,19 @@ export default function useExportPDF() {
     });
 
     const pageHeight = doc.internal.pageSize.getHeight();
+    const marginBottom = 20;
+    const signatureBlockHeight = 65;
 
-    let signY = Math.min(
-      doc.lastAutoTable.finalY + 25,
-      pageHeight - 65
-    );
+    // Where the table actually ended
+    let signY = doc.lastAutoTable.finalY + 25;
+
+    // Remaining space on the page
+    const remainingSpace = pageHeight - signY - marginBottom;
+    
+    if (remainingSpace < signatureBlockHeight) {
+      doc.addPage();
+      signY = 40; // top padding on new page
+    }
 
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
@@ -169,7 +177,7 @@ export default function useExportPDF() {
     doc.setFont("helvetica", "normal");
     doc.text("Role", 25, signY + 26);
 
-    doc.text("Approved by:", 180, signY - 15  );
+    doc.text("Approved by:", 180, signY - 15);
     doc.line(180, signY + 8, 260, signY + 8);
 
     doc.setFont("helvetica", "bold");
