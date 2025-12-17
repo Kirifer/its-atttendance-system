@@ -200,13 +200,6 @@ router.put("/ojt/:userId", authMiddleware, adminOnly, async (req, res) => {
     if (user.role !== "USER")
       return res.status(400).json({ message: "Not an intern user." });
 
-    /**
-     * IMPORTANT:
-     * remainingWorkHours should already be recalculated
-     * by your attendance logic OR via Prisma middleware.
-     * So here we only update totalOJTHours.
-     */
-
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
