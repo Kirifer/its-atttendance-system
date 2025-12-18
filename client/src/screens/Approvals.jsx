@@ -9,7 +9,7 @@ import LeaveTable from "../components/LeaveTable";
 import TimeAdjustmentTable from "../components/TimeAdjustmentTable";
 import AdminCRUD from "../components/AdminCRUD";
 import Loader from "../components/Spinner/Loader";
-
+import "../styles/Approvals.css"
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -109,11 +109,13 @@ function Approvals() {
         {/* ---------- TAB 3 ---------- */}
         <CustomTabPanel value={value} index={2}>
           <Loader loading={loading}>
-            <h1 className="admin__title">Admin Management</h1>
-            <p className="admin__description">
-              Create, update, or remove admin users.
-            </p>
-            <AdminCRUD />
+            <div>
+              <h1 className="admin__title">Admin Management</h1>
+              <p className="admin__description">
+                Create, update, or remove admin users.
+              </p>
+              <AdminCRUD />
+            </div>
           </Loader>
         </CustomTabPanel>
       </div>
