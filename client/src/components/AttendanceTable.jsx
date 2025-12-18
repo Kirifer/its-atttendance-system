@@ -160,8 +160,8 @@ export default function AttendanceTable({
             "Lunch Tardy": lunchTardyMinutes > 0 ? `${lunchTardyMinutes} mins` : "-",
             Tardiness: tardyMinutes > 0 ? `${tardyMinutes} mins` : "-",
             DAYS: presentDays,
-            HOURS: straightWorkMinutes !== null ? formatHoursToHHMMFromMinutes(straightWorkMinutes) : "-",
-            TOTAL: totalWorkMinutes !== null ? formatHoursToHHMMFromMinutes(totalWorkMinutes) : "-",
+            TOTAL: straightWorkMinutes !== null ? formatHoursToHHMMFromMinutes(straightWorkMinutes) : "-",
+            ACTUAL: totalWorkMinutes !== null ? formatHoursToHHMMFromMinutes(totalWorkMinutes) : "-",
           };
         });
 
