@@ -119,7 +119,8 @@ function AdminCRUD() {
     <>
       <div className="crud-table-container">
         <div className="crud-table__search">
-          <select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+          <select value={filterType} onChange={(e) => setFilterType(e.target.value)}
+            className="crud-table__dropdown">
             <option value="username">Username</option>
             <option value="email">Email</option>
           </select>

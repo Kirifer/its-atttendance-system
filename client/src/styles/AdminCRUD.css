@@ -115,19 +115,15 @@
 
 .crud-table__search {
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 15px;
 }
 
 .crud-table__dropdown,
-.crud-table__input {
+.leave-table__input {
   padding: 8px 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
-  font-size: 14px;
-  flex: 1;
-  min-width: 120px;
 }
 
 .admin-modal-backdrop {
