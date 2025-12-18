@@ -10,9 +10,39 @@ import "../styles/Approvals.css";
 import TimeAdjustmentTable from "../components/TimeAdjustmentTable";
 import AdminCRUD from "../components/AdminCRUD";
 
+import Box from "@mui/material/Box";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+
+function CustomTabPanel({ children, value, index }) {
+  return (
+    <div role="tabpanel" hidden={value !== index}>
+      {value === index && (
+        <Box sx={{ pt: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index) {
+  return {
+    id: `approvals-tab-${index}`,
+    "aria-controls": `approvals-tabpanel-${index}`,
+  };
+}
+
+
 function Approvals() {
+  const [value, setValue] = useState(0);
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleChange = (_, newValue) => {
+    setValue(newValue);
+  };
+
 
   const fetchLeaves = async () => {
     try {
@@ -47,37 +77,59 @@ function Approvals() {
     );
 
   return (
-    <DashboardLayout>
+     <DashboardLayout>
       <div className="admin__main">
-        <h1 className="admin__title"> Time Adjustment Requests</h1>
-        <p className="admin__description">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo
-          diam, interdum nec placerat in, venenatis egestas justo. Nam eu
-          gravida ante, vel egestas turpis.
-        </p>
-        <TimeAdjustmentTable />
-        <br></br>
-        <br></br>
-        <h1 className="admin__title">Time-off Requests</h1>
-        <p className="admin__description">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo
-          diam, interdum nec placerat in, venenatis egestas justo. Nam eu
-          gravida ante, vel egestas turpis.
-        </p>
-        <LeaveTable
-          leaves={leaves}
-          onStatusChange={handleStatusUpdate}
-          onDelete={handleDelete}
-        />
-        <br></br>
-        <br></br>
-        <h1 className="admin__title">Admin Management</h1>
-        <p className="admin__description">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec leo
-          diam, interdum nec placerat in, venenatis egestas justo. Nam eu
-          gravida ante, vel egestas turpis.
-        </p>
-        <AdminCRUD />
+        {/* Tabs Header */}
+        <Box
+          sx={{
+            width: "100%",
+            borderBottom: 1,
+            borderColor: "divider",
+          }}
+        >
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            aria-label="Approvals Tabs"
+          >
+            <Tab label="Time Adjustments" {...a11yProps(0)} />
+            <Tab label="Time-off Requests" {...a11yProps(1)} />
+            <Tab label="Admin Management" {...a11yProps(2)} />
+          </Tabs>
+        </Box>
+
+        {/* ---------- TAB 1 ---------- */}
+        <CustomTabPanel value={value} index={0}>
+          <h1 className="admin__title">Time Adjustment Requests</h1>
+          <p className="admin__description">
+            Review and approve employee time adjustment requests.
+          </p>
+          <TimeAdjustmentTable />
+        </CustomTabPanel>
+
+        {/* ---------- TAB 2 ---------- */}
+        <CustomTabPanel value={value} index={1}>
+          <h1 className="admin__title">Time-off Requests</h1>
+          <p className="admin__description">
+            Manage and approve employee leave requests.
+          </p>
+          <LeaveTable
+            leaves={leaves}
+            onStatusChange={handleStatusUpdate}
+            onDelete={handleDelete}
+          />
+        </CustomTabPanel>
+
+        {/* ---------- TAB 3 ---------- */}
+        <CustomTabPanel value={value} index={2}>
+          <h1 className="admin__title">Admin Management</h1>
+          <p className="admin__description">
+            Create, update, or remove admin users.
+          </p>
+          <AdminCRUD />
+        </CustomTabPanel>
       </div>
     </DashboardLayout>
   );
