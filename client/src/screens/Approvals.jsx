@@ -21,9 +21,39 @@ function Approvals() {
   const [loading, setLoading] = useState(true);
 
   const userSchedule = useUserSchedule();
+import TimeAdjustmentTable from "../components/TimeAdjustmentTable";
+import AdminCRUD from "../components/AdminCRUD";
+import Loader from "../components/Spinner/Loader";
+import "../styles/Approvals.css"
+import Box from "@mui/material/Box";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+
+function CustomTabPanel({ children, value, index }) {
+  return (
+    <div role="tabpanel" hidden={value !== index}>
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+function a11yProps(index) {
+  return {
+    id: `approvals-tab-${index}`,
+    "aria-controls": `approvals-tabpanel-${index}`,
+  };
+}
+
+function Approvals() {
+  const [value, setValue] = useState(0);
+  const [leaves, setLeaves] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const handleChange = (_, newValue) => setValue(newValue);
 
   const fetchLeaves = async () => {
     try {
+      setLoading(true);
       const data = await getAllLeaves();
       setLeaves(data);
     } catch (err) {
@@ -46,13 +76,6 @@ function Approvals() {
     await deleteLeave(id);
     fetchLeaves();
   };
-
-  if (loading)
-    return (
-      <DashboardLayout>
-        <div className="admin__loading">Loading...</div>
-      </DashboardLayout>
-    );
 
   return (
     <DashboardLayout>

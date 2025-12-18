@@ -49,13 +49,19 @@ function Dashboard() {
             <div className="dashboard__left__two">
               <FiledLeavesCard />
             </div>
-            <div className="dashboard__right__two">
-              <Calendar />
+
+            <div className="dashboard__container__two">
+              <div className="dashboard__left__two">
+                <FiledLeavesCard />
+              </div>
+              <div className="dashboard__right__two">
+                <Calendar />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </DashboardLayout>
+      </DashboardLayout>
+    </SessionLogout>
   );
 }
 

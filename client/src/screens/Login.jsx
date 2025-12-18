@@ -47,7 +47,7 @@ function Login() {
   };
 
   return (
-    <div className="center-align-items">
+    <div className="login-background">
       <form onSubmit={handleSubmit} className="login-box">
         <img src="/its-logo.png" alt="ITS Logo" className="login-logo" />
 

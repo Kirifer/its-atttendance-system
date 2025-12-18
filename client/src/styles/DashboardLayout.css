@@ -250,6 +250,16 @@ footer {
   color: #1a5dac;
 }
 
+.navbar__item span {
+  text-decoration: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.navbar__item span:hover {
+  color: #1a5dac;
+}
+
 /* MOBILE VIEW */
 @media (max-width: 767px) {
   .dashboard__sidebar {
