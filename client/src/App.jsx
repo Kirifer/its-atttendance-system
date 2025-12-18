@@ -5,6 +5,7 @@ import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedResetRoute from "./components/ProtectedResetRoute";
 // Styling
 import "./App.css";
 import Approvals from "./screens/Approvals";
@@ -18,6 +19,7 @@ import Timeoff from "./screens/Timeoff";
 import Timesheet from "./screens/Timesheet";
 import UserInfo from "./screens/UserInfo";
 import UserRequests from "./screens/UserRequests";
+import ResetErrorPage from "./screens/ResetErrorPage";
 
 function App() {
   useEffect(() => {
@@ -33,6 +35,7 @@ function App() {
       <Routes>
         {/* Default Page "/" */}
         <Route path="/" element={<Login />} />
+
         <Route
           path="/dashboard"
           element={
@@ -41,6 +44,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/approvals"
           element={
@@ -51,7 +55,18 @@ function App() {
         />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/logs" element={<Logs />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+        {/* ---------------------------- Reset Pass URL Security ---------------------------- */}
+        <Route
+          path="/reset-password/:token"
+          element={
+            <ProtectedResetRoute>
+              <ResetPassword />
+            </ProtectedResetRoute>
+          }
+        />
+        <Route path="/reset-password" element={<ResetErrorPage />} />
+
         <Route path="/sign-up" element={<Signup />} />
         <Route path="/time-off" element={<Timeoff />} />
         <Route

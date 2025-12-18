@@ -37,10 +37,10 @@ export const loginUser = async (email, password) => {
 };
 
 // Forgot password
-export const forgotPassword = async (email) => {
+export const forgotPassword = async (email, reason = "initial") => {
   try {
-    const response = await API.post("/auth/forgot-password", { email });
-    return response.data; // returns { resetUrl } in dev mode
+    const response = await API.post("/auth/forgot-password", { email, reason });
+    return response.data;
   } catch (err) {
     let message = "Error during password reset request";
     if (err.response?.data?.message) message = err.response.data.message;
@@ -171,3 +171,9 @@ export const verifyOtp = async (email, otp) => {
   const res = await API.post("/auth/verify-otp", { email, otp });
   return res.data;
 };
+
+export const getTimesheetMeta = async (userId) => {
+  const res = await API.get(`/admins/timesheet-meta/${userId}`);
+  return res.data;
+};
+

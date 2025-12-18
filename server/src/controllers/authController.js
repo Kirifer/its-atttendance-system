@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import pool from "../db.js";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 // Prisma
 const prisma = new PrismaClient();
@@ -179,3 +180,51 @@ export const getAllUsersWithRoles = async (req, res) => {
   }
 };
 
+//--------------------------- OTP ---------------------------
+export const verifyOtpController = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user || !user.otp_hash || !user.otp_expiry) {
+      return res
+        .status(400)
+        .json({ message: "No active reset request found." });
+    }
+
+    if (new Date() > user.otp_expiry) {
+      return res
+        .status(400)
+        .json({ message: "This OTP has expired. Please request a new one." });
+    }
+
+    const isMatch = await bcrypt.compare(otp, user.otp_hash);
+
+    // Custom otp message
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ message: "The OTP code inputted is wrong!" });
+    }
+
+    const resetUUID = crypto.randomUUID();
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        otp_hash: null,
+        otp_expiry: null,
+        reset_uuid: resetUUID,
+        reset_uuid_expiry: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes otp code expiry
+      },
+    });
+
+    res.json({
+      token: resetUUID,
+      resetUrl: `/reset-password/${resetUUID}`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};

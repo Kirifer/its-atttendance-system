@@ -11,27 +11,35 @@ function ForgotPassword() {
   // otp
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState("email");
+  // request new otp code
+  const [newOtp, setNewOtp] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e, reason = "initial") => {
+    if (e) e.preventDefault();
+    setNewOtp(true);
     try {
-      const res = await forgotPassword(email); // use service function
-      setMessage(res.message || "The OTP has been sent to your email."); // DEV mode shows reset link
+      const res = await forgotPassword(email, reason);
+
+      setMessage(res.message);
       setIsError(false);
       setStep("otp");
-      if (res.resetUrl) {
-        console.log("Password reset link:", res.resetUrl);
-      }
+
+      setTimeout(() => {
+        setMessage("");
+      }, 5000);
     } catch (err) {
-      setMessage(err.message || "An error occurred. Please try again.");
+      const errorMsg = err.response?.data?.message || "Invalid email!";
+      setMessage(errorMsg);
       setIsError(true);
 
       setTimeout(() => {
         setMessage("");
         setIsError(false);
       }, 5000);
+    } finally {
+      setNewOtp(false);
     }
   };
 
@@ -39,9 +47,19 @@ function ForgotPassword() {
   const handleVerifyOtp = async () => {
     try {
       const res = await verifyOtp(email, otp);
-      navigate(res.resetUrl.replace(process.env.REACT_APP_API_URL, ""));
+
+      sessionStorage.setItem("reset_allowed", true);
+
+      if (res.token) {
+        navigate(`/reset-password/${res.token}`);
+      } else {
+        const token = res.resetUrl.split("/").pop();
+        navigate(`/reset-password/${token}`);
+      }
     } catch (err) {
-      setMessage(err.message || "Invalid OTP.");
+      const errorMsg =
+        err.response?.data?.message || "The OTP code inputted is wrong!";
+      setMessage(errorMsg);
       setIsError(true);
     }
 
@@ -53,7 +71,10 @@ function ForgotPassword() {
 
   return (
     <div className="background center-align-items">
-      <form onSubmit={handleSubmit} className="forgot-password-box">
+      <form
+        onSubmit={(e) => handleSubmit(e, "initial")}
+        className="forgot-password-box"
+      >
         <div className="top-box-header">
           <p className="forgot-password-text">Forgot Password</p>
           <button
@@ -88,11 +109,7 @@ function ForgotPassword() {
               placeholder="Enter your email"
               required
             />
-            <button
-              type="button"
-              className="forgot-password-button"
-              onClick={handleSubmit}
-            >
+            <button type="submit" className="forgot-password-button">
               Submit
             </button>
           </div>
@@ -105,7 +122,7 @@ function ForgotPassword() {
               type="text"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              placeholder="Enter OTP"
+              placeholder="Enter OTP code"
               required
             />
             <button
@@ -115,6 +132,29 @@ function ForgotPassword() {
             >
               Verify OTP
             </button>
+
+            {/* Request new otp */}
+            <div style={{ marginTop: "15px", textAlign: "center" }}>
+              <span style={{ fontSize: "14px", color: "#555" }}>
+                Didn't receive a code?&nbsp;
+              </span>
+              <span
+                type="button"
+                className="resend-link-btn"
+                disabled={newOtp} // Use the variable, not the function
+                onClick={(e) => handleSubmit(e, "resend")}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: newOtp ? "#0011ffff" : "#007bff", // Use the variable
+                  textDecoration: "underline",
+                  cursor: newOtp ? "not-allowed" : "pointer",
+                  fontSize: "14px",
+                }}
+              >
+                {newOtp ? "Sending..." : "Click here to request new OTP code"}
+              </span>
+            </div>
           </div>
         )}
       </form>
