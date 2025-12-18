@@ -9,10 +9,10 @@ import LeaveTable from "../components/LeaveTable";
 import "../styles/Approvals.css";
 import TimeAdjustmentTable from "../components/TimeAdjustmentTable";
 import AdminCRUD from "../components/AdminCRUD";
-
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import Loader from "../components/Spinner/Loader";
 
 function CustomTabPanel({ children, value, index }) {
   return (
@@ -69,13 +69,6 @@ function Approvals() {
     fetchLeaves();
   };
 
-  if (loading)
-    return (
-      <DashboardLayout>
-        <div className="admin__loading">Loading...</div>
-      </DashboardLayout>
-    );
-
   return (
      <DashboardLayout>
       <div className="admin__main">
@@ -102,33 +95,39 @@ function Approvals() {
 
         {/* ---------- TAB 1 ---------- */}
         <CustomTabPanel value={value} index={0}>
-          <h1 className="admin__title">Time Adjustment Requests</h1>
-          <p className="admin__description">
-            Review and approve employee time adjustment requests.
-          </p>
-          <TimeAdjustmentTable />
+          <Loader loading={loading}>
+            <h1 className="admin__title">Time Adjustment Requests</h1>
+            <p className="admin__description">
+              Review and approve employee time adjustment requests.
+            </p>
+            <TimeAdjustmentTable />
+          </Loader>
         </CustomTabPanel>
 
         {/* ---------- TAB 2 ---------- */}
         <CustomTabPanel value={value} index={1}>
-          <h1 className="admin__title">Time-off Requests</h1>
-          <p className="admin__description">
-            Manage and approve employee leave requests.
-          </p>
-          <LeaveTable
-            leaves={leaves}
-            onStatusChange={handleStatusUpdate}
-            onDelete={handleDelete}
-          />
+          <Loader loading={loading}>
+            <h1 className="admin__title">Time-off Requests</h1>
+            <p className="admin__description">
+              Manage and approve employee leave requests.
+            </p>
+            <LeaveTable
+              leaves={leaves}
+              onStatusChange={handleStatusUpdate}
+              onDelete={handleDelete}
+            />
+          </Loader>
         </CustomTabPanel>
 
         {/* ---------- TAB 3 ---------- */}
         <CustomTabPanel value={value} index={2}>
-          <h1 className="admin__title">Admin Management</h1>
-          <p className="admin__description">
-            Create, update, or remove admin users.
-          </p>
-          <AdminCRUD />
+          <Loader loading={loading}>
+            <h1 className="admin__title">Admin Management</h1>
+            <p className="admin__description">
+              Create, update, or remove admin users.
+            </p>
+            <AdminCRUD />
+          </Loader>
         </CustomTabPanel>
       </div>
     </DashboardLayout>
