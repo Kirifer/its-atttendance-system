@@ -118,72 +118,104 @@ function AdminCRUD() {
   return (
     <>
       <div className="crud-table-container">
-        <div className="crud-table__search">
-          <select value={filterType} onChange={(e) => setFilterType(e.target.value)}
-            className="crud-table__dropdown">
-            <option value="username">Username</option>
-            <option value="email">Email</option>
-          </select>
-          <input
-            placeholder={`Search by ${filterType}`}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
+  {/* FIXED SEARCH */}
+  <div className="crud-table__search-wrapper">
+    <div className="crud-table__search">
+      <select
+        value={filterType}
+        onChange={(e) => setFilterType(e.target.value)}
+        className="crud-table__dropdown"
+      >
+        <option value="username">Username</option>
+        <option value="email">Email</option>
+      </select>
 
-        <table className="crud-table">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredUsers.map((u) => (
-              <tr key={u.id}>
-                <td>{u.username}</td>
-                <td>{u.email}</td>
-                <td>{u.role}</td>
-                <td className={u.resignedAt ? "crud-table__status--rejected" : "crud-table__status--approved"}>
-                  {u.resignedAt ? "Resigned" : "Active"}
-                </td>
-
-                <td>
-                  {u.id !== currentUserId && (
-                    <>
-                      <button
-                        className="crud-table__actions crud-table__role"
-                        onClick={() =>
-                          handleChangeRole(u.id, u.role === "ADMIN" ? "USER" : "ADMIN", u.username)
-                        }
-                        disabled={u.resignedAt}
-                      >
-                        {u.role === "ADMIN" ? "Demote" : "Promote"}
-                      </button>
-
-                      <button
-                        className="crud-table__actions"
-                        onClick={() => openEditModal(u)}
-                      >
-                        Edit Info
-                      </button>
-
-                      {u.resignedAt ? (
-                        <button onClick={() => handleReinstate(u.id, u.username)}>Reinstate</button>
-                      ) : (
-                        <button onClick={() => handleResign(u.id, u.username)}>Resign</button>
-                      )}
-                    </>
-                  )}
-                </td>
+      <input
+        placeholder={`Search by ${filterType}`}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="crud-table__input"
+      />
+    </div>
+  </div>
+        <div className="crud-table-scroll">
+          <table className="crud-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {filteredUsers.map((u) => (
+                <tr key={u.id}>
+                  <td>{u.username}</td>
+                  <td>{u.email}</td>
+                  <td>{u.role}</td>
+                  <td className={u.resignedAt ? "crud-table__status--rejected" : "crud-table__status--approved"}>
+                    {u.resignedAt ? "Resigned" : "Active"}
+                  </td>
+
+                  <td className="crud-table__actions">
+                    {u.id !== currentUserId && (
+                      <>
+                        {/* Promote / Demote */}
+                        <span
+                          className={`material-symbols-outlined crud-action crud-action--role ${
+                            u.resignedAt ? "crud-action--disabled" : ""
+                          }`}
+                          title={u.role === "ADMIN" ? "Demote to User" : "Promote to Admin"}
+                          onClick={() =>
+                            !u.resignedAt &&
+                            handleChangeRole(
+                              u.id,
+                              u.role === "ADMIN" ? "USER" : "ADMIN",
+                              u.username
+                            )
+                          }
+                        >
+                          {u.role === "ADMIN" ? "arrow_downward" : "arrow_upward"}
+                        </span>
+
+                        {/* Edit Info */}
+                        <span
+                          className="material-symbols-outlined crud-action crud-action--edit"
+                          title="Edit Info"
+                          onClick={() => openEditModal(u)}
+                        >
+                          edit
+                        </span>
+
+                        {/* Resign / Reinstate */}
+                        {u.resignedAt ? (
+                          <span
+                            className="material-symbols-outlined crud-action crud-action--reinstate"
+                            title="Reinstate"
+                            onClick={() => handleReinstate(u.id, u.username)}
+                          >
+                            restart_alt
+                          </span>
+                        ) : (
+                          <span
+                            className="material-symbols-outlined crud-action crud-action--delete"
+                            title="Resign"
+                            onClick={() => handleResign(u.id, u.username)}
+                          >
+                            person_remove
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* ================= MODAL ================= */}

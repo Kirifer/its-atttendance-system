@@ -2,6 +2,7 @@
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  height: 400px;
 }
 
 .leave-table {
@@ -12,6 +13,7 @@
   table-layout: fixed;
   white-space: nowrap;
   margin: auto;
+  overflow-y: auto;
 }
 
 /* Table headers */
