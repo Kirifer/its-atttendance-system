@@ -1,11 +1,57 @@
+import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { getAllUsersWithRoles, getTimesheetMeta } from "../api/auth";
+import { getUserOjtHours } from "../api/ojtHours";
 
 export default function useExportPDF() {
-  const exportPDF = (records) => {
+  const [allUsers, setAllUsers] = useState([]);
+  const [usersLoaded, setUsersLoaded] = useState(false);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const users = await getAllUsersWithRoles();
+        setAllUsers(users);
+      } catch (err) {
+        console.error("Failed to fetch users", err);
+      } finally {
+        setUsersLoaded(true);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  const exportPDF = async (records) => {
     if (!records || !records.length) {
       alert("No filtered data available to export.");
       return;
+    }
+
+    if (!usersLoaded) {
+      alert("Users are still loading. Please try again.");
+      return;
+    }
+
+    const internEmail = records[0]?.Intern || "";
+
+    const matchedUser = allUsers.find(
+      (u) => u.email === internEmail
+    );
+
+    const department = matchedUser?.department ?? "—";
+    const position = matchedUser?.position ?? "—";
+    const supervisor = matchedUser?.supervisor ?? "—";
+
+    let remainingHours = 0;
+    if (matchedUser?.id) {
+      try {
+        const ojtData = await getUserOjtHours(matchedUser.id);
+        remainingHours = ojtData.remainingWorkHours ?? 0;
+      } catch (err) {
+        console.error("Failed to fetch remaining work hours", err);
+      }
     }
 
     const doc = new jsPDF({
@@ -13,8 +59,6 @@ export default function useExportPDF() {
       unit: "mm",
       format: [297, 330],
     });
-
-    const internEmail = records[0]?.Intern || "";
 
     const headers = [
       "Date",
@@ -38,26 +82,37 @@ export default function useExportPDF() {
       r.TOTAL,
     ]);
 
-    const totalHoursSpent = records
-      .reduce((sum, r) => {
-        const hours = parseFloat(String(r.TOTAL).replace(" hrs", ""));
-        return isNaN(hours) ? sum : sum + hours;
-      }, 0)
-      .toFixed(2);
+    const totalHoursSpent = records.reduce((sum, r) => {
+      const hours = typeof r.TOTAL === "string" ? parseFloat(r.TOTAL.replace(" hrs", "")) : Number(r.TOTAL);
+      return isNaN(hours) ? sum : sum + hours;
+    }, 0).toFixed(2);
 
     const totalRow = Array(headers.length).fill("");
     totalRow[6] = "Total Hours Spent";
     totalRow[7] = `${totalHoursSpent} hrs`;
 
-    body.push(totalRow);
+    const remainingRow = Array(headers.length).fill("");
+    remainingRow[6] = "Remaining Work Hours";
+    remainingRow[7] = `${remainingHours} hrs`;
+
+    body.push(totalRow, remainingRow);
 
     const didParseCell = (data) => {
-      if (data.row.index === body.length - 1) {
-        if (data.column.index === 4 || data.column.index === 6) {
-          data.cell.styles.fontStyle = "bold";
-        }
+      if (data.row.index >= body.length - 2 && (data.column.index === 6 || data.column.index === 7)) {
+        data.cell.styles.fontStyle = "bold";
       }
     };
+
+    const ROWS_PER_PAGE = 12;
+    const dataRows = body.slice(0, body.length - 2);
+    const totalOnlyRow = body.slice(body.length - 2);
+
+    const chunkedBodies = [];
+    for (let i = 0; i < dataRows.length; i += ROWS_PER_PAGE) {
+      chunkedBodies.push(dataRows.slice(i, i + ROWS_PER_PAGE));
+    }
+
+    chunkedBodies[chunkedBodies.length - 1].push(...totalOnlyRow);
 
     const footer = () => {
       const pageHeight = doc.internal.pageSize.getHeight();
@@ -90,13 +145,13 @@ export default function useExportPDF() {
           { content: "Intern Email:", styles: { fontStyle: "bold" } },
           { content: internEmail },
           { content: "Department:", styles: { fontStyle: "bold" } },
-          { content: "—" },
+          { content: department },
         ],
         [
           { content: "Position:", styles: { fontStyle: "bold" } },
-          { content: "—" },
+          { content: position },
           { content: "Supervisor:", styles: { fontStyle: "bold" } },
-          { content: "—" },
+          { content: supervisor },
         ],
       ],
       styles: { textColor: 0, fontSize: 8, cellPadding: 3 },
@@ -118,65 +173,77 @@ export default function useExportPDF() {
 
     currentY += 8;
 
-    autoTable(doc, {
-      startY: currentY,
-      head: [
-        [
-          {
-            content: `Intern Email: ${internEmail}`,
-            colSpan: headers.length,
-            styles: {
-              fillColor: [41, 128, 185],
-              textColor: 255,
-              fontStyle: "bold",
-              halign: "left",
+    chunkedBodies.forEach((pageBody, index) => {
+      if (index > 0) doc.addPage();
+
+      autoTable(doc, {
+        startY: index === 0 ? currentY : 20,
+        head: [
+          [
+            {
+              content: `Intern Email: ${internEmail}`,
+              colSpan: headers.length,
+              styles: {
+                fillColor: [41, 128, 185],
+                textColor: 255,
+                fontStyle: "bold",
+                halign: "left",
+              },
             },
-          },
+          ],
+          headers,
         ],
-        headers,
-      ],
-      body,
-      styles: {
-        fontSize: 11,
-        cellPadding: 3,
-        valign: "middle",
-      },
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: 255,
-        fontStyle: "bold",
-      },
-      didParseCell,
-      didDrawPage: footer,
+        body: pageBody,
+        styles: { fontSize: 11, cellPadding: 3 },
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+        },
+        didParseCell,
+        didDrawPage: footer,
+      });
     });
 
-    const pageHeight = doc.internal.pageSize.getHeight();
+    let preparedByName = "—";
+    let preparedByPosition = "—";
+    let approvedByName = "—";
+    let approvedByPosition = "—";
 
-    let signY = Math.min(
-      doc.lastAutoTable.finalY + 25,
-      pageHeight - 65
-    );
+    try {
+      if (!matchedUser?.id) throw new Error("Intern ID missing");
 
-    doc.setFontSize(11);
+      const meta = await getTimesheetMeta(matchedUser.id);
+
+      preparedByName = meta.preparedBy?.username ?? "—";
+      preparedByPosition = meta.preparedBy?.position ?? "—";
+
+      approvedByName = meta.approvedBy?.username ?? "—";
+      approvedByPosition = meta.approvedBy?.position ?? "—";
+    } catch (err) {
+      console.error("Failed to load timesheet metadata", err);
+    }
+
+    const signY = doc.lastAutoTable.finalY + 35;
+
     doc.setFont("helvetica", "normal");
-
+    doc.setFontSize(11);
     doc.text("Prepared by:", 25, signY - 15);
     doc.line(25, signY + 8, 105, signY + 8);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Name", 25, signY + 18);
+    doc.text(preparedByName, 25, signY + 18);
+    doc.setFont("helvetica", "normal");
+    doc.text(preparedByPosition, 25, signY + 26);
 
     doc.setFont("helvetica", "normal");
-    doc.text("Role", 25, signY + 26);
-
-    doc.text("Approved by:", 180, signY - 15  );
+    doc.setFontSize(11);
+    doc.text("Approved by:", 180, signY - 15);
     doc.line(180, signY + 8, 260, signY + 8);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Name", 180, signY + 18);
-
+    doc.text(approvedByName, 180, signY + 18);
     doc.setFont("helvetica", "normal");
-    doc.text("Role", 180, signY + 26);
+    doc.text(approvedByPosition, 180, signY + 26);
 
     doc.save("timesheet_filtered.pdf");
   };

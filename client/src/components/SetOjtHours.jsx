@@ -1,0 +1,111 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import useHandleOjtHours from "../hooks/handleOjtHours";
+import "../styles/SetOjtHours.css";
+
+export default function SetOjtHours() {
+  const {
+    search,
+    setSearch,
+    isSearching,
+    setIsSearching,
+    filteredUsers,
+    selectUser,
+    selectedUser,
+    totalOJTHours,
+    setTotalOJTHours,
+    remainingWorkHours,
+    saveOjtHours,
+    resetState,
+    loading,
+    error,
+    success,
+  } = useHandleOjtHours();
+
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => {
+    resetState();
+    setOpen(false);
+  };
+
+  const handleSave = async () => {
+    const ok = await saveOjtHours();
+    if (!ok) return;
+
+    setTimeout(() => {
+      handleClose();
+    }, 5000);
+  };
+
+  return (
+    <>
+      <button className="set_ojthours_btn" onClick={() => setOpen(true)}>
+        Set Intern Hours
+      </button>
+
+      {open && (
+        <div className="set_ojthours_overlay">
+          <div className="set_ojthours_popup">
+            <div className="set_ojthours_header">
+              <h2>Set Intern Hours</h2>
+            </div>
+
+            {error && <p className="set_ojthours_error">{error}</p>}
+            {success && <p className="set_ojthours_success">{success}</p>}
+
+            <label>Intern Email</label>
+            <input
+              type="text"
+              placeholder="Search by email"
+              value={search}
+              onFocus={() => setIsSearching(true)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setIsSearching(true);
+              }}
+            />
+
+            {isSearching && filteredUsers.length > 0 && (
+              <ul className="set_ojthours_user_list">
+                {filteredUsers.map((u) => (
+                  <li
+                    key={u.id}
+                    onClick={() => {
+                      selectUser(u);
+                      setSearch(u.email);
+                    }}
+                  >
+                    {u.email}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <label>Total OJT Hours</label>
+            <input
+              type="number"
+              min="1"
+              value={totalOJTHours}
+              onChange={(e) => setTotalOJTHours(e.target.value)}
+              disabled={!selectedUser || loading}
+            />
+
+            {selectedUser && (
+              <p className="set_ojthours_remaining">
+                <strong>Remaining Hours:</strong> {remainingWorkHours.toFixed(2)}
+              </p>
+            )}
+
+            <div className="set_ojthours_buttons">
+              <button onClick={handleSave} disabled={loading || !selectedUser}>
+                {loading ? "Saving" : "Save"}
+              </button>
+              <button onClick={handleClose}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

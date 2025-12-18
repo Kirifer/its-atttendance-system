@@ -332,7 +332,7 @@ export const updateAttendance = async (req, res) => {
       validatedStatus = status;
     }
 
-    await updateAttStatus(attendance, timeIn, timeOut, lunchOut, lunchIn, validatedStatus);
+    await updateAttStatus(attendance, timeIn, timeOut, lunchOut, lunchIn, validatedStatus, true);
 
     const updatedHours = await recalculateHours(id);
 

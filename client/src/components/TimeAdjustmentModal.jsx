@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "../styles/TimeAdjustmentModal.css";
 import API from "../api/api";
 import { showToast } from "./Notification/toast";
@@ -9,13 +9,14 @@ const TimeAdjustmentModal = ({ isOpen, onClose, refreshRequests }) => {
   const [attachment, setAttachment] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [shiftDate, setShiftDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
-      requestAnimationFrame(() => {
-        setIsAnimating(true);
-      });
+      requestAnimationFrame(() => setIsAnimating(true));
     } else {
       setIsAnimating(false);
       const timer = setTimeout(() => setIsVisible(false), 200);
@@ -33,76 +34,114 @@ const TimeAdjustmentModal = ({ isOpen, onClose, refreshRequests }) => {
       return;
     }
 
+    if (type === "change_shift" && (!shiftDate || !startTime || !endTime)) {
+      alert("Please provide shift date, time in, and time out.");
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append("type", type);
       formData.append("details", details);
-      if (attachment) formData.append("attachment", attachment);
+
+      if (type === "change_shift") {
+        formData.append("shiftDate", shiftDate);
+        formData.append("startTime", startTime);
+        formData.append("endTime", endTime);
+      }
+
+      if (attachment) {
+        formData.append("attachment", attachment);
+      }
 
       await API.post("/time-adjustments", formData);
 
-      showToast({
-        message: "Request submitted successfully!",
-        type: "success",
-        color: "#ffffff",
-      });
+      showToast({ message: "Request submitted successfully!", type: "success" });
 
       setType("");
       setDetails("");
       setAttachment(null);
-      onClose();
+      setShiftDate("");
+      setStartTime("");
+      setEndTime("");
 
-      if (refreshRequests) {
-        refreshRequests();
-      }
+      onClose();
+      refreshRequests?.();
     } catch (err) {
-      showToast({
-        message: "Failed to submit request.",
-        type: "error",
-        color: "#ffffff",
-      });
-      console.log(err);
+      showToast({ message: "Failed to submit request.", type: "error" });
+      console.error(err);
     }
   };
 
   return (
     <div className={`modal-overlay ${isAnimating ? "show" : ""}`}>
       <div className="modal-content">
-        <h2>File Time Adjustment Request</h2>
+        <h2>Time Adjustment Request</h2>
 
         <form onSubmit={handleSubmit}>
-          <label>Type of Adjustment</label>
-          <select value={type} onChange={(e) => setType(e.target.value)}>
-            <option value="">-- Select Type --</option>
-            <option value="change_log">Change Log Request</option>
-            <option value="change_shift">Change Shift Schedule</option>
-            <option value="offset_hours">Offset Extended Hours</option>
-            <option value="overtime">Overtime</option>
-            <option value="undertime">Undertime</option>
-          </select>
+          <div className="form-group">
+            <label>Type</label>
+            <select value={type} onChange={(e) => setType(e.target.value)}>
+              <option value="">Select type</option>
+              <option value="change_log">Change Log</option>
+              <option value="change_shift">Change Shift</option>
+              <option value="offset_hours">Offset Hours</option>
+              <option value="overtime">Overtime</option>
+              <option value="undertime">Undertime</option>
+            </select>
+          </div>
 
-          <label>
-            Details / Reason
+          {type === "change_shift" && (
+            <div className="grid-2">
+              <div className="form-group">
+                <label>Date</label>
+                <input
+                  type="date"
+                  value={shiftDate}
+                  onChange={(e) => setShiftDate(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Time In</label>
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Time Out</label>
+                <input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="form-group">
+            <label>Details</label>
             <textarea
               value={details}
               onChange={(e) => setDetails(e.target.value)}
-              placeholder="Provide details for your request"
+              placeholder="Explain your request..."
             />
-          </label>
+          </div>
 
-          {/* Attachment */}
-          <label>
-            Attachment (optional)
-            <input
-              type="file"
-              onChange={(e) => setAttachment(e.target.files[0])}
-            />
-          </label>
+          <div className="form-group">
+            <label>Attachment (optional)</label>
+            <input type="file" onChange={(e) => setAttachment(e.target.files[0])} />
+          </div>
 
           <div className="modal-actions">
-            <button type="submit">Submit Request</button>
-            <button type="button" onClick={onClose}>
-              Close
+            <button type="button" className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-primary">
+              Submit
             </button>
           </div>
         </form>

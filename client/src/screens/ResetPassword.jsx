@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { resetPassword } from "../api/auth";
 import PasswordInput from "../components/PasswordInput";
@@ -38,6 +38,8 @@ function ResetPassword() {
       setNewPassword("");
       setConfirmNewPassword("");
       setShowSuccessPopup(true);
+
+      sessionStorage.removeItem("reset_allowed");
     } catch (err) {
       console.error(err);
       setMessage(err.response?.data?.message || err.message || "Server Error");
@@ -86,7 +88,7 @@ function ResetPassword() {
           message="Reset password successful! You can now proceed to log in."
           onClose={() => {
             setShowSuccessPopup(false);
-            navigate("/login");
+            navigate("/");
           }}
         />
       )}

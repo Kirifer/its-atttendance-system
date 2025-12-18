@@ -25,6 +25,9 @@ model User {
   password           String
   profilePic         String?
   role               Role      @default(USER)
+  position           String?
+  department         String?
+  supervisor         String?
   useCustomSchedule  Boolean   @default(false)
   created_at         DateTime  @default(now())
   reset_token        String?
@@ -32,11 +35,15 @@ model User {
   onLeave            Boolean   @default(false) 
   totalOJTHours      Float     @default(0)
   remainingWorkHours Float     @default(0)
-
+  resignedAt  DateTime? 
   leaves      Leave[]
   attendance  Attendance[]
   timeAdjustments TimeAdjustment[]
-  schedules   UserSchedule[]    
+  schedules   UserSchedule[]
+  otp_hash          String?
+  otp_expiry        DateTime?
+  reset_uuid        String?
+  reset_uuid_expiry DateTime?    
 }
 
 enum LeaveStatus {
@@ -121,6 +128,9 @@ model TimeAdjustment {
   attachment String?
   status     String   @default("pending")
   createdAt  DateTime @default(now())
+  shiftDate  DateTime?
+  startTime  String?
+  endTime    String?
 }
 
 model UserSchedule {

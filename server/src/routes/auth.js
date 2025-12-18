@@ -23,11 +23,20 @@ import {
   validateUpdateUserInfo,
 } from "../middlewares/validateUser.js";
 // Get all users except admin routing
-import { getAllUsers } from "../controllers/authController.js";
-// Enable expiry helper
-import { deleteExpiredSched } from "../utils/deleteExpiredSched.js";
+import {
+  getAllUsers,
+  getAllAdminUsers,
+} from "../controllers/authController.js";
+
 //prisma
 import { PrismaClient } from "@prisma/client";
+import { getTodaySchedule } from "../utils/getTodaySchedule.js";
+import { deleteExpiredSched } from "../utils/deleteExpiredSched.js";
+import { getAllUsersWithRoles } from "../controllers/authController.js";
+
+import { getWorkSchedule } from "../utils/workSchedule.js";
+// otp
+import { verifyOtpController } from "../controllers/authController.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -111,6 +120,10 @@ router.post("/login", validateLogin, async (req, res) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(400).json({ message: "User does not exist!" });
 
+    // Block resigned admins from logging in
+    if (user.resignedAt)
+      return res.status(403).json({ message: "This admin has been resigned." });
+
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(400).json({ message: "Incorrect password!" });
 
@@ -127,7 +140,10 @@ router.post("/login", validateLogin, async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
-        leave: user.onLeave 
+        leave: user.onLeave,
+        department: user.department,
+        position: user.position,
+        supervisor: user.supervisor,
       },
     });
   } catch (err) {
@@ -152,29 +168,78 @@ export const verifyToken = (req, res, next) => {
 // ------------------- Forgot Password -------------------
 router.post("/forgot-password", async (req, res) => {
   try {
-    const { email } = req.body;
-
+    const { email, reason } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(400).json({ message: "User does not exist!" });
 
-    const token = crypto.randomBytes(32).toString("hex");
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    await prisma.user.update({
-      where: { email },
-      data: {
-        reset_token: token,
-        reset_token_expiry: new Date(Date.now() + 3600 * 1000),
+    if (user) {
+      const otpHash = await bcrypt.hash(otp, 10);
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          otp_hash: otpHash,
+          otp_expiry: new Date(Date.now() + 5 * 60 * 1000), // 5 mins expiry
+        },
+      });
+    } else {
+      return res.json({ message: "The OTP code has been sent to your email." });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
-    // Add this to your .env
-    // FRONTEND_URL=http://localhost:5000
-    const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5000";
-    const resetUrl = `${FRONTEND_URL}/reset-password/${token}`;
-    res.json({ message: "DEV mode: password reset link", resetUrl });
+    await transporter.sendMail({
+      to: email,
+      subject: "IT Squarehub Password Reset OTP",
+      html: `
+        <h3>Password Reset OTP Code</h3>
+        <p>Your OTP code is:</p>
+        <h1 style="color: #007bff;">${otp}</h1>
+        <p><strong>This code expires after 5 minutes.</strong></p>
+        <p>If you didn't request this, ignore this email.</p>
+      `,
+    });
+
+    res.json({
+      message:
+        reason === "resend"
+          ? "A new OTP code has been sent to your email."
+          : "The OTP code has been sent to your email.",
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ------------------- OTP -------------------
+router.post("/verify-otp", verifyOtpController);
+
+// ------------------- Reset Password Route Security -------------------
+router.get("/validate-reset-token/:token", async (req, res) => {
+  try {
+    const { token } = req.params;
+    const user = await prisma.user.findFirst({
+      where: {
+        reset_uuid: token,
+        reset_uuid_expiry: { gt: new Date() },
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ isValid: false });
+    }
+
+    res.json({ isValid: true });
+  } catch (err) {
+    res.status(500).json({ isValid: false });
   }
 });
 
@@ -184,27 +249,36 @@ router.post("/reset-password", validateResetPassword, async (req, res) => {
     const { token, newPassword } = req.body;
 
     const user = await prisma.user.findFirst({
-      where: { reset_token: token, reset_token_expiry: { gt: new Date() } },
+      where: {
+        reset_uuid: token,
+        reset_uuid_expiry: { gt: new Date() },
+      },
     });
 
     if (!user)
-      return res.status(400).json({ message: "Invalid or expired token" });
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired reset link." });
 
     const hashed = await bcrypt.hash(newPassword, 10);
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { password: hashed, reset_token: null, reset_token_expiry: null },
+      data: {
+        password: hashed,
+        reset_uuid: null,
+        reset_uuid_expiry: null,
+      },
     });
 
-    res.json({ message: "Password has been reset successfully" });
+    res.json({ message: "Password has been reset successfully." });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });
   }
 });
 
-// Get Logged in user data
+//------------------- Get Logged in user data -------------------
 router.get("/me", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -220,24 +294,32 @@ router.get("/me", verifyToken, async (req, res) => {
         role: true,
         profilePic: true,
         onLeave: true,
-        useCustomSchedule: true, 
-        schedules: {
-          select: {
-            weekday: true,
-            startTime: true,
-            endTime: true,
-          },
-        },
+        useCustomSchedule: true,
       },
     });
 
-    res.json(user);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const workSchedule = await getWorkSchedule(userId);
+
+    res.json({
+      ...user,
+      todaySchedule: workSchedule
+        ? {
+            startTime: workSchedule.start.toTimeString().slice(0, 5),
+            endTime: workSchedule.end.toTimeString().slice(0, 5),
+          }
+        : null,
+    });
   } catch (err) {
+    console.error("GET /auth/me error:", err);
     res.status(500).json({ message: "Cannot fetch user" });
   }
 });
 
-// Change password
+//------------------- Change password -------------------
 router.post(
   "/change-password",
   validateChangePassword,
@@ -287,11 +369,16 @@ router.post(
   }
 );
 
-// Update user info
+//------------------- Update user info -------------------
 router.put("/update", validateUpdateUserInfo, verifyToken, updateUserInfo);
 
-// Get all non-admin users
+//------------------- Get all non-admin users -------------------
 router.get("/users", verifyToken, getAllUsers);
+
+//------------------- Get all admin usres -------------------
+router.get("/admins", verifyToken, getAllAdminUsers);
+
+router.get("/all-users", verifyToken, getAllUsersWithRoles);
 
 // Must be always below
 export default router;

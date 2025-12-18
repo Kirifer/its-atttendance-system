@@ -9,23 +9,37 @@ const {
 
 const fileTimeAdjustment = async (req, res) => {
   try {
-    const { type, details } = req.body;
+    const { type, details, shiftDate, startTime, endTime } = req.body;
     const userId = req.user.id;
 
     if (!type || !details)
       return res.status(400).json({ message: "Missing fields." });
+
+    // 🔒 Require date & times for change_shift
+    if (type === "change_shift") {
+      if (!shiftDate || !startTime || !endTime) {
+        return res.status(400).json({
+          message: "Shift date, start time, and end time are required",
+        });
+      }
+    }
 
     let attachmentPath = null;
     if (req.file) {
       attachmentPath = "/uploads/" + req.file.filename;
     }
 
-    const request = await createTimeAdjustment(
-      userId,
-      type,
-      details,
-      attachmentPath
-    );
+    const request = await prisma.timeAdjustment.create({
+      data: {
+        userId,
+        type,
+        details,
+        attachment: attachmentPath,
+        shiftDate: shiftDate ? new Date(shiftDate) : null,
+        startTime,
+        endTime,
+      },
+    });
 
     res.status(201).json({
       message: "Time adjustment request filed",
@@ -38,6 +52,7 @@ const fileTimeAdjustment = async (req, res) => {
     });
   }
 };
+
 
 const fetchTimeAdjustments = async (req, res) => {
   try {
@@ -55,7 +70,13 @@ const fetchTimeAdjustments = async (req, res) => {
       status: req.status,
       createdAt: req.createdAt,
       attachment: req.attachment,
-      user: req.user ? { id: req.user.id, username: req.user.username } : null,
+      shiftDate: req.shiftDate,
+      startTime: req.startTime,
+      endTime: req.endTime,
+
+      user: req.user
+        ? { id: req.user.id, username: req.user.username }
+        : null,
     }));
 
     res.status(200).json({ requests: serializedRequests });
@@ -84,24 +105,60 @@ const fetchMyTimeAdjustments = async (req, res) => {
 // Accept and decline user time adjustment requests - ADMIN only
 const updateTimeAdjustmentStatus = async (req, res) => {
   try {
-    const { id } = req.params; // request ID
-    const { status } = req.body; // "approved" or "rejected"
-    const isAdmin = req.user.role === "ADMIN";
+    const { id } = req.params;
+    const { status } = req.body;
 
-    if (!isAdmin) return res.status(403).json({ message: "Unauthorized" });
+    if (req.user.role !== "ADMIN")
+      return res.status(403).json({ message: "Unauthorized" });
 
-    if (!["approved", "rejected"].includes(status.toLowerCase()))
+    const normalizedStatus = status.toLowerCase();
+    if (!["approved", "rejected"].includes(normalizedStatus))
       return res.status(400).json({ message: "Invalid status" });
 
-    const updatedRequest = await prisma.timeAdjustment.update({
+    const request = await prisma.timeAdjustment.update({
       where: { id },
-      data: { status: status.toLowerCase() },
+      data: { status: normalizedStatus },
       include: { user: true },
     });
 
+    if (
+      normalizedStatus === "approved" &&
+      request.type === "change_shift"
+    ) {
+      const scheduleDate = new Date(request.shiftDate);
+      scheduleDate.setHours(23, 59, 59, 999);
+      const weekday = scheduleDate.getDay();
+
+      await prisma.userSchedule.upsert({
+        where: {
+          userId_weekday_scheduleDate: {
+            userId: request.userId,
+            weekday,
+            scheduleDate,
+          },
+        },
+        update: {
+          startTime: request.startTime,
+          endTime: request.endTime,
+        },
+        create: {
+          userId: request.userId,
+          weekday,
+          scheduleDate,
+          startTime: request.startTime,
+          endTime: request.endTime,
+        },
+      });
+
+      await prisma.user.update({
+        where: { id: request.userId },
+        data: { useCustomSchedule: true },
+      });
+    }
+
     res.json({
-      message: `Request ${status.toLowerCase()} successfully`,
-      request: updatedRequest,
+      message: `Request ${normalizedStatus} successfully`,
+      request,
     });
   } catch (err) {
     console.error(err);

@@ -1,0 +1,84 @@
+@media (max-width: 768px) {
+  /* Overall top bar */
+  .attendance_top_bar {
+    margin: 0 8px 12px;   /* move left */
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  /* Search area */
+  .leave-table__search {
+    width: 100%;
+    display: flex;
+    gap: 4px;
+    margin-left: -4px;   /* slight left nudge */
+  }
+
+  .leave-table__dropdown,
+  .leave-table__input {
+    font-size: 13px;     /* smaller */
+    padding: 5px 7px;
+  }
+
+  /* Export button (ADMIN) */
+  .attendance_export_btn {
+    padding: 5px 10px;
+    font-size: 13px;
+    margin-left: -4px;
+  }
+
+  /* Filters container */
+  .attendance_filter_bar {
+    width: 100%;
+    gap: 6px;
+    margin-left: -4px;
+  }
+
+  /* Compact labels */
+  .attendance_filter_bar label {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Compact selects */
+  .attendance_filter_btn {
+    padding: 5px 7px;
+    font-size: 13px;
+  }
+
+  /* Custom range tighter */
+  .attendance_filter-custom-range {
+    flex-direction: row;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .attendance_filter-custom-range input {
+    flex: 1;
+    font-size: 13px;
+    padding: 5px 7px;
+  }
+}
+
+@media (max-width: 480px) {
+  .attendance_top_bar {
+    margin: 0 6px 10px;
+  }
+
+  .leave-table__dropdown {
+    min-width: 70px;
+    font-size: 12px;
+  }
+
+  .leave-table__input {
+    font-size: 12px;
+    height: 28px;
+  }
+
+  .attendance_filter_btn {
+    font-size: 12px;
+    padding: 4px 6px;
+  }
+}

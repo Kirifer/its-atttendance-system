@@ -1,76 +1,67 @@
 import { useState, useEffect } from "react";
-import useUserSchedule from "../hooks/useUserSchedule";
 import { getAllUsers } from "../api/auth";
+import "../styles/EditUserSchedule.css";
 
-export default function EditUserSchedule({ 
-  onClose = () => {},
-  onSave = () => {},
-}) {
+export default function EditUserSchedule({ userSchedule, user }) {
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [timeIn, setTimeIn] = useState("09:00");
   const [timeOut, setTimeOut] = useState("18:00");
   const [date, setDate] = useState("");
-  const [successMessage, setSuccessMessage] = useState(""); // <-- success message state
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const { setSchedule, loading, error } = useUserSchedule();
+  const {
+    showSchedule,
+    closeSchedule,
+    setSchedule,
+    loading,
+    error,
+  } = userSchedule;
 
-  // Fetch all users for selection
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        if (user.role !== "ADMIN") return; 
         const allUsers = await getAllUsers();
         setUsers(allUsers);
         if (allUsers.length > 0) setSelectedUserId(allUsers[0].id);
       } catch (err) {
-        console.error("Error fetching users:", err);
+        console.warn("Fetching users skipped for non-admin", err.message);
       }
     };
     fetchUsers();
-  }, []);
+  }, [user]);
+
+  if (!showSchedule) return null;
 
   const handleSave = async () => {
-    if (!selectedUserId) {
-      alert("Please select a user");
+    if (!selectedUserId || !date) {
+      alert("Please select user and date");
       return;
     }
 
-    if (!date) {
-      alert("Please select a date for the schedule");
-      return;
-    }
+    const result = await setSchedule({
+      userId: selectedUserId,
+      startTime: timeIn,
+      endTime: timeOut,
+      date,
+    });
 
-    try {
-      const result = await setSchedule({
-        userId: selectedUserId,
-        startTime: timeIn,
-        endTime: timeOut,
-        date,
-      });
+    if (result) {
+      setSuccessMessage("Schedule saved successfully!");
 
-      if (result) {
-        setSuccessMessage("Schedule saved successfully!"); // <-- show success
-        onSave?.();
-
-        // Optionally close the popup after a short delay
-        setTimeout(() => {
-          setSuccessMessage("");
-          onClose();
-        }, 2000);
-      } else {
-        alert(error || "Failed to save schedule");
-      }
-    } catch (err) {
-      console.error(err);
+      setTimeout(() => {
+        setSuccessMessage("");
+        closeSchedule();
+      }, 1500);
     }
   };
 
   return (
-    <div>
-      <h2>Set User Schedule</h2>
-
-      <div>
-        <label>User Email:</label>
+    <div className="custom_schedule_overlay">
+      <div className="custom_schedule">
+        <h2>Configure Custom Schedule</h2>
+        <label>User Email</label>
         <select
           value={selectedUserId}
           onChange={(e) => setSelectedUserId(e.target.value)}
@@ -81,43 +72,25 @@ export default function EditUserSchedule({
             </option>
           ))}
         </select>
-      </div>
 
-      <div>
-        <label>Date:</label>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-      </div>
+        <label>Date</label>
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
 
-      <div>
-        <label>Time In:</label>
-        <input
-          type="time"
-          value={timeIn}
-          onChange={(e) => setTimeIn(e.target.value)}
-        />
-      </div>
+        <label>Time In</label>
+        <input type="time" value={timeIn} onChange={(e) => setTimeIn(e.target.value)} />
 
-      <div>
-        <label>Time Out:</label>
-        <input
-          type="time"
-          value={timeOut}
-          onChange={(e) => setTimeOut(e.target.value)}
-        />
-      </div>
+        <label>Time Out</label>
+        <input type="time" value={timeOut} onChange={(e) => setTimeOut(e.target.value)} />
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {successMessage && <p style={{ color: "green" }}>{successMessage}</p>} {/* <-- display success */}
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
 
-      <div>
-        <button onClick={handleSave} disabled={loading}>
-          {loading ? "Saving..." : "Save"}
-        </button>
-        <button onClick={onClose}>Cancel</button>
+        <div className="custom_schedule_buttons">
+          <button onClick={handleSave} disabled={loading}>
+            {loading ? "Saving..." : "Save"}
+          </button>
+          <button onClick={closeSchedule}>Cancel</button>
+        </div>
       </div>
     </div>
   );
