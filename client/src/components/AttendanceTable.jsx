@@ -5,6 +5,7 @@ import "../styles/AttendanceTable.css";
 import useExportPDF from "../hooks/useExportPDF";
 import EditAttendancePopup from "./EditAttendancePopup";
 import FilterAttendanceActions from "./FilterAttendanceActions";
+import { formatHoursToHHMM } from "../hooks/formatHours";
 
 export default function AttendanceTable({
   userId,
@@ -159,8 +160,8 @@ export default function AttendanceTable({
             "Lunch Tardy": lunchTardyMinutes > 0 ? `${lunchTardyMinutes} mins` : "-",
             Tardiness: tardyMinutes > 0 ? `${tardyMinutes} mins` : "-",
             DAYS: presentDays,
-            HOURS: straightWorkHours !== "-" ? `${straightWorkHours} hrs` : "-",
-            TOTAL: totalHours !== "-" ? `${totalHours} hrs` : "-",
+            HOURS: straightWorkHours !== "-" ? formatHoursToHHMM(straightWorkHours) : "-",
+            TOTAL: totalHours !== "-" ? formatHoursToHHMM(totalHours) : "-",
           };
         });
 
