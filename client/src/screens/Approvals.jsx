@@ -6,22 +6,18 @@ import {
   deleteLeave,
 } from "../api/leaveAdmin";
 import LeaveTable from "../components/LeaveTable";
-import "../styles/Approvals.css";
 import TimeAdjustmentTable from "../components/TimeAdjustmentTable";
 import AdminCRUD from "../components/AdminCRUD";
+import Loader from "../components/Spinner/Loader";
+
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Loader from "../components/Spinner/Loader";
 
 function CustomTabPanel({ children, value, index }) {
   return (
     <div role="tabpanel" hidden={value !== index}>
-      {value === index && (
-        <Box sx={{ pt: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -33,19 +29,16 @@ function a11yProps(index) {
   };
 }
 
-
 function Approvals() {
   const [value, setValue] = useState(0);
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const handleChange = (_, newValue) => {
-    setValue(newValue);
-  };
-
+  const handleChange = (_, newValue) => setValue(newValue);
 
   const fetchLeaves = async () => {
     try {
+      setLoading(true);
       const data = await getAllLeaves();
       setLeaves(data);
     } catch (err) {
@@ -70,16 +63,10 @@ function Approvals() {
   };
 
   return (
-     <DashboardLayout>
+    <DashboardLayout>
       <div className="admin__main">
         {/* Tabs Header */}
-        <Box
-          sx={{
-            width: "100%",
-            borderBottom: 1,
-            borderColor: "divider",
-          }}
-        >
+        <Box sx={{ width: "100%", borderBottom: 1, borderColor: "divider" }}>
           <Tabs
             value={value}
             onChange={handleChange}

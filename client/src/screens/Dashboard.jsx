@@ -9,8 +9,9 @@ import FiledLeavesCard from "../components/Dashboard/FiledLeavesCard.jsx";
 import Calendar from "../components/Dashboard/Calendar.jsx";
 import UserStatusCard from "../components/Dashboard/UserStatusCard.jsx";
 import EditUserSchedule from "../components/EditUserSchedule.jsx";
-import useUserSchedule from "../hooks/useUserSchedule.js"
+import useUserSchedule from "../hooks/useUserSchedule.js";
 import SetOjtHours from "../components/SetOjtHours.jsx";
+import SessionLogout from "../components/SessionLogout.jsx";
 
 function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -21,59 +22,67 @@ function Dashboard() {
   const navigate = useNavigate();
 
   return (
-    <DashboardLayout>
-      <div className="dashboard__main">
-        <div>
-          <div className="dashboard__containerone">
-            <div className="dashboard__left">
-              <Clock format="HH:mm:ss" />
-              {user.role === "ADMIN" ? (
-                <div className="custom_schedule_wrapper">
-                  <EditUserSchedule userSchedule={userSchedule} user={user} />  
-                  <button
-                    className="custom_schedule_btn"
-                    onClick={userSchedule.openSchedule}
-                  >
-                    Set Custom Schedule
-                  </button>
-                  <SetOjtHours />
-                </div>          
-              ) : (
-                <AttBtn
-                  userId={user.id}
-                  reload={reload}
-                  onAttendanceChange={() => setReload((r) => !r)}
-                />
-              )}
+    <SessionLogout>
+      <DashboardLayout>
+        <div className="dashboard__main">
+          <div>
+            <div className="dashboard__containerone">
+              <div className="dashboard__left">
+                <Clock format="HH:mm:ss" />
+                {user.role === "ADMIN" ? (
+                  <div className="custom_schedule_wrapper">
+                    <EditUserSchedule userSchedule={userSchedule} user={user} />
+                    <button
+                      className="custom_schedule_btn"
+                      onClick={userSchedule.openSchedule}
+                    >
+                      Set Custom Schedule
+                    </button>
+                    <SetOjtHours />
+                  </div>
+                ) : (
+                  <AttBtn
+                    userId={user.id}
+                    reload={reload}
+                    onAttendanceChange={() => setReload((r) => !r)}
+                  />
+                )}
+              </div>
+
+              <div className="dashboard__right">
+                {user.role === "ADMIN" ? (
+                  <UserStatusCard reload={reload} />
+                ) : (
+                  <LogsCard
+                    userName={user.name}
+                    logs={[
+                      {
+                        timeIn: "November 18, 2025 09:00 AM",
+                        timeOut: "November 18, 2025 06:00 PM",
+                      },
+                      {
+                        timeIn: "November 19, 2025 09:05 AM",
+                        timeOut: "November 19, 2025 06:10 PM",
+                      },
+                    ]}
+                    reload={reload}
+                  />
+                )}
+              </div>
             </div>
-                
-            <div className="dashboard__right">
-              {user.role === "ADMIN" ? (
-                <UserStatusCard reload={reload} />
-              ) : (
-                <LogsCard
-                  userName={user.name}
-                  logs={[
-                    { timeIn: "November 18, 2025 09:00 AM", timeOut: "November 18, 2025 06:00 PM" },
-                    { timeIn: "November 19, 2025 09:05 AM", timeOut: "November 19, 2025 06:10 PM" },
-                  ]}
-                  reload={reload}
-                />
-              )}
-            </div>
-          </div>
-               
-          <div className="dashboard__container__two">
-            <div className="dashboard__left__two">
-              <FiledLeavesCard />
-            </div>
-            <div className="dashboard__right__two">
-              <Calendar />
+
+            <div className="dashboard__container__two">
+              <div className="dashboard__left__two">
+                <FiledLeavesCard />
+              </div>
+              <div className="dashboard__right__two">
+                <Calendar />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </DashboardLayout>
+      </DashboardLayout>
+    </SessionLogout>
   );
 }
 

@@ -1,8 +1,16 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar({ user }) {
   const [open, setOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
 
   return (
     <nav className="navbar">
@@ -36,6 +44,10 @@ export default function Navbar({ user }) {
         )}
         <li className="navbar__item">
           <a href="/user-info">View Profile</a>
+        </li>
+
+        <li onClick={handleSignOut} className="navbar__item ">
+          <span>Sign Out</span>
         </li>
       </ul>
     </nav>
