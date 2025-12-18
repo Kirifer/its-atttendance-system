@@ -72,7 +72,7 @@ function Signup() {
   };
 
   return (
-    <div className="center-align-items">
+    <div className="signup-background">
       <form onSubmit={handleSubmit} className="signup-box">
         <div className="top-box-header">
           <p className="signup-text"></p>

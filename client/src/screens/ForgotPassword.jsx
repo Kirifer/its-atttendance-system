@@ -28,7 +28,7 @@ function ForgotPassword() {
 
       setTimeout(() => {
         setMessage("");
-      }, 5000);
+      }, 10000);
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Invalid email!";
       setMessage(errorMsg);
@@ -37,7 +37,7 @@ function ForgotPassword() {
       setTimeout(() => {
         setMessage("");
         setIsError(false);
-      }, 5000);
+      }, 10000);
     } finally {
       setNewOtp(false);
     }
@@ -70,13 +70,18 @@ function ForgotPassword() {
   };
 
   return (
-    <div className="background center-align-items">
+    <div className="forgot-background">
       <form
         onSubmit={(e) => handleSubmit(e, "initial")}
         className="forgot-password-box"
       >
         <div className="top-box-header">
-          <p className="forgot-password-text">Forgot Password</p>
+          <p className="forgot-password-text">
+            {step === "email"
+              ? "Enter your email address and we'll send you a verification code to reset your password."
+              : `Please enter the 6-digit code sent to ${email} to verify your identity.`}
+          </p>
+
           <button
             type="button"
             className="close-btn"
@@ -138,22 +143,17 @@ function ForgotPassword() {
               <span style={{ fontSize: "14px", color: "#555" }}>
                 Didn't receive a code?&nbsp;
               </span>
-              <span
+              <button
                 type="button"
                 className="resend-link-btn"
-                disabled={newOtp} // Use the variable, not the function
-                onClick={(e) => handleSubmit(e, "resend")}
+                disabled={newOtp}
+                onClick={(e) => !newOtp && handleSubmit(e, "resend")}
                 style={{
-                  background: "none",
-                  border: "none",
-                  color: newOtp ? "#0011ffff" : "#007bff", // Use the variable
-                  textDecoration: "underline",
-                  cursor: newOtp ? "not-allowed" : "pointer",
-                  fontSize: "14px",
+                  color: newOtp ? "#555" : "#1a5dac",
                 }}
               >
                 {newOtp ? "Sending..." : "Click here to request new OTP code"}
-              </span>
+              </button>
             </div>
           </div>
         )}

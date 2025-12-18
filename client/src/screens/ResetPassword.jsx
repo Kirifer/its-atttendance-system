@@ -49,10 +49,12 @@ function ResetPassword() {
   };
 
   return (
-    <div className="background center-align-items">
+    <div className="reset-background">
       <form onSubmit={handleReset} className="reset-password-box">
         <div className="top-box-header">
-          <p className="reset-password-text">Reset Password</p>
+          <p className="reset-password-text">
+            Please enter a new password to secure your account.
+          </p>
           <button
             type="button"
             className="close-btn"
