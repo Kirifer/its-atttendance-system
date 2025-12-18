@@ -1,23 +1,18 @@
 /* Background */
-.background {
-  background-color: #F6F8FA;
+.login-background {
+  background-color: #f6f8fa;
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   z-index: -1;
-}
-
-/* Center content */
-.center-align-items {
   display: flex;
-  background-color: #F6F8FA;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  padding: 0 20px;          /* prevents the box from touching screen edges */
+  padding: 0 20px; /* prevents the box from touching screen edges */
   box-sizing: border-box;
 }
 
@@ -94,7 +89,7 @@
 
 /* Page-specific eye icon placement */
 .login-eye-wrapper .eye-icon {
-  right: 12px !important;   /* perfect for all sizes */
+  right: 12px !important; /* perfect for all sizes */
   top: 50% !important;
   transform: translateY(-50%);
 }
@@ -102,7 +97,7 @@
 /* RESPONSIVE FIXES */
 @media (max-width: 480px) {
   .login-box {
-    padding: 25px 20px;     /* reduce padding on small screens */
+    padding: 25px 20px; /* reduce padding on small screens */
   }
 
   .text-box {

@@ -1,16 +1,12 @@
 /* Full-screen light background like login */
 .signup-background {
-  background-color: #F6F8FA;
+  background-color: #f6f8fa;
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   z-index: -1;
-}
-
-/* Centering container (same as login) */
-.center-align-items {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -29,15 +25,15 @@
   padding: 0 10px;
 }
 
-/* Signup box (same style as login-box) */
 .signup-box {
   background-color: #ffffff;
   padding: 35px 40px;
   border-radius: 12px;
-  max-width: 380px;
+  max-width: 405px;
   width: 100%;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
   text-align: center;
+  box-sizing: border-box;
 }
 
 /* Text fields (same as login) */
@@ -73,11 +69,13 @@
   border: none;
   font-size: 28px;
   font-weight: bold;
-  margin-top: 30px;
+  margin-bottom: 0px;
+  margin-top: 20px;
   cursor: pointer;
   color: #333;
   padding: 5px 10px;
   transition: 0.2s ease;
+  margin-right: -15px;
 }
 
 .close-btn:hover {
@@ -123,7 +121,48 @@
   text-decoration: underline;
 }
 
-.signup-eye-wrapper .eye-icon {
-    right: 30px !important;
+/* Responsive view */
+@media (max-width: 480px) {
+  .signup-box {
+    padding: 25px 20px; /* reduce padding on small screens */
+    width: 90%;
   }
 
+  .close-btn {
+    margin-top: 30px;
+    margin-right: 0px;
+  }
+
+  .text-box {
+    margin: 12px 0;
+    font-size: 15px;
+  }
+}
+
+@media (max-height: 480px) and (orientation: landscape) {
+  .signup-box {
+    width: 90%;
+    height: 90%;
+  }
+
+  .close-btn {
+    margin-top: 20px;
+    margin-bottom: -30px;
+  }
+}
+
+@media (max-width: 360px) {
+  .signup-box {
+    padding: 20px 16px;
+  }
+
+  .close-btn {
+    margin-top: 30px;
+    margin-right: 0px;
+  }
+
+  .text-box {
+    height: 38px;
+    font-size: 14px;
+  }
+}
