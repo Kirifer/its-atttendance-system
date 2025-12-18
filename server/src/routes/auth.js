@@ -139,6 +139,9 @@ router.post("/login", validateLogin, async (req, res) => {
         email: user.email,
         role: user.role,
         leave: user.onLeave,
+        department: user.department,
+        position: user.position,
+        supervisor: user.supervisor,
       },
     });
   } catch (err) {
