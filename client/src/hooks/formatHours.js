@@ -7,3 +7,11 @@ export const formatHoursToHHMM = (decimalHours) => {
 
   return `${hours}:${minutes.toString().padStart(2, "0")}`;
 };
+
+export function formatHoursToHHMMFromMinutes(minutes) {
+  if (minutes == null) return "-";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  
+  return `${h}:${m.toString().padStart(2, "0")}`;
+}
