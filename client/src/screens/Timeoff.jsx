@@ -1,13 +1,23 @@
-import React from "react";
+import { useState } from "react";
 import "../styles/Timeoff.css";
 import DashboardLayout from "../components/DashboardLayout";
 import LeaveForm from "../components/LeaveForm";
 import { createLeave } from "../api/leave";
 import SessionLogout from "../components/SessionLogout";
+import Loader from "../components/Spinner/Loader";
 
 function Timeoff() {
-  const handleLeaveSubmit = async (formData) => {
-    await createLeave(formData);
+   const [loading, setLoading] = useState(false);
+
+   const handleLeaveSubmit = async (formData) => {
+    try {
+      setLoading(true); 
+      await createLeave(formData);
+    } catch (err) {
+      console.error("Failed to create leave:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -20,7 +30,9 @@ function Timeoff() {
             diam, interdum nec placerat in, venenatis egestas justo. Nam eu
             gravida ante, vel egestas turpis.
           </p>
-          <LeaveForm onSubmit={handleLeaveSubmit} />
+          <Loader loading={loading}>
+            <LeaveForm onSubmit={handleLeaveSubmit} />
+          </Loader>
         </div>
       </DashboardLayout>
     </SessionLogout>
