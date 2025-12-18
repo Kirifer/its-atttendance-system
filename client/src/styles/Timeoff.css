@@ -18,3 +18,9 @@
 .timeoff__description {
   color: #828282;
 }
+
+@media (max-width: 766px) {
+  .timeoff__main {
+  margin-top: 80px;
+}
+}
