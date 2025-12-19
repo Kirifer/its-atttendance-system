@@ -14,6 +14,8 @@ import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import SetOjtHours from "../components/SetOjtHours";
+import EditUserSchedule from "../components/EditUserSchedule"
+import useUserSchedule from "../hooks/useUserSchedule.js"
 
 function CustomTabPanel({ children, value, index }) {
   return (
@@ -63,6 +65,9 @@ function Approvals() {
     fetchLeaves();
   };
 
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userSchedule = useUserSchedule();
+
   return (
     <DashboardLayout>
       <div className="admin__main">
@@ -78,7 +83,7 @@ function Approvals() {
             <Tab label="Time Adjustments" {...a11yProps(0)} />
             <Tab label="Time-off Requests" {...a11yProps(1)} />
             <Tab label="Admin Management" {...a11yProps(2)} />
-            <Tab label="Set OJT Hours" {...a11yProps(3)} />
+            <Tab label="Intern Management" {...a11yProps(3)} />
           </Tabs>
         </Box>
 
@@ -124,10 +129,17 @@ function Approvals() {
         <CustomTabPanel value={value} index={3}>
           <Loader loading={loading}>
             <div>
-              <h1 className="admin__title">ojt hours</h1>
+              <h1 className="admin__title">Handle Interns</h1>
               <p className="admin__description">
-                Create, update, or remove admin users.
+                Set custom schedule or work hours.
               </p>
+              <EditUserSchedule userSchedule={userSchedule} user={user} />
+          <button
+            className="custom_schedule_btn"
+            onClick={userSchedule.openSchedule}
+          >
+            Set Custom Schedule
+          </button>
               <SetOjtHours/>
             </div>
           </Loader>
