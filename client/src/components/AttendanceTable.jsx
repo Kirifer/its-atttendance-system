@@ -114,28 +114,28 @@ export default function AttendanceTable({
           const lo = r.lunchOut ? new Date(r.lunchOut) : null;
           const li = r.lunchIn ? new Date(r.lunchIn) : null;
 
-          const workMinutes = ti && to ? Math.round((to - ti) / 1000 / 60) : null;
+          // const workMinutes = ti && to ? Math.round((to - ti) / 1000 / 60) : null;
 
-          const lunchMinutes = 60;
+          // const lunchMinutes = 60;
 
           const lunchTardyMinutes = r.lunchTardinessMinutes || 0;
 
           const tardyMinutes = r.tardinessMinutes || 0;
 
-          const totalMinutes =
-            workMinutes !== null
-            ? workMinutes - lunchMinutes - (tardyMinutes + lunchTardyMinutes)
-            : null;
+          // const totalMinutes =
+          //   workMinutes !== null
+          //   ? workMinutes - lunchMinutes - (tardyMinutes + lunchTardyMinutes)
+          //   : null;
 
-          const straightWorkMinutes =
-            workMinutes !== null 
-            ? workMinutes - lunchTardyMinutes 
-            : null;
+          // const straightWorkMinutes =
+          //   workMinutes !== null 
+          //   ? workMinutes - lunchTardyMinutes 
+          //   : null;
 
-          const totalWorkMinutes =
-            totalMinutes !== null 
-            ? totalMinutes + tardyMinutes
-            : null;
+          // const totalWorkMinutes =
+          //   totalMinutes !== null 
+          //   ? totalMinutes + tardyMinutes
+          //   : null;
 
           const presentDays = res.workDays[String(r.userId)] || 0;
 
@@ -160,8 +160,8 @@ export default function AttendanceTable({
             "Lunch Tardy": lunchTardyMinutes > 0 ? `${lunchTardyMinutes} mins` : "-",
             Tardiness: tardyMinutes > 0 ? `${tardyMinutes} mins` : "-",
             DAYS: presentDays,
-            TOTAL: straightWorkMinutes !== null ? formatHoursToHHMMFromMinutes(straightWorkMinutes) : "-",
-            ACTUAL: totalWorkMinutes !== null ? formatHoursToHHMMFromMinutes(totalWorkMinutes) : "-",
+            TOTAL: r.straightWorkHours !== null ? formatHoursToHHMM(r.straightWorkHours) : "-",
+            ACTUAL: r.totalWorkHours !== null ? formatHoursToHHMM(r.totalWorkHours) : "-",
           };
         });
 

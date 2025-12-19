@@ -55,20 +55,6 @@ export const updateAttStatus = async (
   } 
 }
 
-  // Calculate work minutes and totalWorkHours
-  let totalWorkHours = null;
-  let straightWorkHours = null;
-  if (newTimeIn && newTimeOut) {
-    const workMinutes = (newTimeOut - newTimeIn) / 60000;
-    const lunchMinutes =
-      newLunchOut && newLunchIn ? (newLunchIn - newLunchOut) / 60000 : 0;
-
-    straightWorkHours = parseFloat((workMinutes / 60).toFixed(2));
-    totalWorkHours = parseFloat(
-      ((workMinutes - lunchMinutes - (tardinessMinutes + lunchTardy)) / 60).toFixed(2)
-    );
-  }
-
   // Update attendance record
   const updated = await prisma.attendance.update({
     where: { id: attendance.id },
@@ -79,9 +65,7 @@ export const updateAttStatus = async (
       lunchIn: newLunchIn,
       tardinessMinutes,
       lunchTardinessMinutes: lunchTardy,
-      status,
-      straightWorkHours,
-      totalWorkHours,
+      status
     },
   });
 
