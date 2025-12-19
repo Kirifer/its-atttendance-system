@@ -3,7 +3,6 @@ import DashboardLayout from "../components/DashboardLayout";
 import API from "../api/api";
 import UserRequestsTable from "../components/UserRequestTable";
 import "../styles/UserRequests.css";
-import SessionLogout from "../components/SessionLogout";
 
 function UserRequests() {
   const [userRequests, setUserRequests] = useState([]);
@@ -29,7 +28,6 @@ function UserRequests() {
   }, []);
 
   return (
-    <SessionLogout>
       <DashboardLayout>
         <div className="user-time__main">
           <div className="user-time__header-table">
@@ -54,7 +52,6 @@ function UserRequests() {
           </div>
         </div>
       </DashboardLayout>
-    </SessionLogout>
   );
 }
 

@@ -8,14 +8,14 @@ import LogsCard from "../components/Dashboard/LogsCard.jsx";
 import FiledLeavesCard from "../components/Dashboard/FiledLeavesCard.jsx";
 import Calendar from "../components/Dashboard/Calendar.jsx";
 import UserStatusCard from "../components/Dashboard/UserStatusCard.jsx";
-import SessionLogout from "../components/SessionLogout.jsx";
+
 
 function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [reload, setReload] = useState(false);
 
   return (
-    <SessionLogout>
+
       <DashboardLayout>
         <div className="dashboard__main">
           <div>
@@ -62,7 +62,6 @@ function Dashboard() {
           </div>
         </div>
       </DashboardLayout>
-    </SessionLogout>
   );
 }
 

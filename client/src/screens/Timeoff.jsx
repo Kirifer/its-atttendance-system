@@ -3,7 +3,6 @@ import "../styles/Timeoff.css";
 import DashboardLayout from "../components/DashboardLayout";
 import LeaveForm from "../components/LeaveForm";
 import { createLeave } from "../api/leave";
-import SessionLogout from "../components/SessionLogout";
 import Loader from "../components/Spinner/Loader";
 
 function Timeoff() {
@@ -21,7 +20,6 @@ function Timeoff() {
   };
 
   return (
-    <SessionLogout>
       <DashboardLayout>
         <div className="timeoff__main">
           <h2 className="timeoff_title">File a Leave</h2>
@@ -35,7 +33,6 @@ function Timeoff() {
           </Loader>
         </div>
       </DashboardLayout>
-    </SessionLogout>
   );
 }
 
