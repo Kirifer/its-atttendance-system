@@ -51,15 +51,9 @@ export async function recalculateHours(attendanceId) {
     (((timeOut - timeIn) / 60000) / 60).toFixed(2)
   );
 
-  // 🔹 Total work = schedule based
+  // 🔹 Total work = schedule overlap minus actual lunch
   const totalWorkHours = parseFloat(
-    (
-      (scheduledWorkMinutes -
-        lunchMinutes -
-        tardinessMinutes -
-        lunchTardinessMinutes) /
-      60
-    ).toFixed(2)
+    ((scheduledWorkMinutes - lunchMinutes) / 60).toFixed(2)
   );
 
   const updated = await prisma.attendance.update({

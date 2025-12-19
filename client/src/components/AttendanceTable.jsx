@@ -5,7 +5,7 @@ import "../styles/AttendanceTable.css";
 import useExportPDF from "../hooks/useExportPDF";
 import EditAttendancePopup from "./EditAttendancePopup";
 import FilterAttendanceActions from "./FilterAttendanceActions";
-import { formatHoursToHHMM, formatHoursToHHMMFromMinutes } from "../hooks/formatHours";
+import { formatHoursToHHMM } from "../hooks/formatHours";
 
 export default function AttendanceTable({
   userId,
