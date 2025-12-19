@@ -67,8 +67,8 @@ export default function useExportPDF() {
       "Lunch In",
       "Time Out",
       "Days",
-      "HOURS",
       "TOTAL",
+      "ACTUAL",
     ];
 
     const body = records.map((r) => [
@@ -78,12 +78,12 @@ export default function useExportPDF() {
       r["Lunch In"],
       r["Time Out"],
       r.DAYS,
-      r.HOURS,
       r.TOTAL,
+      r.ACTUAL,
     ]);
 
     const totalHoursSpent = records.reduce((sum, r) => {
-      const hours = typeof r.TOTAL === "string" ? parseFloat(r.TOTAL.replace(" hrs", "")) : Number(r.TOTAL);
+      const hours = typeof r.ACTUAL === "string" ? parseFloat(r.ACTUAL.replace(" hrs", "")) : Number(r.ACTUAL);
       return isNaN(hours) ? sum : sum + hours;
     }, 0).toFixed(2);
 
