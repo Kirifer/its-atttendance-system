@@ -5,6 +5,7 @@ import "../styles/AttendanceTable.css";
 import useExportPDF from "../hooks/useExportPDF";
 import EditAttendancePopup from "./EditAttendancePopup";
 import FilterAttendanceActions from "./FilterAttendanceActions";
+import { formatHoursToHHMM, formatHoursToHHMMFromMinutes } from "../hooks/formatHours";
 
 export default function AttendanceTable({
   userId,
@@ -113,9 +114,9 @@ export default function AttendanceTable({
           const lo = r.lunchOut ? new Date(r.lunchOut) : null;
           const li = r.lunchIn ? new Date(r.lunchIn) : null;
 
-          const workMinutes = ti && to ? Math.floor((to - ti) / 1000 / 60) : null;
+          const workMinutes = ti && to ? Math.round((to - ti) / 1000 / 60) : null;
 
-          const lunchMinutes = lo && li ? Math.floor((li - lo) / 1000 / 60) : 0;
+          const lunchMinutes = 60;
 
           const lunchTardyMinutes = r.lunchTardinessMinutes || 0;
 
@@ -123,18 +124,18 @@ export default function AttendanceTable({
 
           const totalMinutes =
             workMinutes !== null
-              ? workMinutes - lunchMinutes - (tardyMinutes + lunchTardyMinutes)
-              : null;
+            ? workMinutes - lunchMinutes - (tardyMinutes + lunchTardyMinutes)
+            : null;
 
-          const straightWorkHours =
-            workMinutes !== null
-              ? (workMinutes / 60).toFixed(2)
-              : "-";
+          const straightWorkMinutes =
+            workMinutes !== null 
+            ? workMinutes - lunchTardyMinutes 
+            : null;
 
-          const totalHours =
-            totalMinutes !== null
-              ? (totalMinutes / 60).toFixed(2)
-              : "-";
+          const totalWorkMinutes =
+            totalMinutes !== null 
+            ? totalMinutes + tardyMinutes
+            : null;
 
           const presentDays = res.workDays[String(r.userId)] || 0;
 
@@ -159,8 +160,8 @@ export default function AttendanceTable({
             "Lunch Tardy": lunchTardyMinutes > 0 ? `${lunchTardyMinutes} mins` : "-",
             Tardiness: tardyMinutes > 0 ? `${tardyMinutes} mins` : "-",
             DAYS: presentDays,
-            HOURS: straightWorkHours !== "-" ? `${straightWorkHours} hrs` : "-",
-            TOTAL: totalHours !== "-" ? `${totalHours} hrs` : "-",
+            TOTAL: straightWorkMinutes !== null ? formatHoursToHHMMFromMinutes(straightWorkMinutes) : "-",
+            ACTUAL: totalWorkMinutes !== null ? formatHoursToHHMMFromMinutes(totalWorkMinutes) : "-",
           };
         });
 
