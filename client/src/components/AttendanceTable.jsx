@@ -122,21 +122,6 @@ export default function AttendanceTable({
 
           const tardyMinutes = r.tardinessMinutes || 0;
 
-          // const totalMinutes =
-          //   workMinutes !== null
-          //   ? workMinutes - lunchMinutes - (tardyMinutes + lunchTardyMinutes)
-          //   : null;
-
-          // const straightWorkMinutes =
-          //   workMinutes !== null 
-          //   ? workMinutes - lunchTardyMinutes 
-          //   : null;
-
-          // const totalWorkMinutes =
-          //   totalMinutes !== null 
-          //   ? totalMinutes + tardyMinutes
-          //   : null;
-
           const presentDays = res.workDays[String(r.userId)] || 0;
 
           return {
@@ -149,10 +134,7 @@ export default function AttendanceTable({
 
             Intern: role === "ADMIN" ? r.user.email : userEmail,
             Status: r.status,
-
             Date: new Date(r.date).toLocaleDateString("en-US", options),
-            /* Week: getWeekOfMonth(new Date(r.date)),*/
-
             "Time In": ti ? ti.toLocaleTimeString("en-US", timeOptions) : "-",
             "Lunch Out": lo ? lo.toLocaleTimeString("en-US", timeOptions) : "-",
             "Lunch In": li ? li.toLocaleTimeString("en-US", timeOptions) : "-",
