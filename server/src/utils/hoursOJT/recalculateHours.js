@@ -1,55 +1,75 @@
 import { PrismaClient } from "@prisma/client";
+import { getWorkSchedule } from "../workSchedule.js";
 import { updateRemainingWorkHours } from "./updateRemainingWorkHours.js";
 
 const prisma = new PrismaClient();
 
 export async function recalculateHours(attendanceId) {
-  // Fetch the updated attendance record
   const att = await prisma.attendance.findUnique({
     where: { id: attendanceId },
   });
 
-  if (!att) {
-    throw new Error("Attendance record not found for recalculation");
+  if (!att || !att.timeIn || !att.timeOut) {
+    return att;
   }
 
-  const { timeIn, lunchOut, lunchIn, timeOut, tardinessMinutes, lunchTardinessMinutes } = att;
+  const {
+    timeIn,
+    timeOut,
+    lunchOut,
+    lunchIn,
+    tardinessMinutes = 0,
+    lunchTardinessMinutes = 0,
+    userId,
+    date,
+  } = att;
 
-  let straightWorkHours = null;
-  let totalWorkHours = null;
+  // 🔹 Get official schedule
+  const schedule = await getWorkSchedule(userId, new Date(date));
+  if (!schedule) return att;
 
-  if (timeIn && timeOut) {
-    const workMinutes = (new Date(timeOut) - new Date(timeIn)) / 1000 / 60;
-    const lunchMinutes =
-      lunchOut && lunchIn
-        ? (new Date(lunchIn) - new Date(lunchOut)) / 1000 / 60
-        : 0;
+  const schedStart = schedule.start;
+  const schedEnd = schedule.end;
 
-    // Straight work hours is purely total time between timeIn and timeOut
-    straightWorkHours = workMinutes / 60;
+  // 🔹 Clamp actual work inside schedule window
+  const actualStart = new Date(Math.max(timeIn, schedStart));
+  const actualEnd = new Date(Math.min(timeOut, schedEnd));
 
-    // Total work hours subtracts breaks + tardiness
-    totalWorkHours =
-      (workMinutes -
+  let scheduledWorkMinutes = 0;
+  if (actualEnd > actualStart) {
+    scheduledWorkMinutes = (actualEnd - actualStart) / 60000;
+  }
+
+  // 🔹 Lunch minutes (only if both exist)
+  const lunchMinutes =
+    lunchOut && lunchIn
+      ? (new Date(lunchIn) - new Date(lunchOut)) / 60000
+      : 0;
+
+  // 🔹 Straight work = punch based
+  const straightWorkHours = parseFloat(
+    (((timeOut - timeIn) / 60000) / 60).toFixed(2)
+  );
+
+  // 🔹 Total work = schedule based
+  const totalWorkHours = parseFloat(
+    (
+      (scheduledWorkMinutes -
         lunchMinutes -
-        (tardinessMinutes + lunchTardinessMinutes)) /
-      60;
+        tardinessMinutes -
+        lunchTardinessMinutes) /
+      60
+    ).toFixed(2)
+  );
 
-    straightWorkHours = parseFloat(straightWorkHours.toFixed(2));
-    totalWorkHours = parseFloat(totalWorkHours.toFixed(2));
-  }
-
-  // Save straightWorkHours and totalWorkHours into the Attendance model
-  const updatedAttendance = await prisma.attendance.update({
+  const updated = await prisma.attendance.update({
     where: { id: attendanceId },
     data: {
       straightWorkHours,
-      totalWorkHours,
+      totalWorkHours: Math.max(totalWorkHours, 0),
     },
   });
 
-  // Recalculate remainingWorkHours 
-  await updateRemainingWorkHours(updatedAttendance.userId);
-
-  return updatedAttendance;
+  await updateRemainingWorkHours(userId);
+  return updated;
 }
