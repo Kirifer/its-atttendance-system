@@ -4,7 +4,7 @@ const port = process.env.REACT_APP_API_PORT || 5001;
 
 const API = axios.create({
   baseURL: `http://localhost:${port}/api`,
-  timeout: 1000, // unit is in ms = seconds
+  timeout: 180000, // unit is in ms = seconds
 });
 
 // force logout const
@@ -39,9 +39,5 @@ export default API;
 
 // ping logic updated
 export const pingServer = async () => {
-  try {
-    await API.get("/ping");
-  } catch (err) {
-    forceLogout(); // ping fails = logout immediately
-  }
+  await API.get("/ping");
 };

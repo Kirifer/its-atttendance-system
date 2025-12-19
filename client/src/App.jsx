@@ -12,7 +12,6 @@ import Approvals from "./screens/Approvals";
 import Dashboard from "./screens/Dashboard";
 import ForgotPassword from "./screens/ForgotPassword";
 import Login from "./screens/Login";
-import Logs from "./screens/Logs";
 import ResetPassword from "./screens/ResetPassword";
 import Signup from "./screens/Signup";
 import Timeoff from "./screens/Timeoff";
@@ -20,82 +19,77 @@ import Timesheet from "./screens/Timesheet";
 import UserInfo from "./screens/UserInfo";
 import UserRequests from "./screens/UserRequests";
 import ResetErrorPage from "./screens/ResetErrorPage";
+import SessionLogout from "./components/SessionLogout"
 
 function App() {
-  useEffect(() => {
-    const interval = setInterval(() => {
-      pingServer();
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
-    <Router>
-      <Routes>
-        {/* Default Page "/" */}
-        <Route path="/" element={<Login />} />
+    <SessionLogout>
+      <Router>
+        <Routes>
+          {/* Default Page "/" */}
+          <Route path="/" element={<Login />} />
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/approvals"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <Approvals />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/logs" element={<Logs />} />
+          <Route
+            path="/approvals"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <Approvals />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* ---------------------------- Reset Pass URL Security ---------------------------- */}
-        <Route
-          path="/reset-password/:token"
-          element={
-            <ProtectedResetRoute>
-              <ResetPassword />
-            </ProtectedResetRoute>
-          }
-        />
-        <Route path="/reset-password" element={<ResetErrorPage />} />
+          {/* ---------------------------- Reset Pass URL Security ---------------------------- */}
+          <Route
+            path="/reset-password/:token"
+            element={
+              <ProtectedResetRoute>
+                <ResetPassword />
+              </ProtectedResetRoute>
+            }
+          />
+          <Route path="/reset-password" element={<ResetErrorPage />} />
 
-        <Route path="/sign-up" element={<Signup />} />
-        <Route path="/time-off" element={<Timeoff />} />
-        <Route
-          path="/timesheet"
-          element={
-            <ProtectedRoute>
-              <Timesheet />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user-info"
-          element={
-            <ProtectedRoute>
-              <UserInfo />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/my-requests"
-          element={
-            <ProtectedRoute>
-              <UserRequests />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-      <ToastContainer />
-    </Router>
+          <Route path="/sign-up" element={<Signup />} />
+          <Route path="/time-off" element={<Timeoff />} />
+          <Route
+            path="/timesheet"
+            element={
+              <ProtectedRoute>
+                <Timesheet />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user-info"
+            element={
+              <ProtectedRoute>
+                <UserInfo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-requests"
+            element={
+              <ProtectedRoute>
+                <UserRequests />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+        <ToastContainer />
+      </Router>
+    </SessionLogout>
   );
 }
 

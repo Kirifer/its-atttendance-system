@@ -29,12 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 // serve uploads folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// debug logging for requests
-app.use((req, res, next) => {
-  console.log("HEADERS:", req.headers);
-  console.log("REQ.BODY:", req.body);
-  next();
-});
+
 
 //routes
 app.get("/", (req, res) => {
