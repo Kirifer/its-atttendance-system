@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function Navbar({ user }) {
+export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
