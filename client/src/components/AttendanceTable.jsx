@@ -6,6 +6,8 @@ import useExportPDF from "../hooks/useExportPDF";
 import EditAttendancePopup from "./EditAttendancePopup";
 import FilterAttendanceActions from "./FilterAttendanceActions";
 import { formatHoursToHHMM } from "../hooks/formatHours";
+import usePagination from "../hooks/pagination";
+import Pagination from "./Pagination";
 
 export default function AttendanceTable({
   userId,
@@ -182,18 +184,35 @@ export default function AttendanceTable({
     return fieldValue.toString().toLowerCase().includes(query.toLowerCase());
   });
 
+  const {
+    currentPage,
+    totalPages,
+    paginatedData,
+    nextPage,
+    prevPage,
+    goToPage,
+  } = usePagination(filteredRecords, 10);
+
   return (
     <div className="attendance_body">
       <h1 className="attendance_head">Timesheet</h1>
 
-      <FilterAttendanceActions
-        role={role}
-        firstDay={firstDay}
-        exportPDF={exportPDF}
-        filteredRecords={filteredRecords}
-        onFilterChange={setFilters}
-      />
+        <FilterAttendanceActions
+          role={role}
+          firstDay={firstDay}
+          exportPDF={exportPDF}
+          filteredRecords={filteredRecords}
+          onFilterChange={setFilters}
+        />
 
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPrev={prevPage}
+          onNext={nextPage}
+          onGoTo={goToPage}
+        />
+        
       {records.length === 0 ? (
         <p className="attendance_message">
           No attendance for this{" "}
@@ -217,7 +236,7 @@ export default function AttendanceTable({
               </tr>
             </thead>
             <tbody>
-              {filteredRecords.map((r, i) => (
+              {paginatedData.map((r, i) => (
                 <tr key={i}>
                   {Object.keys(r)
                     .filter(
