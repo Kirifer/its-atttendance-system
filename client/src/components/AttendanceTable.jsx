@@ -191,7 +191,7 @@ export default function AttendanceTable({
     nextPage,
     prevPage,
     goToPage,
-  } = usePagination(filteredRecords, 20);
+  } = usePagination(filteredRecords, 10);
 
   return (
     <div className="attendance_body">
