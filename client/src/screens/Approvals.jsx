@@ -13,9 +13,24 @@ import "../styles/Approvals.css"
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import SetOjtHours from "../components/SetOjtHours";
-import EditUserSchedule from "../components/EditUserSchedule"
-import useUserSchedule from "../hooks/useUserSchedule.js"
+import SetOjtHours from "../components/HandleInterns/SetOjtHours";
+import SetOjtHoursDesktop from "../components/HandleInterns/SetOjtHoursDesktop";
+import EditUserSchedule from "../components/HandleInterns/EditUserSchedule";
+import EditUserScheduleDesktop from "../components/HandleInterns/EditUserScheduleDesktop";
+import useUserSchedule from "../hooks/useUserSchedule.js";
+
+function useIsDesktop(breakpoint = 500) {
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= breakpoint);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= breakpoint);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [breakpoint]);
+
+  return isDesktop;
+}
+
 
 function CustomTabPanel({ children, value, index }) {
   return (
@@ -67,6 +82,8 @@ function Approvals() {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userSchedule = useUserSchedule();
+
+  const isDesktop = useIsDesktop();
 
   return (
     <DashboardLayout>
@@ -126,6 +143,7 @@ function Approvals() {
           </Loader>
         </CustomTabPanel>
 
+         {/* ---------- TAB 4 ---------- */}
         <CustomTabPanel value={value} index={3}>
           <Loader loading={loading}>
             <div>
@@ -133,14 +151,27 @@ function Approvals() {
               <p className="admin__description">
                 Set custom schedule or work hours.
               </p>
-              <EditUserSchedule userSchedule={userSchedule} user={user} />
-          <button
-            className="custom_schedule_btn"
-            onClick={userSchedule.openSchedule}
-          >
-            Set Custom Schedule
-          </button>
-              <SetOjtHours/>
+              {!isDesktop && (
+                <>
+                  <EditUserSchedule userSchedule={userSchedule} user={user} />
+                  <button
+                    className="custom_schedule_btn"
+                    onClick={userSchedule.openSchedule}
+                  >
+                    Set Custom Schedule
+                  </button>
+                  <SetOjtHours />
+                </>
+              )}
+              {isDesktop && (
+                <>
+                  <EditUserScheduleDesktop
+                    userSchedule={userSchedule}
+                    user={user}
+                  />
+                  <SetOjtHoursDesktop />
+                </>
+              )}
             </div>
           </Loader>
         </CustomTabPanel>
