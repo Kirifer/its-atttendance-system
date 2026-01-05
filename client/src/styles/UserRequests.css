@@ -1,6 +1,8 @@
 .user-time__main {
+  position: relative;
   border-radius: 10px;
   padding: 30px;
+  padding-top: 60px;
   width: 90%;
   margin-right: 100px;
   margin: 50px auto;
@@ -26,6 +28,9 @@
 
 /* x button */
 .x-button {
+  position: absolute;
+  top: 60px;
+  right: 20px;
   display: inline-flex;
   flex-direction: column;
   gap: 10px;
@@ -38,6 +43,7 @@
   color: #333;
   transition: all 0.2s ease;
   text-decoration: none;
+  z-index: 999;
 }
 
 .x-button:hover {
@@ -54,8 +60,8 @@
 
 @media (max-width: 600px) {
   .x-button {
-    top: 15px;
-    right: 10px;
+    top: 65px;
+    right: 20px;
     font-size: 20px;
     padding: 4px 8px;
     gap: 6px;
