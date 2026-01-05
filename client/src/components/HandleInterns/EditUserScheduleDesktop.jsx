@@ -3,7 +3,6 @@ import { getAllUsers } from "../../api/auth";
 import "../../styles/HandleInterns/EditUserScheduleDesktop.css";
 
 export default function EditUserScheduleDesktop({ userSchedule, user }) {
-  const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [date, setDate] = useState("");
   const [timeIn, setTimeIn] = useState("09:00");
@@ -12,6 +11,9 @@ export default function EditUserScheduleDesktop({ userSchedule, user }) {
 
   const { setSchedule, loading, error } = userSchedule;
 
+
+  const [users, setUsers] = useState([]);
+
   useEffect(() => {
     const fetchUsers = async () => {
       if (user.role !== "ADMIN") return;
@@ -19,7 +21,6 @@ export default function EditUserScheduleDesktop({ userSchedule, user }) {
       try {
         const allUsers = await getAllUsers();
         setUsers(allUsers);
-        if (allUsers.length > 0) setSelectedUserId(allUsers[0].id);
       } catch (err) {
         console.warn("Failed to load users", err);
       }
@@ -49,9 +50,7 @@ export default function EditUserScheduleDesktop({ userSchedule, user }) {
       <h2 className="schedule_title">Set Custom Schedule</h2>
 
       {error && <p className="schedule_error">{error}</p>}
-      {successMessage && (
-        <p className="schedule_success">{successMessage}</p>
-      )}
+      {successMessage && <p className="schedule_success">{successMessage}</p>}
 
       <div className="schedule_horizontal_group">
         {/* USER */}
@@ -61,6 +60,11 @@ export default function EditUserScheduleDesktop({ userSchedule, user }) {
             value={selectedUserId}
             onChange={(e) => setSelectedUserId(e.target.value)}
           >
+            {/* Placeholder message */}
+            <option value="" disabled>
+              Select a user
+            </option>
+          
             {users.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.email}
