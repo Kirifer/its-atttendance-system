@@ -91,3 +91,17 @@
   background: rgba(0, 0, 0, 0.2);
   font-size: 14px;
 }
+
+.footer__address span {
+  display: inline;
+}
+
+
+@media (max-width: 768px) {
+  .footer__address span {
+    display: block;
+    line-height: 1.6;
+  }
+}
+
+
