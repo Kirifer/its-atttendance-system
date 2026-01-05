@@ -11,6 +11,7 @@ import adminRoutes from "./src/routes/adminRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import "./src/cron/leaveChecker.js";
+import "./src/cron/cleanExpiredSched.js";
 
 dotenv.config();
 

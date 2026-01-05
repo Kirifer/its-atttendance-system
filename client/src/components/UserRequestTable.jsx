@@ -1,20 +1,6 @@
 import React from "react";
 import "../styles/UserRequestTable.css";
 
-const typeLabels = {
-  change_log: "Change Log Request",
-  change_shift: "Change Shift Schedule",
-  offset_hours: "Offset Extended Hours",
-  overtime: "Overtime",
-  undertime: "Undertime",
-};
-
-const placeholderMap = {
-  type: "request type",
-  details: "reason",
-  status: "status",
-};
-
 function UserRequestsTable({
   requests,
   filterType,
@@ -22,6 +8,20 @@ function UserRequestsTable({
   setFilterType,
   setQuery,
 }) {
+  const typeLabels = {
+    change_log: "Change Log Request",
+    change_shift: "Change Shift Schedule",
+    offset_hours: "Offset Extended Hours",
+    overtime: "Overtime",
+    undertime: "Undertime",
+  };
+
+  const placeholderMap = {
+    type: "request type",
+    details: "reason",
+    status: "status",
+  };
+
   const filteredRequests = requests.filter((req) => {
     const value =
       filterType === "type"
@@ -56,7 +56,6 @@ function UserRequestsTable({
           className="user-time-table__input"
         />
       </div>
-
       {/* Table */}
       {filteredRequests.length === 0 ? (
         <p>No requests found.</p>
@@ -72,6 +71,7 @@ function UserRequestsTable({
                 <th>Attachment</th>
               </tr>
             </thead>
+
             <tbody>
               {filteredRequests.map((req) => {
                 const status = req.status ? req.status.toLowerCase() : "";
@@ -89,7 +89,10 @@ function UserRequestsTable({
                     </td>
                     <td
                       data-label="Details"
-                      style={{ whiteSpace: "normal", wordBreak: "break-word" }}
+                      style={{
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                      }}
                     >
                       {req.details}
                     </td>

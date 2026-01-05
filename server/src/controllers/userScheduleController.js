@@ -14,8 +14,9 @@ export const setUserSchedule = async (req, res) => {
     }
 
     const scheduleDate = new Date(date);
-    scheduleDate.setHours(23, 59, 59, 999);
+    scheduleDate.setHours(0, 0, 0, 0);
     const weekday = scheduleDate.getDay();
+
 
     const schedule = await prisma.userSchedule.upsert({
       where: { userId_weekday_scheduleDate: { userId, weekday, scheduleDate } },
