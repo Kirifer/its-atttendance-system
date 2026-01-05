@@ -140,7 +140,7 @@ model UserSchedule {
   startTime String
   endTime   String
 
-  scheduleDate DateTime? 
+  scheduleDate DateTime? @db.Date
 
   user User @relation(fields: [userId], references: [id])
 
