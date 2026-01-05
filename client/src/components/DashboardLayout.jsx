@@ -9,7 +9,6 @@ export default function DashboardLayout({ children }) {
   const { user: contextUser } = useContext(UserContext);
   const [user, setUser] = useState({ username: "", email: "", role: "" });
 
-  // Sync user
   useEffect(() => {
     if (contextUser) setUser(contextUser);
     else {
@@ -20,12 +19,12 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="dashboard">
-      <Navbar user={user} />
-
       <div className="dashboard__content-wrapper">
         <Sidebar user={user} />
 
         <main className="dashboard__main">
+          <Navbar user={user} />
+
           {children}
 
           <footer>
