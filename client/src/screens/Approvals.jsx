@@ -153,14 +153,16 @@ function Approvals() {
               </p>
               {!isDesktop && (
                 <>
-                  <EditUserSchedule userSchedule={userSchedule} user={user} />
-                  <button
-                    className="custom_schedule_btn"
-                    onClick={userSchedule.openSchedule}
-                  >
-                    Set Custom Schedule
-                  </button>
-                  <SetOjtHours />
+                  <div className="custom_schedule_wrapper">
+                    <EditUserSchedule userSchedule={userSchedule} user={user} />
+                    <button
+                      className="custom_schedule_btn"
+                      onClick={userSchedule.openSchedule}
+                    >
+                      Set Custom Schedule
+                    </button>
+                    <SetOjtHours />
+                  </div>
                 </>
               )}
               {isDesktop && (
