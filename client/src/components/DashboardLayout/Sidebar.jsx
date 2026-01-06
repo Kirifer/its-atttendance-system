@@ -1,6 +1,7 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import UserDropDownMenu from "../UserDropdownMenu";
 import { NavLink } from "react-router-dom";
+import { UserContext } from "../../context/UserContext";
 
 export default function Sidebar() {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -10,14 +11,13 @@ export default function Sidebar() {
   const userMenuRef = useRef(null);
   const userProfileRef = useRef(null);
 
-  const [user, setUser] = useState(() => {
-    return JSON.parse(localStorage.getItem("user"));
-  });
+  const { user } = useContext(UserContext);
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("user"));
-    setUser(stored);
-  }, []);
+    if (user) setLoading(false);
+  }, [user]);
 
   // Load saved state
   useEffect(() => {
@@ -46,6 +46,9 @@ export default function Sidebar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  if (loading) return <div className="sidebar-loading">Loading...</div>;
+  if (!user) return null;
 
   return (
     <aside
