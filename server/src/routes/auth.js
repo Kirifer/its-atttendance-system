@@ -18,7 +18,6 @@ import {
   verifyOtpController,
 } from "../controllers/authController.js";
 // Middlewares
-import authMiddleware from "../middlewares/authMiddleware.js";
 import verifyToken from "../middlewares/verifyToken.js";
 import {
   validateSignUp,
@@ -27,10 +26,7 @@ import {
   validateChangePassword,
   validateUpdateUserInfo,
 } from "../middlewares/validateUser.js";
-// Utilities
-import { getTodaySchedule } from "../utils/getTodaySchedule.js";
-import { deleteExpiredSched } from "../utils/deleteExpiredSched.js";
-import { getWorkSchedule } from "../utils/workSchedule.js";
+
 
 const router = express.Router();
 
@@ -62,22 +58,11 @@ const upload = multer({
   },
 });
 
-// ------------------- User sign-up -------------------
 router.post("/sign-up", validateSignUp, signUp);
-
-// ------------------- Login -------------------
 router.post("/login", validateLogin, login);
-
-// ------------------- Forgot Password -------------------
 router.post("/forgot-password", forgotPassword);
-
-// ------------------- OTP -------------------
 router.post("/verify-otp", verifyOtpController);
-
-// ------------------- Reset Password -------------------
 router.post("/reset-password", validateResetPassword, resetPassword);
-
-// ------------------- Reset Password Route Security -------------------
 router.get("/validate-reset-token/:token", validateResetToken);
 
 // ------------------- Get Logged in user data -------------------
@@ -91,17 +76,9 @@ router.post(
   changePassword
 );
 
-// ------------------- Username and email update -------------------
 router.put("/update", validateUpdateUserInfo, verifyToken, updateUserInfo);
-
-// ------------------- Get all non-admin users -------------------
 router.get("/users", verifyToken, getAllUsers);
-
-// ------------------- Get all admin usres -------------------
 router.get("/admins", verifyToken, getAllAdminUsers);
-
-// ------------------- Get all user roles -------------------
 router.get("/all-users", verifyToken, getAllUsersWithRoles);
 
-// Must be always below
 export default router;

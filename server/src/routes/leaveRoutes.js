@@ -12,7 +12,6 @@ const router = express.Router();
 
 // Routes
 router.use(verifyToken);
-
 router.post("/", upload.single("attachment"), createLeave);
 router.get("/", getLeaves);
 router.patch("/:id/status", updateLeaveStatus);
