@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useContext } from "react"; // combined imports
+import { useState, useEffect, useContext } from "react"; // combined imports
 import { changePassword, updateUserInfo } from "../api/auth";
-import UserInfoLayout from "../components/UserInfoLayout";
 import "../styles/UserInfo.css";
 import "../styles/PasswordChange.css";
 import API from "../api/api";

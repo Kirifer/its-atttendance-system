@@ -1,4 +1,3 @@
-import React from "react";
 import "../styles/UserRequestTable.css";
 
 function UserRequestsTable({
