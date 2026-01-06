@@ -37,30 +37,17 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// Ping route for frontend to check if backend is alive
+
 app.get("/api/ping", (req, res) => {
   res.status(200).json({ message: "pong" });
 });
 
-// time adjustment
 app.use("/api/time-adjustments", timeAdjustmentRoutes);
-
-// app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/leave", leaveRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/admins", adminRoutes);
 
-//use for testing database connection
-app.get("/test-db", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT NOW()");
-    res.json({ message: "Database connected!", time: result.rows[0] });
-  } catch (err) {
-    console.error("DB Error:", err);
-    res.status(500).json({ error: "Database connection failed" });
-  }
-});
 
 //error handling middleware
 app.use(errorHandling);
