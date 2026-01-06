@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 // Utilities
-import { getTodaySchedule } from "../utils/getTodaySchedule.js";
 import { getWorkSchedule } from "../utils/workSchedule.js";
 import { deleteExpiredSched } from "../utils/deleteExpiredSched.js";
 // Prisma
