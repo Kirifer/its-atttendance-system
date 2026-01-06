@@ -23,8 +23,8 @@ export default function EditAttendancePopup({ record, onClose, onSave }) {
       await updateAttendance(record.id, {
         timeIn: formatTime(timeIn),
         timeOut: formatTime(timeOut),
-        lunchOut: formatTime(lunchOut),
         lunchIn: formatTime(lunchIn),
+        lunchOut: formatTime(lunchOut),
         status, // ✅ include status
       });
 
@@ -44,11 +44,11 @@ export default function EditAttendancePopup({ record, onClose, onSave }) {
         <label>Time In:</label>
         <input type="time" value={timeIn} onChange={(e) => setTimeIn(e.target.value)} />
 
-        <label>Lunch Out:</label>
-        <input type="time" value={lunchOut} onChange={(e) => setLunchOut(e.target.value)} />
-
         <label>Lunch In:</label>
         <input type="time" value={lunchIn} onChange={(e) => setLunchIn(e.target.value)} />
+
+        <label>Lunch Out:</label>
+        <input type="time" value={lunchOut} onChange={(e) => setLunchOut(e.target.value)} />
 
         <label>Time Out:</label>
         <input type="time" value={timeOut} onChange={(e) => setTimeOut(e.target.value)} />
