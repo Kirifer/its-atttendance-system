@@ -157,200 +157,200 @@ const UserInfo = () => {
   if (!user) return <div>Loading...</div>;
 
   return (
-      <DashboardLayout>
-        <div className="user-info-container">
-          <h2>User Info</h2>
-          {/* PFP */}
-          {user.profilePic && (
-            <img
-              src={`http://localhost:5001/uploads/${user.profilePic}`}
-              alt="Profile"
-              style={{
-                width: "120px",
-                height: "120px",
-                borderRadius: "50%",
-                marginTop: "10px",
-                objectFit: "cover",
-              }}
+    <DashboardLayout>
+      <div className="user-info-container">
+        <h2>User Info</h2>
+        {/* PFP */}
+        {user.profilePic && (
+          <img
+            src={`http://localhost:5001/uploads/${user.profilePic}`}
+            alt="Profile"
+            style={{
+              width: "120px",
+              height: "120px",
+              borderRadius: "50%",
+              marginTop: "10px",
+              objectFit: "cover",
+            }}
+          />
+        )}
+
+        {/* Username */}
+        {usernameMsg && <p style={{ color: "green" }}>{usernameMsg}</p>}
+        {usernameErr && <p style={{ color: "red" }}>{usernameErr}</p>}
+        <form onSubmit={handleUsernameUpdate} className="update-user-form">
+          <h3>Username:</h3>
+          <div className="uc-input-group">
+            <input
+              className="text-box"
+              type="text"
+              placeholder="Username"
+              value={username}
+              disabled={!editUsername}
+              onChange={(e) => setUsername(e.target.value)}
             />
+            {!editUsername && (
+              <span
+                className="material-symbols-outlined edit-icon"
+                onClick={() => setEditUsername(true)}
+              >
+                edit
+              </span>
+            )}
+          </div>
+          {editUsername && (
+            <div className="password-buttons">
+              <button className="change-password-form-button" type="submit">
+                Done
+              </button>
+              <button
+                className="change-password-form-button"
+                type="button"
+                onClick={() => {
+                  setEditUsername(false);
+                  setUsername(user.username);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
           )}
+        </form>
 
-          {/* Username */}
-          {usernameMsg && <p style={{ color: "green" }}>{usernameMsg}</p>}
-          {usernameErr && <p style={{ color: "red" }}>{usernameErr}</p>}
-          <form onSubmit={handleUsernameUpdate} className="update-user-form">
-            <h3>Username:</h3>
+        {/* Email */}
+        {emailMsg && <p style={{ color: "green" }}>{emailMsg}</p>}
+        {emailErr && <p style={{ color: "red" }}>{emailErr}</p>}
+        <form onSubmit={handleEmailUpdate} className="update-user-form">
+          <h3>Email:</h3>
+          <div className="uc-input-group">
+            <input
+              className="text-box"
+              type="email"
+              placeholder="Email"
+              value={email}
+              disabled={!editEmail}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            {!editEmail && (
+              <span
+                className="material-symbols-outlined edit-icon"
+                onClick={() => setEditEmail(true)}
+              >
+                edit
+              </span>
+            )}
+          </div>
+          {editEmail && (
+            <div className="password-buttons">
+              <button className="change-password-form-button" type="submit">
+                Done
+              </button>
+              <button
+                className="change-password-form-button"
+                type="button"
+                onClick={() => {
+                  setEditEmail(false);
+                  setEmail(user.email);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </form>
+
+        {/* Password */}
+        {passMsg && <p style={{ color: "green" }}>{passMsg}</p>}
+        {passErr && <p style={{ color: "red" }}>{passErr}</p>}
+        <h3>Change Password:</h3>
+        <form onSubmit={handleChange}>
+          {!editPassword ? (
             <div className="uc-input-group">
               <input
-                className="text-box"
-                type="text"
-                placeholder="Username"
-                value={username}
-                disabled={!editUsername}
-                onChange={(e) => setUsername(e.target.value)}
+                type="password"
+                placeholder="***************"
+                disabled
+                className="uc-password-input"
               />
-              {!editUsername && (
-                <span
-                  className="material-symbols-outlined edit-icon"
-                  onClick={() => setEditUsername(true)}
-                >
-                  edit
-                </span>
-              )}
+              <span
+                className="material-symbols-outlined edit-icon"
+                style={{ cursor: "pointer" }}
+                onClick={() => setEditPassword(true)}
+              >
+                edit
+              </span>
             </div>
-            {editUsername && (
-              <div className="password-buttons">
-                <button className="change-password-form-button" type="submit">
-                  Done
-                </button>
-                <button
-                  className="change-password-form-button"
-                  type="button"
-                  onClick={() => {
-                    setEditUsername(false);
-                    setUsername(user.username);
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
-          </form>
-
-          {/* Email */}
-          {emailMsg && <p style={{ color: "green" }}>{emailMsg}</p>}
-          {emailErr && <p style={{ color: "red" }}>{emailErr}</p>}
-          <form onSubmit={handleEmailUpdate} className="update-user-form">
-            <h3>Email:</h3>
-            <div className="uc-input-group">
-              <input
-                className="text-box"
-                type="email"
-                placeholder="Email"
-                value={email}
-                disabled={!editEmail}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              {!editEmail && (
-                <span
-                  className="material-symbols-outlined edit-icon"
-                  onClick={() => setEditEmail(true)}
-                >
-                  edit
-                </span>
-              )}
-            </div>
-            {editEmail && (
-              <div className="password-buttons">
-                <button className="change-password-form-button" type="submit">
-                  Done
-                </button>
-                <button
-                  className="change-password-form-button"
-                  type="button"
-                  onClick={() => {
-                    setEditEmail(false);
-                    setEmail(user.email);
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
-          </form>
-
-          {/* Password */}
-          {passMsg && <p style={{ color: "green" }}>{passMsg}</p>}
-          {passErr && <p style={{ color: "red" }}>{passErr}</p>}
-          <h3>Change Password:</h3>
-          <form onSubmit={handleChange}>
-            {!editPassword ? (
+          ) : (
+            <>
               <div className="uc-input-group">
                 <input
-                  type="password"
-                  placeholder="***************"
-                  disabled
+                  type={showOld ? "text" : "password"}
+                  placeholder="Old Password"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
                   className="uc-password-input"
                 />
                 <span
-                  className="material-symbols-outlined edit-icon"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setEditPassword(true)}
+                  className="uc-eye-icon material-symbols-outlined"
+                  onClick={() => setShowOld(!showOld)}
                 >
-                  edit
+                  {showOld ? "visibility" : "visibility_off"}
                 </span>
               </div>
-            ) : (
-              <>
-                <div className="uc-input-group">
-                  <input
-                    type={showOld ? "text" : "password"}
-                    placeholder="Old Password"
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
-                    className="uc-password-input"
-                  />
-                  <span
-                    className="uc-eye-icon material-symbols-outlined"
-                    onClick={() => setShowOld(!showOld)}
-                  >
-                    {showOld ? "visibility" : "visibility_off"}
-                  </span>
-                </div>
-                <div className="uc-input-group">
-                  <input
-                    type={showNew ? "text" : "password"}
-                    placeholder="New Password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="uc-password-input"
-                  />
-                  <span
-                    className="uc-eye-icon material-symbols-outlined"
-                    onClick={() => setShowNew(!showNew)}
-                  >
-                    {showNew ? "visibility" : "visibility_off"}
-                  </span>
-                </div>
-                <div className="uc-input-group">
-                  <input
-                    type={showConfirm ? "text" : "password"}
-                    placeholder="Confirm New Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="uc-password-input"
-                  />
-                  <span
-                    className="uc-eye-icon material-symbols-outlined"
-                    onClick={() => setShowConfirm(!showConfirm)}
-                  >
-                    {showConfirm ? "visibility" : "visibility_off"}
-                  </span>
-                </div>
-                <div className="password-buttons">
-                  <button className="change-password-form-button" type="submit">
-                    Done
-                  </button>
-                  <button
-                    className="change-password-form-button"
-                    type="button"
-                    onClick={() => {
-                      setEditPassword(false);
-                      setOldPassword("");
-                      setNewPassword("");
-                      setConfirmPassword("");
-                      setPassErr("");
-                      setPassMsg("");
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </>
-            )}
-          </form>
-        </div>
-      </DashboardLayout>
+              <div className="uc-input-group">
+                <input
+                  type={showNew ? "text" : "password"}
+                  placeholder="New Password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="uc-password-input"
+                />
+                <span
+                  className="uc-eye-icon material-symbols-outlined"
+                  onClick={() => setShowNew(!showNew)}
+                >
+                  {showNew ? "visibility" : "visibility_off"}
+                </span>
+              </div>
+              <div className="uc-input-group">
+                <input
+                  type={showConfirm ? "text" : "password"}
+                  placeholder="Confirm New Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="uc-password-input"
+                />
+                <span
+                  className="uc-eye-icon material-symbols-outlined"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                >
+                  {showConfirm ? "visibility" : "visibility_off"}
+                </span>
+              </div>
+              <div className="password-buttons">
+                <button className="change-password-form-button" type="submit">
+                  Done
+                </button>
+                <button
+                  className="change-password-form-button"
+                  type="button"
+                  onClick={() => {
+                    setEditPassword(false);
+                    setOldPassword("");
+                    setNewPassword("");
+                    setConfirmPassword("");
+                    setPassErr("");
+                    setPassMsg("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </>
+          )}
+        </form>
+      </div>
+    </DashboardLayout>
   );
 };
 

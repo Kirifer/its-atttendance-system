@@ -1,18 +1,22 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../../context/UserContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   const navigate = useNavigate();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { user, setUser } = useContext(UserContext);
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    setUser(null);
     navigate("/");
   };
+
+  if (!user) return null;
 
   return (
     <nav className="navbar">

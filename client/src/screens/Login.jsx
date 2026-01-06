@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../api/auth";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 import "../styles/Login.css";
 import PasswordInput from "../components/PasswordInput";
 import API from "../api/api";
@@ -15,6 +17,7 @@ function Login() {
   });
 
   const navigate = useNavigate();
+  const { fetchUser } = useContext(UserContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,10 +28,10 @@ function Login() {
     });
 
     try {
-      const { token, user } = await loginUser(email, password);
+      const { token } = await loginUser(email, password);
 
       localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+      await fetchUser();
 
       setFieldErrors({ ...fieldErrors, general: "Login successful!" });
       setTimeout(() => {
