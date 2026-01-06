@@ -25,7 +25,6 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
     HALF_DAY: "Half Day",
   };
 
-  const timeOffRawTypes = ["SICK", "VACATION", "HOLIDAY", "OFFSET"];
 
   // Custom filter request placeholder names
   const placeholderMap = {

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import useFilterAttendance from "../hooks/useFilterAttendance";
 import "../styles/FilterAttendanceActions.css"
 
@@ -7,7 +7,7 @@ export default function FilterAttendanceActions({
   firstDay,
   exportPDF,
   filteredRecords,
-  onFilterChange, // send states back to AttendanceTable
+  onFilterChange, 
 }) {
   const {
     filterType,

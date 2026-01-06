@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Calendar from "react-calendar";
-import "../../styles/Calendar.css"; // your CSS file
+import "../../styles/Calendar.css"; 
 
 function DashboardCalendar() {
   const [date, setDate] = useState(new Date());

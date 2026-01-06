@@ -15,12 +15,6 @@ function UserLeaveTable({
     OFFSET: "Offset Hours",
   };
 
-  const coverageTypeLabels = {
-    FULL_DAY: "Full Day",
-    HALF_DAY: "Half Day",
-  };
-
-  const timeOffRawTypes = ["SICK", "VACATION", "HOLIDAY", "OFFSET"];
 
   const leavePlaceholderMap = {
     leaveType: "request type",

@@ -5,7 +5,6 @@ export default function Pagination({
   totalPages,
   onPrev,
   onNext,
-//  onGoTo,
 }) {
   if (totalPages <= 1) return null;
 

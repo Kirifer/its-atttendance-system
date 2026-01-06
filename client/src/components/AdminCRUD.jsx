@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getAllUsersWithRoles, changeUserRole } from "../api/auth";
 import API from "../api/api";
 import "../styles/AdminCRUD.css";

@@ -1,13 +1,13 @@
 import { useEffect, useState, useMemo } from "react";
 import { getUserAttendance, getAllAttendance } from "../api/attendance";
 import { formatAttStatus } from "../hooks/formatAttStatus";
-import "../styles/AttendanceTable.css";
 import useExportPDF from "../hooks/useExportPDF";
 import EditAttendancePopup from "./EditAttendancePopup";
 import FilterAttendanceActions from "./FilterAttendanceActions";
 import { formatHoursToHHMM } from "../hooks/formatHours";
 import usePagination from "../hooks/pagination";
 import Pagination from "./Pagination";
+import "../styles/AttendanceTable.css";
 
 export default function AttendanceTable({
   userId,

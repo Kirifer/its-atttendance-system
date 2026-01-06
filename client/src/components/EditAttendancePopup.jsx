@@ -7,7 +7,7 @@ export default function EditAttendancePopup({ record, onClose, onSave }) {
   const [lunchOut, setLunchOut] = useState(record["Lunch Out"] !== "-" ? record["Lunch Out"] : "");
   const [lunchIn, setLunchIn] = useState(record["Lunch In"] !== "-" ? record["Lunch In"] : "");
   const [timeOut, setTimeOut] = useState(record["Time Out"] !== "-" ? record["Time Out"] : "");
-  const [status, setStatus] = useState(record.status || "PRESENT"); // default enum value
+  const [status, setStatus] = useState(record.status || "PRESENT"); 
 
   const handleSave = async () => {
     try {
