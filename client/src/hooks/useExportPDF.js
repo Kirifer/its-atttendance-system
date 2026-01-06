@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 import { getAllUsersWithRoles, getTimesheetMeta } from "../api/auth";
 import { getUserOjtHours } from "../api/ojtHours";
 
@@ -23,22 +25,8 @@ export default function useExportPDF() {
     fetchUsers();
   }, []);
 
-  const exportPDF = async (records) => {
-    if (!records || !records.length) {
-      alert("No filtered data available to export.");
-      return;
-    }
-
-    if (!usersLoaded) {
-      alert("Users are still loading. Please try again.");
-      return;
-    }
-
-    const internEmail = records[0]?.Intern || "";
-
-    const matchedUser = allUsers.find(
-      (u) => u.email === internEmail
-    );
+  const generatePDFForUser = async (userRecords, internEmail) => {
+    const matchedUser = allUsers.find((u) => u.email === internEmail);
 
     const department = matchedUser?.department ?? "—";
     const position = matchedUser?.position ?? "—";
@@ -71,7 +59,7 @@ export default function useExportPDF() {
       "ACTUAL",
     ];
 
-    const body = records.map((r) => [
+    const body = userRecords.map((r) => [
       r.Date,
       r["Time In"],
       r["Lunch Out"],
@@ -82,7 +70,7 @@ export default function useExportPDF() {
       r.ACTUAL,
     ]);
 
-    const totalHoursSpent = records.reduce((sum, r) => {
+    const totalHoursSpent = userRecords.reduce((sum, r) => {
       const hours = typeof r.ACTUAL === "string" ? parseFloat(r.ACTUAL.replace(" hrs", "")) : Number(r.ACTUAL);
       return isNaN(hours) ? sum : sum + hours;
     }, 0).toFixed(2);
@@ -245,7 +233,57 @@ export default function useExportPDF() {
     doc.setFont("helvetica", "normal");
     doc.text(approvedByPosition, 180, signY + 26);
 
-    doc.save("timesheet_filtered.pdf");
+    return doc;
+  };
+
+  const exportPDF = async (records) => {
+    if (!records || !records.length) {
+      alert("No filtered data available to export.");
+      return;
+    }
+
+    if (!usersLoaded) {
+      alert("Users are still loading. Please try again.");
+      return;
+    }
+
+    // Group records by user email
+    const recordsByUser = records.reduce((acc, record) => {
+      const email = record.Intern;
+      if (!acc[email]) {
+        acc[email] = [];
+      }
+      acc[email].push(record);
+      return acc;
+    }, {});
+
+    const userEmails = Object.keys(recordsByUser);
+
+    // If only one user, generate and download single PDF
+    if (userEmails.length === 1) {
+      const singleUserEmail = userEmails[0];
+      const doc = await generatePDFForUser(recordsByUser[singleUserEmail], singleUserEmail);
+      doc.save(`timesheet_${singleUserEmail.replace(/[@.]/g, '_')}.pdf`);
+      return;
+    }
+
+    // If multiple users, generate PDFs and zip them
+    try {
+      const zip = new JSZip();
+
+      for (const email of userEmails) {
+        const doc = await generatePDFForUser(recordsByUser[email], email);
+        const pdfBlob = doc.output("blob");
+        const sanitizedEmail = email.replace(/[@.]/g, '_');
+        zip.file(`timesheet_${sanitizedEmail}.pdf`, pdfBlob);
+      }
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      saveAs(zipBlob, "timesheets_export.zip");
+    } catch (err) {
+      console.error("Failed to generate ZIP file", err);
+      alert("Failed to export multiple PDFs. Please try again.");
+    }
   };
 
   return { exportPDF };
