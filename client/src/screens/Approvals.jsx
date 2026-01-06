@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   getAllLeaves,
   updateLeaveStatus,
@@ -46,12 +47,34 @@ function a11yProps(index) {
   };
 }
 
-function Approvals() {
-  const [value, setValue] = useState(0);
+function Approvals() {  
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Read tab from URL query parameter, default to 0
+  const getTabFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    const tab = parseInt(params.get('tab'), 10);
+    return !isNaN(tab) && tab >= 0 && tab <= 3 ? tab : 0;
+  };
+
+  const [value, setValue] = useState(getTabFromUrl());
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const handleChange = (_, newValue) => setValue(newValue);
+ // Update URL when tab changes
+  const handleChange = (_, newValue) => {
+    setValue(newValue);
+    const params = new URLSearchParams(location.search);
+    params.set('tab', newValue);
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+  };
+
+  // Sync state with URL on page load/refresh
+  useEffect(() => {
+    setValue(getTabFromUrl());
+  }, [location.search]);
 
   const fetchLeaves = async () => {
     try {
