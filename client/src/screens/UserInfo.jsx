@@ -6,7 +6,6 @@ import "../styles/PasswordChange.css";
 import API from "../api/api";
 import { UserContext } from "../context/UserContext";
 import DashboardLayout from "../components/DashboardLayout";
-import SessionLogout from "../components/SessionLogout";
 
 const UserInfo = () => {
   const [user, setUser] = useState(null); // real-time update
@@ -158,7 +157,6 @@ const UserInfo = () => {
   if (!user) return <div>Loading...</div>;
 
   return (
-    <SessionLogout>
       <DashboardLayout>
         <div className="user-info-container">
           <h2>User Info</h2>
@@ -353,7 +351,6 @@ const UserInfo = () => {
           </form>
         </div>
       </DashboardLayout>
-    </SessionLogout>
   );
 };
 

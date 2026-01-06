@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getAllUsers } from "../api/auth";
-import "../styles/EditUserSchedule.css";
+import { getAllUsers } from "../../api/auth";
+import "../../styles/HandleInterns/EditUserSchedule.css";
 
 export default function EditUserSchedule({ userSchedule, user }) {
   const [users, setUsers] = useState([]);

@@ -198,14 +198,6 @@ export const lunchIn = async (req, res) => {
 
 export const timeOut = async (req, res) => {
   try {
-    const user = req.user;
-
-    if (user.role === "ADMIN") {
-      return res
-        .status(403)
-        .json({ message: "Admins cannot have attendance records" });
-    }
-
     const userId = req.user.id;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -214,53 +206,28 @@ export const timeOut = async (req, res) => {
       where: { userId_date: { userId, date: today } },
     });
 
-    if (!attendance) {
-      return res.status(400).json({ message: "You have not timed in today" });
-    }
-
-    if (attendance.timeOut) {
-      return res.status(400).json({ message: "Already timed out today" });
+    if (!attendance || attendance.timeOut) {
+      return res.status(400).json({ message: "Invalid time-out" });
     }
 
     if (attendance.lunchOut && !attendance.lunchIn) {
-      return res
-        .status(400)
-        .json({ message: "Please return from lunch before timing out" });
+      return res.status(400).json({ message: "Return from lunch first" });
     }
 
-    const now = new Date();
-
-    const timeIn = attendance.timeIn;
-    const timeOut = now;
-
-    const workMinutes = timeIn && timeOut ? (timeOut - timeIn) / 1000 / 60 : 0;
-    const lunchMinutes =
-      attendance.lunchOut && attendance.lunchIn
-        ? (attendance.lunchIn - attendance.lunchOut) / 1000 / 60
-        : 0;
-
-    const straightWorkHours = workMinutes / 60;
-    const totalWorkHours =
-      (workMinutes -
-        lunchMinutes -
-        (attendance.tardinessMinutes + attendance.lunchTardinessMinutes)) /
-      60;
-
-    const updated = await prisma.attendance.update({
+    await prisma.attendance.update({
       where: { id: attendance.id },
-      data: {
-        timeOut: now,
-        straightWorkHours: parseFloat(straightWorkHours.toFixed(2)),
-        totalWorkHours: parseFloat(totalWorkHours.toFixed(2)),
-      },
+      data: { timeOut: new Date() },
     });
 
+    const updated = await recalculateHours(attendance.id);
+
     res.json({ message: "Time-out logged", attendance: updated });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Error logging time-out" });
   }
 };
+
 
 export const getUserAttendance = async (req, res) => {
   try {

@@ -1,0 +1,106 @@
+/* Container */
+.schedule_desktop_container {
+  background: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  margin-top: 12px;
+  max-width: 100%;
+}
+
+/* Title */
+.schedule_title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* Messages */
+.schedule_error {
+  color: #dc2626;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.schedule_success {
+  color: #16a34a;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+/* Horizontal layout */
+.schedule_horizontal_group {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+/* Fields */
+.schedule_field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Labels */
+.schedule_field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+/* Inputs & Select */
+.schedule_field input,
+.schedule_field select {
+  height: 36px;
+  padding: 6px 10px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+/* Focus */
+.schedule_field input:focus,
+.schedule_field select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+/* Action */
+.schedule_field.action {
+  flex: 0.7;
+}
+
+/* Save button */
+.schedule_save_btn {
+  height: 36px;
+  padding: 0 14px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  background: #1a5dac;
+  color: #fff;
+  cursor: pointer;
+}
+
+.schedule_save_btn:hover {
+  background: #0066d3;
+}
+
+.schedule_save_btn:disabled {
+  opacity: 0.9;
+  cursor: not-allowed;
+}
+
+/* Responsive fallback */
+@media (max-width: 1024px) {
+  .schedule_horizontal_group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

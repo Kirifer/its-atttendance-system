@@ -5,6 +5,9 @@ import "../styles/AttendanceTable.css";
 import useExportPDF from "../hooks/useExportPDF";
 import EditAttendancePopup from "./EditAttendancePopup";
 import FilterAttendanceActions from "./FilterAttendanceActions";
+import { formatHoursToHHMM } from "../hooks/formatHours";
+import usePagination from "../hooks/pagination";
+import Pagination from "./Pagination";
 
 export default function AttendanceTable({
   userId,
@@ -113,28 +116,13 @@ export default function AttendanceTable({
           const lo = r.lunchOut ? new Date(r.lunchOut) : null;
           const li = r.lunchIn ? new Date(r.lunchIn) : null;
 
-          const workMinutes = ti && to ? Math.floor((to - ti) / 1000 / 60) : null;
+          // const workMinutes = ti && to ? Math.round((to - ti) / 1000 / 60) : null;
 
-          const lunchMinutes = lo && li ? Math.floor((li - lo) / 1000 / 60) : 0;
+          // const lunchMinutes = 60;
 
           const lunchTardyMinutes = r.lunchTardinessMinutes || 0;
 
           const tardyMinutes = r.tardinessMinutes || 0;
-
-          const totalMinutes =
-            workMinutes !== null
-              ? workMinutes - lunchMinutes - (tardyMinutes + lunchTardyMinutes)
-              : null;
-
-          const straightWorkHours =
-            workMinutes !== null
-              ? (workMinutes / 60).toFixed(2)
-              : "-";
-
-          const totalHours =
-            totalMinutes !== null
-              ? (totalMinutes / 60).toFixed(2)
-              : "-";
 
           const presentDays = res.workDays[String(r.userId)] || 0;
 
@@ -148,10 +136,7 @@ export default function AttendanceTable({
 
             Intern: role === "ADMIN" ? r.user.email : userEmail,
             Status: r.status,
-
             Date: new Date(r.date).toLocaleDateString("en-US", options),
-            /* Week: getWeekOfMonth(new Date(r.date)),*/
-
             "Time In": ti ? ti.toLocaleTimeString("en-US", timeOptions) : "-",
             "Lunch Out": lo ? lo.toLocaleTimeString("en-US", timeOptions) : "-",
             "Lunch In": li ? li.toLocaleTimeString("en-US", timeOptions) : "-",
@@ -159,8 +144,8 @@ export default function AttendanceTable({
             "Lunch Tardy": lunchTardyMinutes > 0 ? `${lunchTardyMinutes} mins` : "-",
             Tardiness: tardyMinutes > 0 ? `${tardyMinutes} mins` : "-",
             DAYS: presentDays,
-            HOURS: straightWorkHours !== "-" ? `${straightWorkHours} hrs` : "-",
-            TOTAL: totalHours !== "-" ? `${totalHours} hrs` : "-",
+            TOTAL: r.straightWorkHours !== null ? formatHoursToHHMM(r.straightWorkHours) : "-",
+            ACTUAL: r.totalWorkHours !== null ? formatHoursToHHMM(r.totalWorkHours) : "-",
           };
         });
 
@@ -199,18 +184,35 @@ export default function AttendanceTable({
     return fieldValue.toString().toLowerCase().includes(query.toLowerCase());
   });
 
+  const {
+    currentPage,
+    totalPages,
+    paginatedData,
+    nextPage,
+    prevPage,
+    goToPage,
+  } = usePagination(filteredRecords, 10);
+
   return (
     <div className="attendance_body">
       <h1 className="attendance_head">Timesheet</h1>
 
-      <FilterAttendanceActions
-        role={role}
-        firstDay={firstDay}
-        exportPDF={exportPDF}
-        filteredRecords={filteredRecords}
-        onFilterChange={setFilters}
-      />
+        <FilterAttendanceActions
+          role={role}
+          firstDay={firstDay}
+          exportPDF={exportPDF}
+          filteredRecords={filteredRecords}
+          onFilterChange={setFilters}
+        />
 
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPrev={prevPage}
+          onNext={nextPage}
+          onGoTo={goToPage}
+        />
+        
       {records.length === 0 ? (
         <p className="attendance_message">
           No attendance for this{" "}
@@ -234,7 +236,7 @@ export default function AttendanceTable({
               </tr>
             </thead>
             <tbody>
-              {filteredRecords.map((r, i) => (
+              {paginatedData.map((r, i) => (
                 <tr key={i}>
                   {Object.keys(r)
                     .filter(

@@ -17,7 +17,12 @@ function Footer() {
 
             <div className="footer__col footer__col--wide">
                 <h6 className="footer__title">Contact US</h6>
-                <p className="footer__text">G/F, Unit 5, Clark Center 09, Jose Abad Santos, Clark Freeport Zone, Central Luzon, Philippines</p>
+                <p className="footer__text footer__address">
+  <span>G/F, Unit 5, Clark Center 09,</span>
+  <span> Jose Abad Santos,</span>
+  <span> Clark Freeport Zone,</span>
+  <span> Central Luzon, Philippines</span>
+</p>
                 <p className="footer__text">info@gmail.com</p>
                 <p className="footer__text">PH: +63 9060010784 (Globe)</p>
                 <p className="footer__text">PH: +63 9218591348 (Smart)</p>

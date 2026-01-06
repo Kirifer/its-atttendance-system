@@ -1,40 +1,50 @@
 import { PrismaClient } from "@prisma/client";
+import { deleteExpiredSched } from "./deleteExpiredSched.js";
+
 const prisma = new PrismaClient();
 
 export const getWorkSchedule = async (userId, date = new Date()) => {
-    const day = date.getDay();
+  const today = new Date(date);
+  today.setHours(0, 0, 0, 0);
 
-    if (day === 0 || day === 6) {
-        return null;
-    }
+  const day = today.getDay();
+  if (day === 0 || day === 6) return null;
 
-    const custom = await prisma.userSchedule.findFirst({
-        where: { userId, weekday: day, scheduleDate: {gte: new Date()} },
-    });
+  
+  await deleteExpiredSched(userId, prisma);
 
-    if (custom) {
-        const start = new Date(date);
-        const end = new Date(date);
+  // Try date-specific custom schedule
+  const custom = await prisma.userSchedule.findFirst({
+    where: {
+      userId,
+      scheduleDate: today,
+    },
+  });
 
-        const [sh, sm] = custom.startTime.split(":").map(Number);
-        const [eh, em] = custom.endTime.split(":").map(Number);
+  if (custom) {
+    const start = new Date(today);
+    const end = new Date(today);
 
-        start.setHours(sh, sm, 0, 0);
-        end.setHours(eh, em, 0, 0);
+    const [sh, sm] = custom.startTime.split(":").map(Number);
+    const [eh, em] = custom.endTime.split(":").map(Number);
 
-        return { start, end };
-    }
-    
-    const start = new Date(date);
-    const end = new Date(date);
-
-    if (day === 3) {
-        start.setHours(10, 0, 0, 0);
-        end.setHours(19, 0, 0, 0);
-    } else {
-        start.setHours(9, 0, 0, 0);
-        end.setHours(18, 0, 0, 0);
-    }
+    start.setHours(sh, sm, 0, 0);
+    end.setHours(eh, em, 0, 0);
 
     return { start, end };
-}
+  }
+
+  // Default weekday schedule
+  const start = new Date(today);
+  const end = new Date(today);
+
+  if (day === 3) {
+    start.setHours(10, 0, 0, 0);
+    end.setHours(19, 0, 0, 0);
+  } else {
+    start.setHours(9, 0, 0, 0);
+    end.setHours(18, 0, 0, 0);
+  }
+
+  return { start, end };
+};

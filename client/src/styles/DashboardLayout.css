@@ -175,8 +175,6 @@ footer {
   }
 
   .navbar {
-    margin-left: 84px;
-    width: calc(100% - 84px);
     height: 80px;
     display: flex;
     justify-content: space-between;
@@ -184,7 +182,7 @@ footer {
     padding: 0 20px;
     background: white;
     border-bottom: 1px solid #ddd;
-    position: fixed;
+    position: sticky;
     top: 0;
     z-index: 2000;
   }
@@ -275,7 +273,7 @@ footer {
     padding: 0 20px;
     background: white;
     border-bottom: 1px solid #ddd;
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     z-index: 2000;
@@ -308,3 +306,5 @@ footer {
   transform: scaleX(1) scaleY(1);
   transition: all 0.3s ease;
 }
+
+

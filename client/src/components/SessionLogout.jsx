@@ -5,54 +5,49 @@ import { jwtDecode } from "jwt-decode";
 const SessionLogout = ({ children }) => {
   const [serverError, setServerError] = useState(false);
 
+  const handleForceLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    if (window.location.pathname !== "/") {
+      window.location.href = "/";
+    }
+  };
+
+  // 🔐 Token check (ONCE)
   useEffect(() => {
-    const checkStatus = async () => {
-      const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-      if (!token && window.location.pathname !== "/") {
+    if (!token) {
+      handleForceLogout();
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+
+      if (decoded.exp < currentTime) {
         handleForceLogout();
-        return;
       }
+    } catch {
+      handleForceLogout();
+    }
+  }, []);
 
-      if (token) {
-        try {
-          const decoded = jwtDecode(token);
-          const currentTime = Date.now() / 1000;
-          if (decoded.exp < currentTime) {
-            console.warn("Token expired. Logging out...");
-            handleForceLogout();
-            return;
-          }
-        } catch (err) {
-          console.error("Invalid token format detected.");
-          handleForceLogout();
-          return;
-        }
-      }
-
+  // 🌐 Server heartbeat (SLOW)
+  useEffect(() => {
+    const ping = async () => {
       try {
         await pingServer();
         setServerError(false);
-      } catch (err) {
-        if (err.response?.status === 401 || err.response?.status === 403) {
-          handleForceLogout();
-        } else {
-          setServerError(true);
-        }
+      } catch {
+        setServerError(true);
       }
     };
 
-    const handleForceLogout = () => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      if (window.location.pathname !== "/") {
-        window.location.href = "/";
-      }
-    };
+    ping(); // initial ping
+    const interval = setInterval(ping, 60_000); // 1 minute
 
-    checkStatus();
-
-    const interval = setInterval(checkStatus, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -78,5 +73,4 @@ const errorBarStyle = {
   zIndex: 9999,
   fontWeight: "bold",
 };
-
 export default SessionLogout;

@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import useHandleOjtHours from "../hooks/handleOjtHours";
-import "../styles/SetOjtHours.css";
+import useHandleOjtHours from "../../hooks/handleOjtHours";
+import "../../styles/HandleInterns/SetOjtHours.css";
 
 export default function SetOjtHours() {
   const {

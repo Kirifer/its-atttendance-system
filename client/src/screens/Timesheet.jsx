@@ -6,7 +6,6 @@ import API from "../api/api";
 import "../styles/AttendanceTable.css";
 import "../styles/DateRange.css";
 import "../styles/TimeAdjustmentModal.css";
-import SessionLogout from "../components/SessionLogout.jsx";
 
 function Timesheet() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -57,7 +56,6 @@ function Timesheet() {
   };
 
   return (
-    <SessionLogout>
       <DashboardLayout>
         <div className="dashboard-main" style={{ position: "relative" }}>
           {!isAdmin && (
@@ -110,7 +108,6 @@ function Timesheet() {
           />
         </div>
       </DashboardLayout>
-    </SessionLogout>
   );
 }
 
