@@ -9,7 +9,7 @@ import LeaveTable from "../components/LeaveTable";
 import TimeAdjustmentTable from "../components/TimeAdjustmentTable";
 import AdminCRUD from "../components/AdminCRUD";
 import Loader from "../components/Spinner/Loader";
-import "../styles/Approvals.css"
+import "../styles/Approvals.css";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -30,7 +30,6 @@ function useIsDesktop(breakpoint = 500) {
 
   return isDesktop;
 }
-
 
 function CustomTabPanel({ children, value, index }) {
   return (
@@ -95,6 +94,7 @@ function Approvals() {
             onChange={handleChange}
             variant="scrollable"
             scrollButtons="auto"
+            allowScrollButtonsMobile
             aria-label="Approvals Tabs"
           >
             <Tab label="Time Adjustments" {...a11yProps(0)} />
@@ -143,7 +143,7 @@ function Approvals() {
           </Loader>
         </CustomTabPanel>
 
-         {/* ---------- TAB 4 ---------- */}
+        {/* ---------- TAB 4 ---------- */}
         <CustomTabPanel value={value} index={3}>
           <Loader loading={loading}>
             <div>
@@ -176,7 +176,6 @@ function Approvals() {
           </Loader>
         </CustomTabPanel>
       </div>
-      
     </DashboardLayout>
   );
 }

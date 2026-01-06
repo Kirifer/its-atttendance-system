@@ -1,12 +1,12 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { UserContext } from "../context/UserContext";
 import "../styles/UserInfoLayout.css";
 
 function UserInfoLayout({ children }) {
   const [open, setOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [user, setUser] = useState({ username: "", email: "" });
+  const { user, setUser } = useContext(UserContext);
   const userMenuRef = useRef(null);
   const userProfileRef = useRef(null);
 
@@ -15,6 +15,7 @@ function UserInfoLayout({ children }) {
   const handleSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    setUser(null);
     navigate("/login");
   };
 
@@ -36,11 +37,6 @@ function UserInfoLayout({ children }) {
     };
   }, []);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    setUser(storedUser ? JSON.parse(storedUser) : { username: "", email: "" });
-  }, []);
-
   return (
     // Desktop-View
     <div className="userinfo">
@@ -51,19 +47,19 @@ function UserInfoLayout({ children }) {
         <ul className="userinfo__sidebar-links">
           <li>
             <a href="user-info">
-              <span class="material-symbols-outlined">person</span>
+              <span className="material-symbols-outlined">person</span>
               Profile
             </a>
           </li>
           <li>
             <a href="dashboard">
-              <span class="material-symbols-outlined">dashboard</span>
+              <span className="material-symbols-outlined">dashboard</span>
               Return to Dashboard
             </a>
           </li>
           <li>
             <a onClick={handleSignOut}>
-              <span class="material-symbols-outlined">logout</span>
+              <span className="material-symbols-outlined">logout</span>
               Sign Out
             </a>
           </li>
