@@ -88,6 +88,7 @@ function UserRequests() {
             onChange={handleChange}
             variant="scrollable"
             scrollButtons="auto"
+            allowScrollButtonsMobile
             aria-label="Approvals Tabs"
           >
             <Tab label="Time Adjustments" {...a11yProps(0)} />
