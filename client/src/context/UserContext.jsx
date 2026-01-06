@@ -5,21 +5,38 @@ export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setUser(null);
+        return;
+      }
+
+      const res = await API.get("/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setUser(res.data.user || res.data);
+      localStorage.setItem("user", JSON.stringify(res.data.user || res.data));
+    } catch (err) {
+      console.error("Failed to fetch user", err);
+      setUser(null);
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await API.get("/auth/me");
-        setUser(res.data);
-      } catch (err) {
-        console.log("Error fetching user:", err);
-      }
-    };
     fetchUser();
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, fetchUser, loading }}>
       {children}
     </UserContext.Provider>
   );
