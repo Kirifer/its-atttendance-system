@@ -21,7 +21,7 @@ export default function EditUserSchedule({ userSchedule, user }) {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        if (user.role !== "ADMIN") return; 
+        if (user.role !== "ADMIN") return;
         const allUsers = await getAllUsers();
         setUsers(allUsers);
         if (allUsers.length > 0) setSelectedUserId(allUsers[0].id);
@@ -58,40 +58,40 @@ export default function EditUserSchedule({ userSchedule, user }) {
   };
 
   return (
-    <div className="custom_schedule_overlay">
-      <div className="custom_schedule">
-        <h2>Configure Custom Schedule</h2>
-        <label>User Email</label>
-        <select
-          value={selectedUserId}
-          onChange={(e) => setSelectedUserId(e.target.value)}
-        >
-          {users.map((user) => (
-            <option key={user.id} value={user.id}>
-              {user.email}
-            </option>
-          ))}
-        </select>
+      <div className="custom_schedule_overlay">
+        <div className="custom_schedule">
+          <h2>Configure Custom Schedule</h2>
+          <label>User Email</label>
+          <select
+            value={selectedUserId}
+            onChange={(e) => setSelectedUserId(e.target.value)}
+          >
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.email}
+              </option>
+            ))}
+          </select>
 
-        <label>Date</label>
-        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          <label>Date</label>
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
 
-        <label>Time In</label>
-        <input type="time" value={timeIn} onChange={(e) => setTimeIn(e.target.value)} />
+          <label>Time In</label>
+          <input type="time" value={timeIn} onChange={(e) => setTimeIn(e.target.value)} />
 
-        <label>Time Out</label>
-        <input type="time" value={timeOut} onChange={(e) => setTimeOut(e.target.value)} />
+          <label>Time Out</label>
+          <input type="time" value={timeOut} onChange={(e) => setTimeOut(e.target.value)} />
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
 
-        <div className="custom_schedule_buttons">
-          <button onClick={handleSave} disabled={loading}>
-            {loading ? "Saving..." : "Save"}
-          </button>
-          <button onClick={closeSchedule}>Cancel</button>
+          <div className="custom_schedule_buttons">
+            <button onClick={handleSave} disabled={loading}>
+              {loading ? "Saving..." : "Save"}
+            </button>
+            <button onClick={closeSchedule}>Cancel</button>
+          </div>
         </div>
       </div>
-    </div>
   );
 }

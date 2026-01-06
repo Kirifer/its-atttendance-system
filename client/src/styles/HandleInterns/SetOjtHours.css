@@ -1,14 +1,15 @@
 .set_ojthours_btn {
-  padding: 10px 16px;
+  padding: 15px 0px;
   background: #1a5dac;
   color: #fff;
   border-radius: 8px;
   cursor: pointer;
   border: none;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   transition: background 0.2s ease-in-out;
   white-space: nowrap;
+  width: 19em;
 }
 
 .set_ojthours_btn:hover {
@@ -56,19 +57,6 @@
   font-weight: 600;
   color: #333;
 }
-
-/* not used for now but plzzzz dont remove plzz ty */
-
-/* .set_ojthours_view_link {
-  font-size: 13px;
-  color: #007bff;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.set_ojthours_view_link:hover {
-  text-decoration: underline;
-} */
 
 .set_ojthours_popup label {
   display: block;
