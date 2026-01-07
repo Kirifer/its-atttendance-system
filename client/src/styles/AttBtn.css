@@ -212,3 +212,15 @@
   color: #555;
   letter-spacing: 1px;
 }
+
+.att__hint {
+  display: block;
+  max-width: 150px;       
+  margin: 6px auto 0;     
+  font-size: 0.95rem;
+  line-height: 1.2;
+  text-align: center;
+  color: #c15353;
+  opacity: 0.9;
+  user-select: none;
+}

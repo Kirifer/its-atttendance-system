@@ -6,6 +6,7 @@ import API from "../api/api"; // <-- needed for /me
 export function useTimeInOut(userId, onAttendanceChange) {
   const [isTimedIn, setIsTimedIn] = useState(false);
   const [onLeave, setOnLeave] = useState(false);
+  const [totalOJTHours, setTotalOJTHours] = useState(null); 
 
   const user = JSON.parse(localStorage.getItem("user"));
   const role = user?.role;
@@ -25,15 +26,15 @@ export function useTimeInOut(userId, onAttendanceChange) {
 
         setIsTimedIn(todayRecord?.timeIn && !todayRecord?.timeOut);
 
-        // 2. Fetch updated user info (includes onLeave)
+
         const userRes = await API.get("/auth/me");
         const updatedUser = userRes.data;
 
         setOnLeave(updatedUser.onLeave);
+        setTotalOJTHours(updatedUser.totalOJTHours); 
 
         // update localStorage
         localStorage.setItem("user", JSON.stringify(updatedUser));
-
       } catch (err) {
         console.error("Error initializing attendance:", err);
       }
@@ -44,6 +45,14 @@ export function useTimeInOut(userId, onAttendanceChange) {
 
   const handleTimeIn = async () => {
     try {
+      if (totalOJTHours === null) {
+        return showToast({
+          message: "Please contact HR/Admin to update your OJT hours",
+          color: "#ffffff",
+          type: "warning",
+        });
+      }
+
       await timeIn();
 
       showToast({
@@ -54,7 +63,6 @@ export function useTimeInOut(userId, onAttendanceChange) {
 
       setIsTimedIn(true);
       onAttendanceChange();
-
     } catch (err) {
       showToast({
         message: err?.response?.data?.message || "Failed to time in",
@@ -82,6 +90,7 @@ export function useTimeInOut(userId, onAttendanceChange) {
     isTimedIn,
     handleTimeIn,
     handleTimeOut,
-    onLeave,  // <-- now correct & real-time synced
+    onLeave,
+    totalOJTHours,
   };
 }

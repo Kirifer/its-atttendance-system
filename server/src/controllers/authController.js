@@ -50,6 +50,7 @@ export const getMe = async (req, res) => {
         profilePic: true,
         onLeave: true,
         useCustomSchedule: true,
+        totalOJTHours: true,
       },
     });
 

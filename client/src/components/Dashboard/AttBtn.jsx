@@ -8,14 +8,15 @@ function AttBtn({ userId, onAttendanceChange, reload }) {
     isTimedIn,
     handleTimeIn,
     handleTimeOut,
-    onLeave
+    onLeave,
+    totalOJTHours, 
   } = useTimeInOut(userId, onAttendanceChange);
 
   const {
     canLunchOut,
     canLunchIn,
     handleLunchOut,
-    handleLunchIn
+    handleLunchIn,
   } = useLunchInOut(userId, reload, onAttendanceChange);
 
   if (role === "ADMIN") return null;
@@ -25,13 +26,19 @@ function AttBtn({ userId, onAttendanceChange, reload }) {
       <div className="att__carousel">
 
         <div className="att__carousel-card">
-          <button
-            className="att__btn-ti"
-            onClick={handleTimeIn}
-            disabled={isTimedIn || onLeave}
-          >
-            Time In
-          </button>
+          {totalOJTHours === null ? (
+            <div className="att__hint ">
+              Please contact HR/Admin to update your OJT hours
+            </div>
+          ) : (
+            <button
+              className="att__btn-ti"
+              onClick={handleTimeIn}
+              disabled={isTimedIn || onLeave}
+            >
+              Time In
+            </button>
+          )}
         </div>
 
         <div className="att__carousel-card">
