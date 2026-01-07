@@ -135,6 +135,18 @@ export const login = async (req, res) => {
       { expiresIn: "1h" }
     );
 
+    if (user.role !== "ADMIN" && user.totalOJTHours === 0) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { 
+          totalOJTHours: null,
+          remainingWorkHours: null 
+        },
+      });
+      user.totalOJTHours = null;
+      user.remainingWorkHours = null;
+    }
+
     res.json({
       token,
       user: {
@@ -146,6 +158,8 @@ export const login = async (req, res) => {
         department: user.department,
         position: user.position,
         supervisor: user.supervisor,
+        totalOJTHours: user.totalOJTHours, 
+        remainingWorkHours: user.remainingWorkHours,
       },
     });
   } catch (err) {

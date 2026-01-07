@@ -10,6 +10,10 @@ export async function updateRemainingWorkHours(userId) {
 
   if (!user) return;
 
+  if (user.totalOJTHours === null) {
+    return null;
+  }
+
   // Sum TOTAL WORK HOURS of the user
   const { _sum } = await prisma.attendance.aggregate({
     where: { userId },
