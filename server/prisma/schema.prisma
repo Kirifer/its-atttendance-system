@@ -33,8 +33,8 @@ model User {
   reset_token        String?
   reset_token_expiry DateTime?
   onLeave            Boolean   @default(false) 
-  totalOJTHours      Float     @default(0)
-  remainingWorkHours Float     @default(0)
+  totalOJTHours      Float?     @default(0)
+  remainingWorkHours Float?    @default(0)
   resignedAt  DateTime? 
   leaves      Leave[]
   attendance  Attendance[]
