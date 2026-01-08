@@ -23,8 +23,6 @@ router.get("/", authMiddleware, adminOnly, async (req, res) => {
         username: true,
         email: true,
         resignedAt: true,
-        // ------------------ Disabled for now ------------------
-        // profilePic: true,
         created_at: true,
       },
       // ascending ordering

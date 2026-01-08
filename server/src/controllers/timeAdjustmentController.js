@@ -3,7 +3,6 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const {
-  createTimeAdjustment,
   getTimeAdjustments,
 } = require("../models/timeAdjustment");
 
