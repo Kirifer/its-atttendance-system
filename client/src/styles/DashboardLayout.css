@@ -11,11 +11,12 @@
 .dashboard__content-wrapper {
   flex: 1;
   display: flex;
-  overflow: hidden;
   align-items: stretch;
+  overflow: visible;
 }
 
 .dashboard__sidebar {
+  position: sticky;
   top: 0;
   left: 0;
   height: 100%;
@@ -54,6 +55,7 @@
 }
 
 .dashboard__sidebar-links li a {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0 20px;
@@ -77,10 +79,7 @@
 .dashboard__sidebar-links li a::before {
   content: "";
   position: absolute;
-  top: -5px;
-  bottom: -5px;
-  left: -10px;
-  right: -10px;
+  inset: -5px -10px;
   background-color: #1a5dac;
   border-radius: 10px;
   z-index: -1;
