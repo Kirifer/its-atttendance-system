@@ -159,7 +159,7 @@ function Approvals() {
             <div>
               <h1 className="admin__title">Admin Management</h1>
               <p className="admin__description">
-                Create, update, or remove admin users.
+                Create, update, or remove users.
               </p>
               <AdminCRUD />
             </div>
