@@ -4,6 +4,7 @@ import "../styles/UserInfo.css";
 import "../styles/PasswordChange.css";
 import API from "../api/api";
 import { UserContext } from "../context/UserContext";
+import UserTotalOJTHours from "../components/UserTotalOJTHours";
 import DashboardLayout from "../components/DashboardLayout";
 
 const UserInfo = () => {
@@ -173,6 +174,9 @@ const UserInfo = () => {
             }}
           />
         )}
+
+        {/* User's Total OJT Hours */}
+        <UserTotalOJTHours />
 
         {/* Username */}
         {usernameMsg && <p style={{ color: "green" }}>{usernameMsg}</p>}
