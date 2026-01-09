@@ -7,6 +7,7 @@ import crypto from "crypto";
 // Utilities
 import { getWorkSchedule } from "../utils/workSchedule.js";
 import { deleteExpiredSched } from "../utils/deleteExpiredSched.js";
+import { updateRemainingWorkHours } from "../utils/hoursOJT/updateRemainingWorkHours.js";
 // Prisma
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
@@ -40,6 +41,8 @@ export const getMe = async (req, res) => {
 
     await deleteExpiredSched(userId, prisma);
 
+    const remainingHours = await updateRemainingWorkHours(userId);
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -62,6 +65,7 @@ export const getMe = async (req, res) => {
 
     res.json({
       ...user,
+      remainingWorkHours: remainingHours ?? 0,
       todaySchedule: workSchedule
         ? {
             startTime: workSchedule.start.toTimeString().slice(0, 5),
@@ -139,9 +143,9 @@ export const login = async (req, res) => {
     if (user.role !== "ADMIN" && user.totalOJTHours === 0) {
       await prisma.user.update({
         where: { id: user.id },
-        data: { 
+        data: {
           totalOJTHours: null,
-          remainingWorkHours: null 
+          remainingWorkHours: null,
         },
       });
       user.totalOJTHours = null;
@@ -159,7 +163,7 @@ export const login = async (req, res) => {
         department: user.department,
         position: user.position,
         supervisor: user.supervisor,
-        totalOJTHours: user.totalOJTHours, 
+        totalOJTHours: user.totalOJTHours,
         remainingWorkHours: user.remainingWorkHours,
       },
     });
