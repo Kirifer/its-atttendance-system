@@ -6,7 +6,7 @@ import API from "../api/api"; // <-- needed for /me
 export function useTimeInOut(userId, onAttendanceChange) {
   const [isTimedIn, setIsTimedIn] = useState(false);
   const [onLeave, setOnLeave] = useState(false);
-  const [totalOJTHours, setTotalOJTHours] = useState(null); 
+  const [totalOJTHours, setTotalOJTHours] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const role = user?.role;
@@ -24,14 +24,15 @@ export function useTimeInOut(userId, onAttendanceChange) {
           (r) => new Date(r.date).toDateString() === today
         );
 
-        setIsTimedIn(todayRecord?.timeIn && !todayRecord?.timeOut);
+        const isOnLeaveToday = todayRecord?.status === "ON_LEAVE";
 
+        setIsTimedIn(todayRecord?.timeIn && !todayRecord?.timeOut);
+        setOnLeave(isOnLeaveToday);
 
         const userRes = await API.get("/auth/me");
         const updatedUser = userRes.data;
 
-        setOnLeave(updatedUser.onLeave);
-        setTotalOJTHours(updatedUser.totalOJTHours); 
+        setTotalOJTHours(updatedUser.totalOJTHours);
 
         // update localStorage
         localStorage.setItem("user", JSON.stringify(updatedUser));
