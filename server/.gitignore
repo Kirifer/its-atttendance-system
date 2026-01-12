@@ -1,6 +1,7 @@
 node_modules
 .env
 
+/src/config/firebaseServiceAccount.json
 firebaseServiceAccount.json
 
 /src/generated/prisma
