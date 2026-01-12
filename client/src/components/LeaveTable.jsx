@@ -136,10 +136,7 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                 <td>
                   {leave.attachment ? (
                     <a
-                      href={`${
-                        process.env.REACT_APP_BACKEND_URL ||
-                        "http://localhost:5001"
-                      }${leave.attachment}`}
+                      href={leave.attachment}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
