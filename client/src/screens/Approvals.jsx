@@ -19,18 +19,7 @@ import SetOjtHoursDesktop from "../components/HandleInterns/SetOjtHoursDesktop";
 import EditUserSchedule from "../components/HandleInterns/EditUserSchedule";
 import EditUserScheduleDesktop from "../components/HandleInterns/EditUserScheduleDesktop";
 import useUserSchedule from "../hooks/useUserSchedule.js";
-
-function useIsDesktop(breakpoint = 500) {
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= breakpoint);
-
-  useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= breakpoint);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [breakpoint]);
-
-  return isDesktop;
-}
+import useIsDesktop from "../hooks/useIsDesktop.js";
 
 function CustomTabPanel({ children, value, index }) {
   return (
