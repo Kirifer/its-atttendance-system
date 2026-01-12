@@ -11,6 +11,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import "./src/cron/leaveChecker.js";
 import "./src/cron/cleanExpiredSched.js";
+import { bucket } from "./src/config/firebase.js";
 
 dotenv.config();
 
@@ -54,4 +55,7 @@ app.use(errorHandling);
 //server run
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+  console.log("Firebase bucket:", bucket.name);
 });
+
+

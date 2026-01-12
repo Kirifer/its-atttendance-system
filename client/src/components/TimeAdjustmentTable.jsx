@@ -183,12 +183,7 @@ function TimeAdjustmentTable() {
                 const statusDisplay = capitalize(req.status || "");
                 const statusClass = (req.status || "").toLowerCase();
                 // Attachment Logic
-                const fullAttachmentUrl = req.attachment
-                  ? `${
-                      process.env.REACT_APP_BACKEND_URL ||
-                      "http://localhost:5001"
-                    }${req.attachment}`
-                  : null;
+                const fullAttachmentUrl = req.attachment || null;
 
                 return (
                   <tr key={req.id}>

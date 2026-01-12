@@ -1,20 +1,19 @@
 // Accept and decline user time adjustment requests - ADMIN only
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+import { PrismaClient } from "@prisma/client";
+import { uploadToFirebase } from "../utils/firebase/uploadToFirebase.js";
+import { getTimeAdjustments } from "../models/timeAdjustment.js";
 
-const {
-  getTimeAdjustments,
-} = require("../models/timeAdjustment");
+const prisma = new PrismaClient();
 
 const fileTimeAdjustment = async (req, res) => {
   try {
     const { type, details, shiftDate, startTime, endTime } = req.body;
     const userId = req.user.id;
 
-    if (!type || !details)
+    if (!type || !details) {
       return res.status(400).json({ message: "Missing fields." });
+    }
 
-    // 🔒 Require date & times for change_shift
     if (type === "change_shift") {
       if (!shiftDate || !startTime || !endTime) {
         return res.status(400).json({
@@ -23,34 +22,38 @@ const fileTimeAdjustment = async (req, res) => {
       }
     }
 
-    let attachmentPath = null;
+    let attachmentUrl = null;
     if (req.file) {
-      attachmentPath = "/uploads/" + req.file.filename;
+      attachmentUrl = await uploadToFirebase(req.file, "time-adjustments");
     }
 
-    const request = await prisma.timeAdjustment.create({
-      data: {
-        userId,
-        type,
-        details,
-        attachment: attachmentPath,
-        shiftDate: shiftDate ? new Date(shiftDate) : null,
-        startTime,
-        endTime,
-      },
-    });
+    // ✅ build data safely
+    const data = {
+      userId,
+      type,
+      details,
+      attachment: attachmentUrl,
+    };
+
+    if (shiftDate) data.shiftDate = new Date(shiftDate);
+    if (startTime) data.startTime = startTime;
+    if (endTime) data.endTime = endTime;
+
+    const request = await prisma.timeAdjustment.create({ data });
 
     res.status(201).json({
       message: "Time adjustment request filed",
       request,
     });
   } catch (error) {
+    console.error("PRISMA ERROR:", error);
     res.status(500).json({
       message: "Failed to file time adjustment request",
       error: error.message,
     });
   }
 };
+
 
 
 const fetchTimeAdjustments = async (req, res) => {
@@ -188,7 +191,7 @@ const deleteTimeAdjustment = async (req, res) => {
   }
 };
 
-module.exports = {
+export{
   fileTimeAdjustment,
   fetchTimeAdjustments,
   fetchMyTimeAdjustments,
