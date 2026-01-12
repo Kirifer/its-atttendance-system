@@ -2,8 +2,10 @@ import { useEffect, useState, useMemo } from "react";
 import { getUserAttendance, getAllAttendance } from "../api/attendance";
 import { formatAttStatus } from "../hooks/formatAttStatus";
 import useExportPDF from "../hooks/useExportPDF";
+import useIsDesktop from "../hooks/useIsDesktop";
 import EditAttendancePopup from "./EditAttendancePopup";
 import FilterAttendanceActions from "./FilterAttendanceActions";
+import FilterAttendanceActionsMobile from "./FilterAttendanceActionsMobile";
 import { formatHoursToHHMM } from "../hooks/formatHours";
 import usePagination from "../hooks/pagination";
 import Pagination from "./Pagination";
@@ -21,6 +23,8 @@ export default function AttendanceTable({
   const [records, setRecords] = useState([]);
   const [editingRecord, setEditingRecord] = useState(null);
   const [reloadCounter, setReloadCounter] = useState(0);
+
+  const isDesktop = useIsDesktop();
 
   const [filters, setFilters] = useState({
     filterType: "Month",
@@ -197,6 +201,7 @@ export default function AttendanceTable({
     <div className="attendance_body">
       <h1 className="attendance_head">Timesheet</h1>
 
+      {isDesktop ? (
         <FilterAttendanceActions
           role={role}
           firstDay={firstDay}
@@ -204,15 +209,24 @@ export default function AttendanceTable({
           filteredRecords={filteredRecords}
           onFilterChange={setFilters}
         />
-
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPrev={prevPage}
-          onNext={nextPage}
-          onGoTo={goToPage}
+      ) : (
+        <FilterAttendanceActionsMobile
+          role={role}
+          firstDay={firstDay}
+          exportPDF={exportPDF}
+          filteredRecords={filteredRecords}
+          onFilterChange={setFilters}
         />
-        
+      )}
+      
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPrev={prevPage}
+        onNext={nextPage}
+        onGoTo={goToPage}
+      />
+
       {records.length === 0 ? (
         <p className="attendance_message">
           No attendance for this{" "}
