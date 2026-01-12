@@ -12,7 +12,9 @@ const serviceAccount = JSON.parse(
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: "its-atttendance-system.firebasestorage.app",
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
 });
 
-export const bucket = admin.storage().bucket();
+export const bucket = admin
+  .storage()
+  .bucket(process.env.FIREBASE_STORAGE_BUCKET);
