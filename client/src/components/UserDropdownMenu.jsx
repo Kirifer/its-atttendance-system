@@ -1,9 +1,12 @@
 import React, { forwardRef } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import "../styles/UserDropdownMenu.css";
 
 const UserDropDownMenu = forwardRef(({ pos, open }, ref) => {
   const navigate = useNavigate();
+
+  if (!open) return null;
 
   const style = {
     position: "fixed",
@@ -18,7 +21,7 @@ const UserDropDownMenu = forwardRef(({ pos, open }, ref) => {
     navigate("/");
   };
 
-  return (
+  return createPortal (
     <div
       ref={ref}
       style={style}
@@ -34,7 +37,8 @@ const UserDropDownMenu = forwardRef(({ pos, open }, ref) => {
           <span className="material-symbols-outlined">logout</span>Sign Out
         </li>
       </ul>
-    </div>
+    </div>,
+    document.body
   );
 });
 

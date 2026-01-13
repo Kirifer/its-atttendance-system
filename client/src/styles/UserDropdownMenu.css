@@ -36,6 +36,7 @@
   cursor: pointer;
   transition: background-color 0.15s ease-in-out;
   border-radius: 5px;
+  font-size: 17px;
 }
 
 .user-dropdown ul li:hover {
