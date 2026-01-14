@@ -40,11 +40,6 @@ function TimeAdjustmentTable() {
     fetchAllRequests();
   }, []);
 
-  // Custom confirm messages
-  const confirmMessages = {
-    APPROVED: "Are you sure you want to approve this request?",
-    REJECTED: "Are you sure you want to reject this request?",
-  };
 
   const handleUpdateStatus = async (id, status) => {
     if (
@@ -181,7 +176,6 @@ function TimeAdjustmentTable() {
             ) : (
               filteredRequests.map((req) => {
                 const statusDisplay = capitalize(req.status || "");
-                const statusClass = (req.status || "").toLowerCase();
                 // Attachment Logic
                 const fullAttachmentUrl = req.attachment || null;
 
@@ -250,7 +244,7 @@ function TimeAdjustmentTable() {
 
                     {/* Actions Header */}
                     <td className="time-table__actions">
-                      {/* {statusClass === "pending" && ( */}
+
                       <>
                         <span
                           className="material-symbols-outlined time-table__approve"

@@ -140,3 +140,23 @@
   /* Smoother */
   transition: transform 0.5s ease-out, opacity 0.5s ease-out;
 }
+
+@media (max-width: 768px) {
+  .user-info-container {
+    margin: 16px auto;   /* keeps centering */
+    width: calc(100% - 32px); /* creates side spacing */
+    padding: 24px 18px;
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 768px) {
+  .edit-icon {
+    right: 10px;
+  }
+
+  .text-box {
+    width: 100%;
+    padding-right: 45px; /* room for edit icon */
+  }
+}   
