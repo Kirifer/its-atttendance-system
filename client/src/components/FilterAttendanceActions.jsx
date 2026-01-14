@@ -56,7 +56,7 @@ export default function FilterAttendanceActions({
             className="leave-table__dropdown"
           >
             <option value="id">ID</option>
-            <option value="Intern">Intern Email</option>
+            <option value="Intern">Username</option>
             <option value="Status">Status</option>
             <option value="Date">Date</option>
           </select>

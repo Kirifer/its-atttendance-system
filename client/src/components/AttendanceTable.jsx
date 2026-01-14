@@ -13,7 +13,7 @@ import "../styles/AttendanceTable.css";
 
 export default function AttendanceTable({
   userId,
-  userEmail,
+  username,
   firstDay,
   lastDay,
 }) {
@@ -138,7 +138,7 @@ export default function AttendanceTable({
             rawLunchOut: r.lunchOut,
             rawLunchIn: r.lunchIn,
 
-            Intern: role === "ADMIN" ? r.user.email : userEmail,
+            Intern: role === "ADMIN" ? r.user.username : user.username,
             Status: r.status,
             Date: new Date(r.date).toLocaleDateString("en-US", options),
             "Time In": ti ? ti.toLocaleTimeString("en-US", timeOptions) : "-",
@@ -169,7 +169,7 @@ export default function AttendanceTable({
     filterWeek,
     customStart,
     customEnd,
-    userEmail,
+    user.username,
     reloadCounter,
     options,
     timeOptions,

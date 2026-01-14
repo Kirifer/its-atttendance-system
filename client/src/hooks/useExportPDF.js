@@ -25,8 +25,8 @@ export default function useExportPDF() {
     fetchUsers();
   }, []);
 
-  const generatePDFForUser = async (userRecords, internEmail) => {
-    const matchedUser = allUsers.find((u) => u.email === internEmail);
+  const generatePDFForUser = async (userRecords, internUsername) => {
+    const matchedUser = allUsers.find((u) => u.username === internUsername);
 
     const department = matchedUser?.department ?? "—";
     const position = matchedUser?.position ?? "—";
@@ -130,8 +130,8 @@ export default function useExportPDF() {
       tableWidth: 270,
       body: [
         [
-          { content: "Intern Email:", styles: { fontStyle: "bold" } },
-          { content: internEmail },
+          { content: "Intern:", styles: { fontStyle: "bold" } },
+          { content: internUsername },
           { content: "Department:", styles: { fontStyle: "bold" } },
           { content: department },
         ],
@@ -169,7 +169,7 @@ export default function useExportPDF() {
         head: [
           [
             {
-              content: `Intern Email: ${internEmail}`,
+              content: `Username: ${internUsername}`,
               colSpan: headers.length,
               styles: {
                 fillColor: [41, 128, 185],
@@ -247,15 +247,14 @@ export default function useExportPDF() {
       return;
     }
 
-    // Group records by user email
+    // Group records by username
     const recordsByUser = records.reduce((acc, record) => {
-      const email = record.Intern;
-      if (!acc[email]) {
-        acc[email] = [];
-      }
-      acc[email].push(record);
+      const username = record.Intern;
+      if (!acc[username]) acc[username] = [];
+      acc[username].push(record);
       return acc;
     }, {});
+
 
     const userEmails = Object.keys(recordsByUser);
 

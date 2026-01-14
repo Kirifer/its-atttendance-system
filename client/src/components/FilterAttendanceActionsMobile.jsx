@@ -86,7 +86,7 @@ export default function FilterAttendanceActionsMobile({
               onChange={(e) => setSearchField(e.target.value)}
             >
               <option value="id">ID</option>
-              <option value="Intern">Intern Email</option>
+              <option value="Intern">Username</option>
               <option value="Status">Status</option>
               <option value="Date">Date</option>
             </select>
