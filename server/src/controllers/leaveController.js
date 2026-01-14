@@ -16,9 +16,14 @@ const storage = multer.diskStorage({
 export const upload = multer({ storage });
 
 // Update user's onLeave status based on today's date
+const normalizeDate = (d) => {
+  const date = new Date(d);
+  date.setHours(0, 0, 0, 0);
+  return date;
+};
+
 const updateUserOnLeaveStatus = async (userId) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = normalizeDate(new Date());
 
   const activeLeaves = await prisma.leave.count({
     where: {

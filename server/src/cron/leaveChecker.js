@@ -4,23 +4,25 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 cron.schedule("0 0 * * *", async () => {
-  const users = await prisma.user.findMany({ where: { onLeave: true } });
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const users = await prisma.user.findMany();
 
   for (const user of users) {
     const activeLeave = await prisma.leave.findFirst({
       where: {
         userId: user.id,
         status: "APPROVED",
-        endDate: { gte: new Date() }
-      }
+        startDate: { lte: today },
+        endDate: { gte: today },
+      },
     });
 
-    if (!activeLeave) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { onLeave: false }
-      });
-    }
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { onLeave: Boolean(activeLeave) },
+    });
   }
 });
 

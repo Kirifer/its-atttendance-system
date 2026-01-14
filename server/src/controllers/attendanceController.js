@@ -18,10 +18,6 @@ export const timeIn = async (req, res) => {
   try {
     const user = req.user;
     
-    if (req.user.onLeave) {
-      return res.status(400).json({ message: "You are currently on leave" });
-    }
-
     if (user.role === "ADMIN") {
       return res
         .status(403)
@@ -29,9 +25,22 @@ export const timeIn = async (req, res) => {
     }
 
     const userId = req.user.id;
-
+    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
+    const onLeaveToday = await prisma.leave.findFirst({
+      where: {
+        userId,
+        status: "APPROVED",
+        startDate: { lte: today },
+        endDate: { gte: today },
+      },
+    });
+
+    if (onLeaveToday) {
+      return res.status(400).json({ message: "You are currently on leave" });
+    }
 
     const schedule = await getWorkSchedule(userId, today);
     if (!schedule) {
