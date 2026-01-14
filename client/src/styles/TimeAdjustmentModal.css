@@ -220,11 +220,19 @@ modal-actions button {
 
 @media (max-width: 768px) {
   .time-adjustment-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    position: static;        
+    margin: 15px auto;
+    align-items: stretch;
+    width: 90%;
+    z-index: auto;
+  }
 
-    top: 165px;
-    right: 5px;
+  .time-adjustment-box {
+    width: 87%;
+    text-align: center;
+  }
+
+  .time-adjustment-container {
+    margin: 0;
   }
 }
