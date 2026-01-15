@@ -10,6 +10,9 @@ export default function useExportPDF() {
   const [allUsers, setAllUsers] = useState([]);
   const [usersLoaded, setUsersLoaded] = useState(false);
 
+  const sanitizeUsername = (username) =>
+    username.replace(/[@.]/g, "_");
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -256,29 +259,39 @@ export default function useExportPDF() {
     }, {});
 
 
-    const userEmails = Object.keys(recordsByUser);
+    const usernames = Object.keys(recordsByUser);
 
-    // If only one user, generate and download single PDF
-    if (userEmails.length === 1) {
-      const singleUserEmail = userEmails[0];
-      const doc = await generatePDFForUser(recordsByUser[singleUserEmail], singleUserEmail);
-      doc.save(`timesheet_${singleUserEmail.replace(/[@.]/g, '_')}.pdf`);
+    // Single user
+    if (usernames.length === 1) {
+      const username = usernames[0];
+      const doc = await generatePDFForUser(
+        recordsByUser[username],
+        username
+      );
+
+      const sanitized = sanitizeUsername(username);
+      doc.save(`DTR_${sanitized}.pdf`);
       return;
     }
 
-    // If multiple users, generate PDFs and zip them
+    // Multiple users → ZIP
     try {
       const zip = new JSZip();
 
-      for (const email of userEmails) {
-        const doc = await generatePDFForUser(recordsByUser[email], email);
+      for (const username of usernames) {
+        const doc = await generatePDFForUser(
+          recordsByUser[username],
+          username
+        );
+
         const pdfBlob = doc.output("blob");
-        const sanitizedEmail = email.replace(/[@.]/g, '_');
-        zip.file(`timesheet_${sanitizedEmail}.pdf`, pdfBlob);
+        const sanitized = sanitizeUsername(username);
+
+        zip.file(`DTR_${sanitized}.pdf`, pdfBlob);
       }
 
       const zipBlob = await zip.generateAsync({ type: "blob" });
-      saveAs(zipBlob, "timesheets_export.zip");
+      saveAs(zipBlob, "DTR_Export.zip");
     } catch (err) {
       console.error("Failed to generate ZIP file", err);
       alert("Failed to export multiple PDFs. Please try again.");
