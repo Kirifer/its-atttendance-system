@@ -58,11 +58,6 @@ export const timeIn = async (req, res) => {
     const now = new Date();
     const { start: workStart } = schedule;
 
-    console.log("Now:", now.toLocaleString());
-    console.log("Work Start:", workStart.toLocaleString());
-    console.log("Today Date:", today.toLocaleDateString());
-    console.log("Timezone Offset (minutes):", now.getTimezoneOffset());
-
     let status = AttendanceStatus.PRESENT;
     let tardinessMinutes = 0;
 
