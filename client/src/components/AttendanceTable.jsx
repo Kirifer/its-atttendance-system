@@ -9,6 +9,7 @@ import FilterAttendanceActionsMobile from "./FilterAttendanceActionsMobile";
 import { formatHoursToHHMM } from "../hooks/formatHours";
 import usePagination from "../hooks/pagination";
 import Pagination from "./Pagination";
+import Loader from "./Spinner/Loader";
 import "../styles/AttendanceTable.css";
 
 export default function AttendanceTable({
@@ -23,6 +24,7 @@ export default function AttendanceTable({
   const [records, setRecords] = useState([]);
   const [editingRecord, setEditingRecord] = useState(null);
   const [reloadCounter, setReloadCounter] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const isDesktop = useIsDesktop();
 
@@ -73,6 +75,9 @@ export default function AttendanceTable({
   useEffect(() => {
     const fetchAttendance = async () => {
       if (!userId) return;
+
+      setLoading(true);
+
       try {
         let res;
         if (role === "ADMIN") res = await getAllAttendance();
@@ -157,6 +162,8 @@ export default function AttendanceTable({
       } catch (err) {
         console.error(err);
         setRecords([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -227,6 +234,7 @@ export default function AttendanceTable({
         onGoTo={goToPage}
       />
 
+      <Loader loading={loading}>
       {records.length === 0 ? (
         <p className="attendance_message">
           No attendance for this{" "}
@@ -290,6 +298,8 @@ export default function AttendanceTable({
           </table>
         </div>
       )}
+      </Loader>
+      
       {editingRecord && (
         <EditAttendancePopup
           record={editingRecord}
