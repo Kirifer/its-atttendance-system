@@ -4,6 +4,7 @@ import { resetPassword } from "../api/auth";
 import PasswordInput from "../components/PasswordInput";
 import SuccessPopup from "../components/SuccessPopup";
 import "../styles/ResetPassword.css";
+import Loader from "../components/Loader";
 import API from "../api/api";
 
 function ResetPassword() {
@@ -13,14 +14,17 @@ function ResetPassword() {
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleReset = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (newPassword !== confirmNewPassword) {
       setMessage("Passwords do not match!");
       setIsError(true);
+      setLoading(false);
       setTimeout(() => setIsError(false), 5000);
       return;
     }
@@ -45,11 +49,14 @@ function ResetPassword() {
       setMessage(err.response?.data?.message || err.message || "Server Error");
       setIsError(true);
       setTimeout(() => setIsError(false), 5000);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="reset-background">
+      {loading && <Loader />}
       <form onSubmit={handleReset} className="reset-password-box">
         <div className="top-box-header">
           <p className="reset-password-text">

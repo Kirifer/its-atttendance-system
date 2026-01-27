@@ -14,7 +14,6 @@ function UserLeaveTable({
     OFFSET: "Offset Hours",
   };
 
-
   const leavePlaceholderMap = {
     leaveType: "request type",
     reason: "reason",
@@ -80,11 +79,19 @@ function UserLeaveTable({
             <tbody>
               {filteredLeaves.map((leave) => {
                 const status = leave.status ? leave.status.toLowerCase() : "";
-                const fullAttachmentUrl = leave.attachment
-                  ? `${
-                      process.env.REACT_APP_BACKEND_URL ||
-                      "http://localhost:5001"
-                    }${leave.attachment}`
+
+                const baseHost =
+                  process.env.REACT_APP_BACKEND_URL || "http://localhost:5001";
+
+                const cleanBase = baseHost.replace(/\/$/, "");
+                const cleanPath = leave.attachment?.startsWith("/")
+                  ? leave.attachment
+                  : `/${leave.attachment}`;
+
+                const fullAttachmentUrl = leave.attachment?.startsWith("http")
+                  ? leave.attachment
+                  : leave.attachment
+                  ? `${cleanBase}${cleanPath}`
                   : null;
 
                 return (

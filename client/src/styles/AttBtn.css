@@ -55,25 +55,47 @@
   translate: 50%;
 }
 
-.att__carousel::scroll-button(right),
+.att__carousel::scroll-button(right):disabled,
 .att__carousel::scroll-button(left):disabled {
+  background-color: #e7e6e6;
   cursor: auto;
 }
 
-.att__carousel::scroll-button(left):hover,
-.att__carousel::scroll-button(right):hover {
+.att__carousel::scroll-button(left):not(:disabled):hover,
+.att__carousel::scroll-button(right):not(:disabled):hover {
   background-color: #1a5dac;
   color: #fff;
 }
 
+.att__btn-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.att__btn-spinner {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0.7);
+}
+
+.att__btn-text.hidden {
+  visibility: hidden;
+}
+
 .att__btn-ti {
-  background-color: #54cc58;
+  background-color: #60e664;
   border: 0.5px solid;
   border-style: none;
   border-radius: 5px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: large;
-  padding: 16px 24px;
+  padding: 16px 24px; 
+  position: relative;
+  cursor: pointer;
 }
 
 .att__btn-to {
@@ -83,11 +105,13 @@
   border-radius: 5px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: large;
-  padding: 16px 24px;
+  padding: 16px 24px;  
+  position: relative;
+  cursor: pointer;
 }
 
 .att__btn-ti:hover {
-  background-color: #60e664;
+  background-color: #54cc58;
 }
 
 .att__btn-to:hover {
@@ -104,40 +128,44 @@
   cursor: not-allowed;
 }
 
-.att__btn-li {
-  background-color: #54cc58;
-  border: 0.5px solid;
-  border-style: none;
-  border-radius: 5px;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: large;
-  padding: 16px 24px;
-}
-
 .att__btn-lo {
-  background-color: #e86e6e;
+  background-color: #60e664;
   border: 0.5px solid;
   border-style: none;
   border-radius: 5px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: large;
-  padding: 16px 24px;
+  padding: 16px 24px;  
+  position: relative;
+  cursor: pointer;
 }
 
-.att__btn-li:hover {
-  background-color: #60e664;
+.att__btn-li {
+  background-color: #ff7979;
+  border: 0.5px solid;
+  border-style: none;
+  border-radius: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+  padding: 16px 24px;  
+  position: relative;
+  cursor: pointer;
 }
 
 .att__btn-lo:hover {
-  background-color: #ff7979;
+  background-color: #54cc58;
 }
 
-.att__btn-li:disabled {
+.att__btn-li:hover {
+  background-color: #e86e6e;
+}
+
+.att__btn-lo:disabled {
   background-color: gray;
   cursor: not-allowed;
 }
 
-.att__btn-lo:disabled {
+.att__btn-li:disabled {
   background-color: gray;
   cursor: not-allowed;
 }

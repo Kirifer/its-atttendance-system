@@ -10,9 +10,6 @@ export default function useExportPDF() {
   const [allUsers, setAllUsers] = useState([]);
   const [usersLoaded, setUsersLoaded] = useState(false);
 
-  const sanitizeUsername = (username) =>
-    username.replace(/[@.]/g, "_");
-
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -29,20 +26,40 @@ export default function useExportPDF() {
   }, []);
 
   const generatePDFForUser = async (userRecords, internUsername) => {
-    const matchedUser = allUsers.find((u) => u.username === internUsername);
+    const matchedUser = allUsers.find(
+      (u) =>
+        u.username?.trim().toLowerCase() ===
+        internUsername?.trim().toLowerCase()
+    );
 
     const department = matchedUser?.department ?? "—";
     const position = matchedUser?.position ?? "—";
     const supervisor = matchedUser?.supervisor ?? "—";
+    const manager = matchedUser?.manager ?? "—";
+    const supervisorManager = `${supervisor} / ${manager}`;
 
     let remainingHours = 0;
+    let preparedByName = "—";
+    let preparedByPosition = "—";
+    let approvedByName = "—";
+    let approvedByPosition = "—";
+
     if (matchedUser?.id) {
       try {
         const ojtData = await getUserOjtHours(matchedUser.id);
         remainingHours = ojtData.remainingWorkHours ?? 0;
+
+        const meta = await getTimesheetMeta(matchedUser.id);
+        preparedByName = meta.preparedBy?.username ?? "—";
+        preparedByPosition = meta.preparedBy?.position ?? "—";
+
+        approvedByName = supervisor;
+        approvedByPosition = "Supervisor";
       } catch (err) {
-        console.error("Failed to fetch remaining work hours", err);
+        console.error("Failed to load timesheet data", err);
       }
+    } else {
+      console.warn("No matched user for:", internUsername);
     }
 
     const doc = new jsPDF({
@@ -73,10 +90,15 @@ export default function useExportPDF() {
       r.ACTUAL,
     ]);
 
-    const totalHoursSpent = userRecords.reduce((sum, r) => {
-      const hours = typeof r.ACTUAL === "string" ? parseFloat(r.ACTUAL.replace(" hrs", "")) : Number(r.ACTUAL);
-      return isNaN(hours) ? sum : sum + hours;
-    }, 0).toFixed(2);
+    const totalHoursSpent = userRecords
+      .reduce((sum, r) => {
+        const hours =
+          typeof r.ACTUAL === "string"
+            ? parseFloat(r.ACTUAL.replace(" hrs", ""))
+            : Number(r.ACTUAL);
+        return isNaN(hours) ? sum : sum + hours;
+      }, 0)
+      .toFixed(2);
 
     const totalRow = Array(headers.length).fill("");
     totalRow[6] = "Total Hours Spent";
@@ -89,7 +111,10 @@ export default function useExportPDF() {
     body.push(totalRow, remainingRow);
 
     const didParseCell = (data) => {
-      if (data.row.index >= body.length - 2 && (data.column.index === 6 || data.column.index === 7)) {
+      if (
+        data.row.index >= body.length - 2 &&
+        (data.column.index === 6 || data.column.index === 7)
+      ) {
         data.cell.styles.fontStyle = "bold";
       }
     };
@@ -141,8 +166,8 @@ export default function useExportPDF() {
         [
           { content: "Position:", styles: { fontStyle: "bold" } },
           { content: position },
-          { content: "Supervisor:", styles: { fontStyle: "bold" } },
-          { content: supervisor },
+          { content: "Supervisor / Manager:", styles: { fontStyle: "bold" } },
+          { content: supervisorManager },
         ],
       ],
       styles: { textColor: 0, fontSize: 8, cellPadding: 3 },
@@ -158,9 +183,12 @@ export default function useExportPDF() {
 
     doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
-    doc.text("Daily Time Records", doc.internal.pageSize.getWidth() / 2, currentY, {
-      align: "center",
-    });
+    doc.text(
+      "Daily Time Records",
+      doc.internal.pageSize.getWidth() / 2,
+      currentY,
+      { align: "center" }
+    );
 
     currentY += 8;
 
@@ -172,7 +200,7 @@ export default function useExportPDF() {
         head: [
           [
             {
-              content: `Username: ${internUsername}`,
+              content: `Intern: ${internUsername}`,
               colSpan: headers.length,
               styles: {
                 fillColor: [41, 128, 185],
@@ -195,28 +223,8 @@ export default function useExportPDF() {
       });
     });
 
-    let preparedByName = "—";
-    let preparedByPosition = "—";
-    let approvedByName = "—";
-    let approvedByPosition = "—";
-
-    try {
-      if (!matchedUser?.id) throw new Error("Intern ID missing");
-
-      const meta = await getTimesheetMeta(matchedUser.id);
-
-      preparedByName = meta.preparedBy?.username ?? "—";
-      preparedByPosition = meta.preparedBy?.position ?? "—";
-
-      approvedByName = meta.approvedBy?.username ?? "—";
-      approvedByPosition = meta.approvedBy?.position ?? "—";
-    } catch (err) {
-      console.error("Failed to load timesheet metadata", err);
-    }
-
     const signY = doc.lastAutoTable.finalY + 35;
 
-    doc.setFont("helvetica", "normal");
     doc.setFontSize(11);
     doc.text("Prepared by:", 25, signY - 15);
     doc.line(25, signY + 8, 105, signY + 8);
@@ -226,8 +234,6 @@ export default function useExportPDF() {
     doc.setFont("helvetica", "normal");
     doc.text(preparedByPosition, 25, signY + 26);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
     doc.text("Approved by:", 180, signY - 15);
     doc.line(180, signY + 8, 260, signY + 8);
 
@@ -250,51 +256,36 @@ export default function useExportPDF() {
       return;
     }
 
-    // Group records by username
     const recordsByUser = records.reduce((acc, record) => {
-      const username = record.Intern;
-      if (!acc[username]) acc[username] = [];
-      acc[username].push(record);
+      const key = record.Intern;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(record);
       return acc;
     }, {});
 
+    const userKeys = Object.keys(recordsByUser);
 
-    const usernames = Object.keys(recordsByUser);
-
-    // Single user
-    if (usernames.length === 1) {
-      const username = usernames[0];
-      const doc = await generatePDFForUser(
-        recordsByUser[username],
-        username
-      );
-
-      const sanitized = sanitizeUsername(username);
-      doc.save(`DTR_${sanitized}.pdf`);
+    if (userKeys.length === 1) {
+      const key = userKeys[0];
+      const doc = await generatePDFForUser(recordsByUser[key], key);
+      doc.save(`timesheet_${key}.pdf`);
       return;
     }
 
-    // Multiple users → ZIP
     try {
       const zip = new JSZip();
 
-      for (const username of usernames) {
-        const doc = await generatePDFForUser(
-          recordsByUser[username],
-          username
-        );
-
+      for (const key of userKeys) {
+        const doc = await generatePDFForUser(recordsByUser[key], key);
         const pdfBlob = doc.output("blob");
-        const sanitized = sanitizeUsername(username);
-
-        zip.file(`DTR_${sanitized}.pdf`, pdfBlob);
+        zip.file(`timesheet_${key}.pdf`, pdfBlob);
       }
 
       const zipBlob = await zip.generateAsync({ type: "blob" });
-      saveAs(zipBlob, "DTR_Export.zip");
+      saveAs(zipBlob, "timesheets_export.zip");
     } catch (err) {
       console.error("Failed to generate ZIP file", err);
-      alert("Failed to export multiple PDFs. Please try again.");
+      alert("Failed to export multiple PDFs.");
     }
   };
 

@@ -63,13 +63,31 @@ export const getMe = async (req, res) => {
 
     const workSchedule = await getWorkSchedule(userId);
 
+    const formatTimePH = (date) =>
+      date.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "Asia/Manila",
+      });
+
     res.json({
       ...user,
       remainingWorkHours: remainingHours ?? 0,
+
+      // 🔥 expose the schedule itself, not just a boolean
+      useCustomSchedule: workSchedule
+        ? {
+            startTime: formatTimePH(workSchedule.start),
+            endTime: formatTimePH(workSchedule.end),
+          }
+        : null,
+
+      // optional: keep todaySchedule if other parts still use it
       todaySchedule: workSchedule
         ? {
-            startTime: workSchedule.start.toTimeString().slice(0, 5),
-            endTime: workSchedule.end.toTimeString().slice(0, 5),
+            startTime: formatTimePH(workSchedule.start),
+            endTime: formatTimePH(workSchedule.end),
           }
         : null,
     });
@@ -163,6 +181,7 @@ export const login = async (req, res) => {
         department: user.department,
         position: user.position,
         supervisor: user.supervisor,
+        manager: user.manager,
         totalOJTHours: user.totalOJTHours,
         remainingWorkHours: user.remainingWorkHours,
       },

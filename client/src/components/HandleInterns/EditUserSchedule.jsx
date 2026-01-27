@@ -24,7 +24,7 @@ export default function EditUserSchedule({ userSchedule, user }) {
         if (user.role !== "ADMIN") return;
         const allUsers = await getAllUsers();
         setUsers(allUsers);
-        if (allUsers.length > 0) setSelectedUserId(allUsers[0].id);
+        setSelectedUserId(""); // start empty
       } catch (err) {
         console.warn("Fetching users skipped for non-admin", err.message);
       }
@@ -36,12 +36,12 @@ export default function EditUserSchedule({ userSchedule, user }) {
 
   const handleSave = async () => {
     if (!selectedUserId || !date) {
-      alert("Please select user and date");
+      alert("Please select user(s) and date");
       return;
     }
 
     const result = await setSchedule({
-      userId: selectedUserId,
+      userId: selectedUserId, 
       startTime: timeIn,
       endTime: timeOut,
       date,
@@ -49,7 +49,6 @@ export default function EditUserSchedule({ userSchedule, user }) {
 
     if (result) {
       setSuccessMessage("Schedule saved successfully!");
-
       setTimeout(() => {
         setSuccessMessage("");
         closeSchedule();
@@ -57,41 +56,92 @@ export default function EditUserSchedule({ userSchedule, user }) {
     }
   };
 
+  // helper for checkbox logic
+  const selectedIds =
+    selectedUserId && selectedUserId !== "ALL"
+      ? selectedUserId.split(",")
+      : [];
+
   return (
-      <div className="custom_schedule_overlay">
-        <div className="custom_schedule">
-          <h2>Configure Custom Schedule</h2>
-          <label>User Email</label>
-          <select
-            value={selectedUserId}
-            onChange={(e) => setSelectedUserId(e.target.value)}
-          >
-            {users.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.email}
-              </option>
-            ))}
-          </select>
+    <div className="custom_schedule_overlay">
+      <div className="custom_schedule">
+        <h2>Configure Custom Schedule</h2>
 
-          <label>Date</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        {/* USER SELECTION */}
+        <label>Select Users</label>
+        <div className="user-select-box">
+          <label className="user-select-item">
+            <input
+              type="checkbox"
+              checked={selectedUserId === "ALL"}
+              onChange={(e) =>
+                setSelectedUserId(e.target.checked ? "ALL" : "")
+              }
+            />
+            <strong>ALL USERS</strong>
+          </label>
 
-          <label>Time In</label>
-          <input type="time" value={timeIn} onChange={(e) => setTimeIn(e.target.value)} />
+          <hr />
 
-          <label>Time Out</label>
-          <input type="time" value={timeOut} onChange={(e) => setTimeOut(e.target.value)} />
+          {users.map((u) => (
+            <label key={u.id} className="user-select-item">
+              <input
+                type="checkbox"
+                disabled={selectedUserId === "ALL"}
+                checked={selectedIds.includes(u.id)}
+                onChange={(e) => {
+                  let newIds = [...selectedIds];
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+                  if (e.target.checked) {
+                    newIds.push(u.id);
+                  } else {
+                    newIds = newIds.filter(id => id !== u.id);
+                  }
 
-          <div className="custom_schedule_buttons">
-            <button onClick={handleSave} disabled={loading}>
-              {loading ? "Saving..." : "Save"}
-            </button>
-            <button onClick={closeSchedule}>Cancel</button>
-          </div>
+                  setSelectedUserId(newIds.join(","));
+                }}
+              />
+              {u.email}
+            </label>
+          ))}
+        </div>
+
+        {/* DATE */}
+        <label>Date</label>
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
+
+        {/* TIME IN */}
+        <label>Time In</label>
+        <input
+          type="time"
+          value={timeIn}
+          onChange={(e) => setTimeIn(e.target.value)}
+        />
+
+        {/* TIME OUT */}
+        <label>Time Out</label>
+        <input
+          type="time"
+          value={timeOut}
+          onChange={(e) => setTimeOut(e.target.value)}
+        />
+
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        {successMessage && (
+          <p style={{ color: "green" }}>{successMessage}</p>
+        )}
+
+        <div className="custom_schedule_buttons">
+          <button onClick={handleSave} disabled={loading}>
+            {loading ? "Saving..." : "Save"}
+          </button>
+          <button onClick={closeSchedule}>Cancel</button>
         </div>
       </div>
+    </div>
   );
 }

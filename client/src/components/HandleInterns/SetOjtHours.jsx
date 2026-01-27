@@ -54,32 +54,34 @@ export default function SetOjtHours() {
             {success && <p className="set_ojthours_success">{success}</p>}
 
             <label>Intern Email</label>
-            <input
-              type="text"
-              placeholder="Search by email"
-              value={search}
-              onFocus={() => setIsSearching(true)}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setIsSearching(true);
-              }}
-            />
+            <div className="set_ojthours_search_wrapper">
+              <input
+                type="text"
+                placeholder="Search by email"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value)
+                  setIsSearching(true)
+                }}
+              />
 
-            {isSearching && filteredUsers.length > 0 && (
-              <ul className="set_ojthours_user_list">
-                {filteredUsers.map((u) => (
-                  <li
-                    key={u.id}
-                    onClick={() => {
-                      selectUser(u);
-                      setSearch(u.email);
-                    }}
-                  >
-                    {u.email}
-                  </li>
-                ))}
-              </ul>
-            )}
+              {filteredUsers.length > 0 && (
+                <ul className="set_ojthours_user_list-mobile">
+                  {filteredUsers.map((u) => (
+                    <li
+                      key={u.id}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        selectUser(u);
+                        setSearch(u.email);
+                      }}
+                    >
+                      {u.email}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
 
             <label>Total OJT Hours</label>
             <input
@@ -88,13 +90,13 @@ export default function SetOjtHours() {
               value={totalOJTHours}
               onChange={(e) => setTotalOJTHours(e.target.value)}
               disabled={!selectedUser || loading}
+              onFocus={() => setIsSearching(false)}
             />
 
-            {selectedUser && (
-              <p className="set_ojthours_remaining">
-                <strong>Remaining Hours:</strong> {remainingWorkHours.toFixed(2)}
-              </p>
-            )}
+            <p className="set_ojthours_remaining">
+              <strong>Remaining Hours:</strong>{" "}
+              {selectedUser ? remainingWorkHours.toFixed(2) : "-"}
+            </p>
 
             <div className="set_ojthours_buttons">
               <button onClick={handleSave} disabled={loading || !selectedUser}>

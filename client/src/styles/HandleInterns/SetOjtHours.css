@@ -42,7 +42,8 @@
   animation: fadeIn 0.25s ease-in-out;
   font-family: "Inter", sans-serif;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
 }
 
 .set_ojthours_header {
@@ -82,7 +83,11 @@
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
 
-.set_ojthours_user_list {
+.set_ojthours_search_wrapper {
+  position: relative;
+}
+
+.set_ojthours_user_list-mobile {
   list-style: none;
   padding: 0;
   margin: -6px 0 14px 0;
@@ -90,12 +95,19 @@
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 8px;
+
+  position: absolute;
+  top: 90%;          
+  left: 0;
+  width: 100%;
+  
+  background: #fff;
 }
 
-.set_ojthours_user_list li {
+.set_ojthours_user_list-mobile li {
   padding: 8px 12px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .set_ojthours_user_list li:hover {

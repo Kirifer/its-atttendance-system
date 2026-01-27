@@ -2,7 +2,6 @@
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  height: 400px;
 }
 
 .leave-table {
@@ -97,4 +96,22 @@
   padding: 8px 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
+}
+
+/* Mobile table search and dropdown adjustments */
+@media (max-width: 600px) {
+  .leave-table__search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .leave-table__dropdown {
+    width: 100%;
+    max-width: 140px; /* ID / Request Type / Status */
+  }
+
+  .leave-table__input {
+    width: 100%;
+    max-width: 220px; /* Search input */
+  }
 }

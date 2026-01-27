@@ -4,6 +4,7 @@ import { getWorkSchedule } from "../utils/workSchedule.js";
 import { countWorkDays } from "../utils/countWorkDays.js";
 import { updateAttStatus } from "../utils/updateAttStatus.js";
 import { recalculateHours } from "../utils/hoursOJT/recalculateHours.js";
+import { getUTCDay } from "../utils/dateUTC.js";
 
 const prisma = new PrismaClient();
 
@@ -26,8 +27,7 @@ export const timeIn = async (req, res) => {
 
     const userId = req.user.id;
     
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getUTCDay();
 
     const onLeaveToday = await prisma.leave.findFirst({
       where: {
@@ -97,8 +97,7 @@ export const lunchOut = async (req, res) => {
     }
 
     const userId = req.user.id;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getUTCDay();
 
     const attendance = await prisma.attendance.findUnique({
       where: { userId_date: { userId, date: today } },
@@ -141,8 +140,7 @@ export const lunchIn = async (req, res) => {
     }
 
     const userId = req.user.id;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getUTCDay();
 
     const attendance = await prisma.attendance.findUnique({
       where: { userId_date: { userId, date: today } },
@@ -200,11 +198,84 @@ export const lunchIn = async (req, res) => {
   }
 };
 
+export const breakOut = async (req, res) => {
+  try {
+
+    const userId = req.user.id;
+    const today = getUTCDay();
+
+    const att = await prisma.attendance.findUnique({
+      where: { userId_date: { userId, date: today } },
+    });
+
+    if (!att || !att.timeIn) return res.status(400).json({ message: "You must time in first" });
+    if (att.breakOut) return res.status(400).json({ message: "Already out for break" });
+    if (att.timeOut) return res.status(400).json({ message: "Cannot break after time out" });
+
+    const updated = await prisma.attendance.update({
+      where: { id: att.id },
+      data: { breakOut: new Date() },
+    });
+
+    res.json({ message: "Break out logged", attendance: updated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error logging break out" });
+  }
+};
+
+export const breakIn = async (req, res) => {
+  try {
+    const user = req.user;
+
+    if (user.role === "ADMIN") {
+      return res
+        .status(403)
+        .json({ message: "Admins cannot have attendance records" });
+    }
+
+    const userId = req.user.id;
+    const today = getUTCDay();
+
+    const att = await prisma.attendance.findUnique({
+      where: { userId_date: { userId, date: today } },
+    });
+
+    if (!att || !att.breakOut) return res.status(400).json({ message: "You are not out for break" });
+    if (att.breakIn) return res.status(400).json({ message: "Already back from break" });
+    if (att.timeOut) return res.status(400).json({ message: "Cannot break in after time out" });
+
+    const now = new Date();
+    const breakDuration = Math.floor((now - att.breakOut) / 60000);
+    const MAX_BREAK = 15;
+
+    const extraTardy = breakDuration > MAX_BREAK ? breakDuration - MAX_BREAK : 0;
+
+    const updated = await prisma.attendance.update({
+      where: { id: att.id },
+      data: {
+        breakIn: now,
+        breakTardinessMinutes: extraTardy,
+        status: att.status === AttendanceStatus.TARDY || extraTardy > 0 ? AttendanceStatus.TARDY : AttendanceStatus.PRESENT,
+      },
+    });
+
+    res.json({
+      message: "Back from break logged",
+      breakTardiness: extraTardy,
+      attendance: updated,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error logging break in" });
+  }
+};
+
+
 export const timeOut = async (req, res) => {
   try {
     const userId = req.user.id;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getUTCDay();
 
     const attendance = await prisma.attendance.findUnique({
       where: { userId_date: { userId, date: today } },
@@ -293,7 +364,7 @@ export const getAllAttendance = async (req, res) => {
 export const updateAttendance = async (req, res) => {
   try {
     const { id } = req.params;
-    const { timeIn, timeOut, lunchOut, lunchIn, status } = req.body;
+    const { timeIn, timeOut, lunchOut, lunchIn, breakOut, breakIn, status } = req.body;
 
     const attendance = await prisma.attendance.findUnique({ where: { id } });
     if (!attendance) return res.status(404).json({ message: "Attendance not found" });
@@ -303,7 +374,7 @@ export const updateAttendance = async (req, res) => {
       validatedStatus = status;
     }
 
-    await updateAttStatus(attendance, timeIn, timeOut, lunchOut, lunchIn, validatedStatus, true);
+    await updateAttStatus(attendance, timeIn, timeOut, lunchOut, lunchIn, breakOut, breakIn, validatedStatus, true);
 
     const updatedHours = await recalculateHours(id);
 
@@ -345,8 +416,7 @@ export const deleteAttendance = async (req, res) => {
 
 export const getLoginStatus = async (req, res) => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getUTCDay();
 
     const users = await prisma.user.findMany({
       where: { role: "USER" },

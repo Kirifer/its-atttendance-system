@@ -19,10 +19,9 @@ import Timesheet from "./screens/Timesheet";
 import UserInfo from "./screens/UserInfo";
 import UserRequests from "./screens/UserRequests";
 import ResetErrorPage from "./screens/ResetErrorPage";
-import SessionLogout from "./components/SessionLogout"
+import SessionLogout from "./components/SessionLogout";
 
 function App() {
-
   return (
     <SessionLogout>
       <Router>
@@ -61,7 +60,15 @@ function App() {
           <Route path="/reset-password" element={<ResetErrorPage />} />
 
           <Route path="/sign-up" element={<Signup />} />
-          <Route path="/time-off" element={<Timeoff />} />
+          <Route
+            path="/time-off"
+            element={
+              <ProtectedRoute userOnly={true}>
+                {" "}
+                <Timeoff />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/timesheet"
             element={

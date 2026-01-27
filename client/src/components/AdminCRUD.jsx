@@ -78,6 +78,7 @@ function AdminCRUD() {
       department: user.department || "",
       position: user.position || "",
       supervisor: user.supervisor || "",
+      manager: user.manager || "",
     });
     setShowModal(true);
   };
@@ -94,6 +95,7 @@ function AdminCRUD() {
         department: selectedUser.department,
         position: selectedUser.position,
         supervisor: selectedUser.supervisor,
+        manager: selectedUser.manager,
       });
       showToast({ message: "User info updated", type: "success", color: "#fff" });
       closeModal();
@@ -245,6 +247,14 @@ function AdminCRUD() {
               value={selectedUser.supervisor}
               onChange={(e) =>
                 setSelectedUser({ ...selectedUser, supervisor: e.target.value })
+              }
+            />
+
+            <label>Manager</label>
+            <input
+              value={selectedUser.manager}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, manager: e.target.value })
               }
             />
 

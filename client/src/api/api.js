@@ -1,9 +1,13 @@
 import axios from "axios";
 
-const port = process.env.REACT_APP_API_PORT || 5001;
+const API_URL =
+  process.env.REACT_APP_API_URL &&
+  process.env.REACT_APP_API_URL.includes("https")
+    ? process.env.REACT_APP_API_URL
+    : "http://localhost:5001/api";
 
 const API = axios.create({
-  baseURL: `http://localhost:${port}/api`,
+  baseURL: API_URL,
   timeout: 180000, // unit is in ms = seconds
 });
 
