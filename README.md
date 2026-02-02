@@ -1,4 +1,4 @@
-# Intern Attendance Management System<br>
+# ITS Attendance Management System<br>
 
 ### Project Overview
 
