@@ -74,11 +74,17 @@ function UserRequestsTable({
             <tbody>
               {filteredRequests.map((req) => {
                 const status = req.status ? req.status.toLowerCase() : "";
+
+                const baseHost =
+                  process.env.REACT_APP_BACKEND_URL || "http://localhost:5001";
+
+                const cleanBase = baseHost.replace(/\/$/, "");
+                const cleanPath = req.attachment?.startsWith("/")
+                  ? req.attachment
+                  : `/${req.attachment}`;
+
                 const fullAttachmentUrl = req.attachment
-                  ? `${
-                      process.env.REACT_APP_BACKEND_URL ||
-                      "http://localhost:5001"
-                    }${req.attachment}`
+                  ? `${cleanBase}${cleanPath}`
                   : null;
 
                 return (

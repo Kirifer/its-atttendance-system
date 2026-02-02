@@ -10,6 +10,7 @@ import LogsCard from "../components/Dashboard/LogsCard.jsx";
 import FiledLeavesCard from "../components/Dashboard/FiledLeavesCard.jsx";
 import Calendar from "../components/Dashboard/Calendar.jsx";
 import UserStatusCard from "../components/Dashboard/UserStatusCard.jsx";
+import RegistrationNotif from "../components/RegistrationNotif.jsx";
 
 function Dashboard() {
   const { user } = useContext(UserContext);
@@ -20,6 +21,7 @@ function Dashboard() {
   return (
     <DashboardLayout>
       <div className="dashboard__main">
+        <RegistrationNotif user={user} />
         <div>
           <div className="dashboard__containerone">
             <div className="dashboard__left">

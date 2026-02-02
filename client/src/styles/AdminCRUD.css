@@ -28,10 +28,9 @@
   border-radius: 8px;
   table-layout: fixed;
   white-space: nowrap;
-  min-height: 100px; 
+  min-height: 100px;
   margin: auto;
 }
-
 
 .crud-table th {
   color: black;
@@ -41,7 +40,6 @@
   font-weight: 600;
   background-color: #f7f7f7;
 }
-
 
 .crud-table td {
   padding: 12px;
@@ -60,7 +58,7 @@
   border-radius: 6px;
   text-transform: uppercase;
   transition: all 0.2s ease-in-out;
-  margin: 2px 4px 2px 0; 
+  margin: 2px 4px 2px 0;
   display: inline-block;
 }
 
@@ -127,7 +125,6 @@
   color: #d40707;
 }
 
-
 .crud-table__search {
   display: flex;
   gap: 10px;
@@ -144,7 +141,7 @@
 .admin-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -159,7 +156,7 @@
   border-radius: 8px;
   padding: 20px;
   box-sizing: border-box;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -191,7 +188,7 @@
 .admin-modal input:focus {
   outline: none;
   border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0,123,255,0.15);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
 }
 
 .admin-modal__actions {
@@ -294,7 +291,7 @@
 }
 
 .crud-action--role {
-  color: #01B9D5; 
+  color: #01b9d5;
 }
 
 .crud-action--edit {
@@ -321,5 +318,22 @@
   .crud-action {
     font-size: 20px;
     margin-right: 6px;
+  }
+}
+
+/* Mobile table search and dropdown adjustments */
+@media (max-width: 600px) {
+  .crud-table__search {
+    align-items: stretch;
+  }
+
+  .crud-table__dropdown {
+    width: 100%;
+    max-width: 140px; /* Username / Email */
+  }
+
+  .crud-table__input {
+    width: 100%;
+    max-width: 220px; /* Search field */
   }
 }

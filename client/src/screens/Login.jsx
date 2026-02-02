@@ -5,11 +5,13 @@ import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
 import "../styles/Login.css";
 import PasswordInput from "../components/PasswordInput";
+import Loader from "../components/Loader";
 import API from "../api/api";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({
     email: "",
     password: "",
@@ -26,6 +28,7 @@ function Login() {
       password: "",
       general: "",
     });
+    setLoading(true);
 
     try {
       const { token } = await loginUser(email, password);
@@ -46,11 +49,14 @@ function Login() {
       setTimeout(() => {
         setFieldErrors((prev) => ({ ...prev, general: "" }));
       }, 5000);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="login-background">
+      {loading && <Loader />}
       <form onSubmit={handleSubmit} className="login-box">
         <img src="/its-logo.png" alt="ITS Logo" className="login-logo" />
 

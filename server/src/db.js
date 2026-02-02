@@ -1,4 +1,3 @@
-
 import pg from "pg";
 import dotenv from "dotenv";
 dotenv.config();
@@ -6,20 +5,15 @@ dotenv.config();
 const { Pool } = pg;
 
 const pool = new Pool({
-  user: process.env.PG_USER,
-  host: process.env.PG_HOST,
-  database: process.env.PG_DATABASE,
-  password: process.env.PG_PASSWORD,
-  port: process.env.PG_PORT,
+  connectionString:
+    process.env.DATABASE_URL ||
+    `postgresql://${process.env.PG_USER}:${process.env.PG_PASSWORD}@${process.env.PG_HOST}:${process.env.PG_PORT}/${process.env.PG_DATABASE}`,
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
 });
 
-
-console.log("Postgres Config:", {
-  user: process.env.PG_USER,
-  host: process.env.PG_HOST,
-  database: process.env.PG_DATABASE,
-  password: process.env.PG_PASSWORD ? "****" : null,
-  port: process.env.PG_PORT,
-});
+console.log(
+  "Postgres connected using:",
+  process.env.DATABASE_URL ? "DATABASE_URL" : "Local Config"
+);
 
 export default pool;

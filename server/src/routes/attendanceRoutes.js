@@ -4,6 +4,8 @@ import {
   timeIn,
   lunchOut,
   lunchIn,
+  breakIn,
+  breakOut,
   timeOut,
   getAllAttendance,
   getUserAttendance,
@@ -20,6 +22,8 @@ const router = express.Router();
 router.post("/time-in", verifyToken, timeIn);
 router.post("/lunch-out", verifyToken, lunchOut);
 router.post("/lunch-in", verifyToken, lunchIn);
+router.post("/break-out", verifyToken, breakOut);
+router.post("/break-in", verifyToken, breakIn);
 router.post("/time-out", verifyToken, timeOut);
 router.get("/", verifyToken, getAllAttendance);
 router.get("/attendance-status", authMiddleware, isAdmin, getLoginStatus);

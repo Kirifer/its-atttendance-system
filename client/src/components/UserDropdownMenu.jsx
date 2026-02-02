@@ -6,8 +6,6 @@ import "../styles/UserDropdownMenu.css";
 const UserDropDownMenu = forwardRef(({ pos, open }, ref) => {
   const navigate = useNavigate();
 
-  if (!open) return null;
-
   const style = {
     position: "fixed",
     top: pos.y,
@@ -18,10 +16,10 @@ const UserDropDownMenu = forwardRef(({ pos, open }, ref) => {
   const handleSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/");
+    window.location.href = "/";
   };
 
-  return createPortal (
+  return createPortal(
     <div
       ref={ref}
       style={style}
@@ -38,7 +36,7 @@ const UserDropDownMenu = forwardRef(({ pos, open }, ref) => {
         </li>
       </ul>
     </div>,
-    document.body
+    document.body,
   );
 });
 

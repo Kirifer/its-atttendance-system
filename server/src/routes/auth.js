@@ -27,30 +27,32 @@ import {
   validateUpdateUserInfo,
 } from "../middlewares/validateUser.js";
 
-
 const router = express.Router();
 
 // Multer (Must always be on TOP HERE!!!)
 const uploadsDir = path.join(process.cwd(), "uploads");
 
-if (!fs.existsSync(uploadsDir)) {
+if (process.env.NODE_ENV !== "production" && !fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    cb(null, name + ext);
-  },
-});
+const storage =
+  process.env.NODE_ENV === "production"
+    ? multer.memoryStorage()
+    : multer.diskStorage({
+        destination: (req, file, cb) => cb(null, uploadsDir),
+        filename: (req, file, cb) => {
+          const ext = path.extname(file.originalname);
+          const name = `${Date.now()}-${Math.random()
+            .toString(36)
+            .slice(2, 8)}`;
+          cb(null, name + ext);
+        },
+      });
 
 const upload = multer({
   storage,
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10 MB limit to allow higher res pics
-  },
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (!file.mimetype.startsWith("image/"))
       return cb(new Error("Only image files are allowed!"), false);

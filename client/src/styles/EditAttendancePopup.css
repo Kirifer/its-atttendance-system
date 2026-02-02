@@ -1,4 +1,3 @@
-
 .attendance_edit_btn {
   padding: 10px 16px;
   background: #007bff;
@@ -119,6 +118,26 @@
 
 .attendance_popup_buttons button:last-child:hover {
   background: #e0e0e0;
+}
+
+.attendance_btn-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+}
+
+.attendance_btn-spinner {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0.5);
+}
+
+.attendance_btn-text.hidden {
+  visibility: hidden;
 }
 
 @keyframes fadeIn {

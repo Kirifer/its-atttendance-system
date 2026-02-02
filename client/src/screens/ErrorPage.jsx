@@ -3,20 +3,27 @@ import { useNavigate } from "react-router-dom";
 
 function ErrorPage({ message }) {
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate("/");
+      navigate(token ? "/dashboard" : "/");
     }, 3000); // milliseconds to seconds = 3 seconds
 
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, token]);
 
   return (
     <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h1 style={{ color: "red" }}>Access Denied</h1>
-      <h2 style={{ color: "red" }}>SIGN IN FIRST TO ACCESS THIS PAGE!!</h2>
-      <h3 style={{ color: "red" }}>Redirecting back to home page...</h3>
+      <h1 style={{ color: "red", fontWeight: "bolder" }}>Access Denied!!</h1>
+      <h2 style={{ color: "red", fontWeight: "bolder" }}>
+        {token
+          ? "YOU DO NOT HAVE ACCESS TO THIS PAGE!!"
+          : "SIGN IN FIRST TO ACCESS THIS PAGE!!"}
+      </h2>
+      <h3 style={{ color: "red" }}>
+        {token ? "Redirecting to dashboard..." : "Redirecting to home page..."}
+      </h3>
       <p>{message}</p>
     </div>
   );

@@ -1,3 +1,4 @@
+/* Button to open modal */
 .custom_schedule_wrapper {
   width: 100%;
   display: flex;
@@ -23,6 +24,7 @@
   background: #0066d3;
 }
 
+/* Modal Overlay */
 .custom_schedule_overlay {
   position: fixed;
   top: 0;
@@ -37,80 +39,226 @@
   z-index: 999;
   padding: 10px;
   box-sizing: border-box;
-  overflow-y: auto; 
+  overflow-y: auto;
 }
 
+/* Modal Container */
 .custom_schedule {
   background: #fff;
-  padding: 28px 24px;
+  padding: 20px;
   width: 100%;
-  max-width: 380px;
-  border-radius: 16px;
+  max-width: 480px;
+  border-radius: 8px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   animation: fadeIn 0.25s ease-in-out;
-  font-family: "Inter", sans-serif;
   box-sizing: border-box;
 }
 
 .custom_schedule h2 {
-  margin-bottom: 20px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  text-align: center;
+  margin-bottom: 16px;
   color: #333;
 }
 
-.custom_schedule label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: 6px;
-  color: #555;
+/* Error/Success Messages */
+.schedule_error {
+  color: #dc2626;
+  font-size: 14px;
+  margin-bottom: 12px;
 }
 
-.custom_schedule input,
-.custom_schedule select {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+.schedule_success {
+  color: #16a34a;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+/* Field Wrapper */
+.schedule_field {
+  display: flex;
+  flex-direction: column;
   margin-bottom: 16px;
+}
+
+.field_label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.schedule_field input {
+  height: 40px;
+  padding: 8px 12px;
   font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
   outline: none;
-  transition: 0.2s;
   box-sizing: border-box;
 }
 
-.custom_schedule input:focus,
-.custom_schedule select:focus {
+.schedule_field input:focus {
   border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
 }
 
+/* User Selection - Chip Container */
+.schedule_field.user_list_wrapper {
+  position: relative;
+}
+
+.user_chip_container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  min-height: 40px;
+  height: auto;
+  box-sizing: border-box;
+  cursor: text;
+  transition: all 0.2s;
+}
+
+.user_chip_container:focus-within {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+  outline: none;
+}
+
+.user_chip_container.locked {
+  background-color: #f3f4f6;
+  cursor: not-allowed !important;
+}
+
+.user_chip_container.locked:focus-within {
+  border-color: #d1d5db;
+  box-shadow: none;
+}
+
+/* User Chips */
+.user_chip {
+  display: flex;
+  align-items: center;
+  background: #e8f0fe;
+  color: #1967d2;
+  padding: 4px 8px;
+  height: 26px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.user_chip.all_chip {
+  background: #1a5dac;
+  color: #fff;
+  font-weight: 600;
+}
+
+.user_chip button {
+  background: none;
+  border: none;
+  color: inherit;
+  margin-left: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  line-height: 1;
+}
+
+.user_chip button:hover {
+  opacity: 0.8;
+}
+
+/* Search Input Inside Chip Container */
+.user_search_input {
+  border: none !important;
+  outline: none !important;
+  flex: 1;
+  min-width: 120px;
+  height: auto !important;
+  font-size: 15px !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.user_chip_container.locked .user_search_input {
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+/* User Dropdown */
+.user_dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.user_dropdown_item {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+
+.user_dropdown_item:hover {
+  background-color: #f1f3f4;
+}
+
+.user_dropdown_item.all_option {
+  border-bottom: 1px solid #e5e7eb;
+  color: #1a5dac;
+}
+
+.user_no_results {
+  padding: 12px;
+  color: #6b7280;
+  font-style: italic;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Buttons */
 .custom_schedule_buttons {
   display: flex;
   gap: 12px;
-  justify-content: space-between;
-  margin-top: 12px;
+  margin-top: 20px;
 }
 
 .custom_schedule_buttons button {
   flex: 1;
-  padding: 10px 0;
-  border-radius: 8px;
+  height: 42px;
+  border-radius: 6px;
   border: none;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
-  transition: 0.2s;
+  transition: all 0.2s;
 }
 
 .custom_schedule_buttons button:first-child {
-  background: #007bff;
+  background: #1a5dac;
   color: #fff;
 }
 
 .custom_schedule_buttons button:first-child:hover {
   background: #0066d3;
+}
+
+.custom_schedule_buttons button:first-child:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .custom_schedule_buttons button:last-child {
@@ -122,6 +270,7 @@
   background: #e0e0e0;
 }
 
+/* Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -130,5 +279,25 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .custom_schedule {
+    padding: 16px;
+    max-width: 100%;
+  }
+
+  .custom_schedule h2 {
+    font-size: 16px;
+  }
+
+  .schedule_field input {
+    height: 38px;
+  }
+
+  .user_chip_container {
+    min-height: 38px;
   }
 }

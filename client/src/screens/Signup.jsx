@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { signUpUser } from "../api/auth";
 import "../styles/Signup.css";
 import PasswordInput from "../components/PasswordInput";
-import SuccessPopup from "../components/SuccessPopup";
+import SignupSuccess from "../components/SignupSuccess";
+import Loader from "../components/Loader";
 import API from "../api/api";
 
 function Signup() {
@@ -12,6 +13,7 @@ function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({
     username: "",
     email: "",
@@ -32,17 +34,24 @@ function Signup() {
         confirmPassword: "",
         general: "",
       });
-      setShowSuccessPopup(false);
     }, 5000);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFieldErrors({ general: "" });
+    setFieldErrors({
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      general: "",
+    });
+    setLoading(true);
 
     if (password !== confirmPassword) {
       setFieldErrors({ general: "Passwords do not match!" });
       clearMessages();
+      setLoading(false);
       return;
     }
 
@@ -51,7 +60,7 @@ function Signup() {
         username,
         email,
         password,
-        confirmPassword
+        confirmPassword,
       );
       localStorage.setItem("token", token);
 
@@ -68,12 +77,25 @@ function Signup() {
 
       setFieldErrors({ general: err.message });
       clearMessages();
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="signup-background">
-      <form onSubmit={handleSubmit} className="signup-box">
+      {loading && <Loader />}
+      <form
+        onSubmit={handleSubmit}
+        onKeyDown={(e) => {
+          if (showSuccessPopup) return;
+
+          if (e.key === "Enter" || e.key === "NumpadEnter") {
+            handleSubmit(e);
+          }
+        }}
+        className="signup-box"
+      >
         <div className="top-box-header">
           <p className="signup-text"></p>
           <button className="close-btn" onClick={() => navigate("/")}>
@@ -139,9 +161,10 @@ function Signup() {
       </form>
 
       {showSuccessPopup && (
-        <SuccessPopup
-          message="Sign up successful! You can now log in."
+        <SignupSuccess
+          message="Registration successful. Your account is currently pending administrative activation."
           onClose={() => {
+            localStorage.removeItem("token");
             setShowSuccessPopup(false);
             navigate("/");
           }}

@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { timeIn, timeOut, getUserAttendance } from "../api/attendance";
 import { showToast } from "../components/Notification/toast";
-import API from "../api/api"; // <-- needed for /me
+import API from "../api/api"; 
 
 export function useTimeInOut(userId, onAttendanceChange) {
   const [isTimedIn, setIsTimedIn] = useState(false);
   const [onLeave, setOnLeave] = useState(false);
   const [totalOJTHours, setTotalOJTHours] = useState(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [loadingAction, setLoadingAction] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const role = user?.role;
@@ -16,7 +18,6 @@ export function useTimeInOut(userId, onAttendanceChange) {
 
     const init = async () => {
       try {
-        // 1. Fetch today's attendance
         const res = await getUserAttendance(userId);
         const today = new Date().toDateString();
 
@@ -24,20 +25,17 @@ export function useTimeInOut(userId, onAttendanceChange) {
           (r) => new Date(r.date).toDateString() === today
         );
 
-        const isOnLeaveToday = todayRecord?.status === "ON_LEAVE";
-
         setIsTimedIn(todayRecord?.timeIn && !todayRecord?.timeOut);
-        setOnLeave(isOnLeaveToday);
+        setOnLeave(todayRecord?.status === "ON_LEAVE");
 
         const userRes = await API.get("/auth/me");
-        const updatedUser = userRes.data;
+        setTotalOJTHours(userRes.data.totalOJTHours);
 
-        setTotalOJTHours(updatedUser.totalOJTHours);
-
-        // update localStorage
-        localStorage.setItem("user", JSON.stringify(updatedUser));
+        localStorage.setItem("user", JSON.stringify(userRes.data));
       } catch (err) {
-        console.error("Error initializing attendance:", err);
+        console.error(err);
+      } finally {
+        setIsInitializing(false);
       }
     };
 
@@ -45,15 +43,18 @@ export function useTimeInOut(userId, onAttendanceChange) {
   }, [userId, role]);
 
   const handleTimeIn = async () => {
-    try {
-      if (totalOJTHours === null) {
-        return showToast({
-          message: "Please contact HR/Admin to update your OJT hours",
-          color: "#ffffff",
-          type: "warning",
-        });
-      }
+    if (loadingAction) return;
 
+    if (!isInitializing && totalOJTHours === null) {
+      return showToast({
+        message: "Please contact HR/Admin to update your OJT hours",
+        color: "#ffffff",
+        type: "warning",
+      });
+    }
+
+    try {
+      setLoadingAction(true);
       await timeIn();
 
       showToast({
@@ -66,24 +67,32 @@ export function useTimeInOut(userId, onAttendanceChange) {
       onAttendanceChange();
     } catch (err) {
       showToast({
-        message: err?.response?.data?.message || "Failed to time in",
+        message: err.message || "Failed to time in",
         color: "#ffffff",
         type: "error",
       });
+    } finally {
+      setLoadingAction(false);
     }
   };
 
   const handleTimeOut = async () => {
-    await timeOut();
+    if (loadingAction) return;
 
-    showToast({
-      message: "Successfully timed out",
-      color: "#ffffff",
-      type: "success",
-    });
+    try {
+      setLoadingAction(true);
+      await timeOut();
 
-    setIsTimedIn(false);
-    onAttendanceChange();
+      showToast({ 
+        message: "Successfully timed out", 
+        color: "#ffffff",
+        type: "success" 
+      });
+      setIsTimedIn(false);
+      onAttendanceChange();
+    } finally {
+      setLoadingAction(false);
+    }
   };
 
   return {
@@ -93,5 +102,7 @@ export function useTimeInOut(userId, onAttendanceChange) {
     handleTimeOut,
     onLeave,
     totalOJTHours,
+    isInitializing,
+    loadingAction,
   };
 }

@@ -96,3 +96,21 @@
   border: 1px solid #ddd;
   border-radius: 6px;
 }
+
+/* Mobile table search and dropdown adjustments */
+@media (max-width: 600px) {
+  .time-table__search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .time-table__dropdown {
+    width: 100%;
+    max-width: 140px; /* ID / Request Type / Status */
+  }
+
+  .time-table__input {
+    width: 100%;
+    max-width: 220px; /* Search input */
+  }
+}

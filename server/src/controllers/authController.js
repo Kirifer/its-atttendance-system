@@ -52,6 +52,7 @@ export const getMe = async (req, res) => {
         role: true,
         profilePic: true,
         onLeave: true,
+        isApproved: true,
         useCustomSchedule: true,
         totalOJTHours: true,
       },
@@ -63,13 +64,31 @@ export const getMe = async (req, res) => {
 
     const workSchedule = await getWorkSchedule(userId);
 
+    const formatTimePH = (date) =>
+      date.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "Asia/Manila",
+      });
+
     res.json({
       ...user,
       remainingWorkHours: remainingHours ?? 0,
+
+      // 🔥 expose the schedule itself, not just a boolean
+      useCustomSchedule: workSchedule
+        ? {
+            startTime: formatTimePH(workSchedule.start),
+            endTime: formatTimePH(workSchedule.end),
+          }
+        : null,
+
+      // optional: keep todaySchedule if other parts still use it
       todaySchedule: workSchedule
         ? {
-            startTime: workSchedule.start.toTimeString().slice(0, 5),
-            endTime: workSchedule.end.toTimeString().slice(0, 5),
+            startTime: formatTimePH(workSchedule.start),
+            endTime: formatTimePH(workSchedule.end),
           }
         : null,
     });
@@ -88,17 +107,21 @@ export const signUp = async (req, res) => {
       return res.status(400).json({ message: "User already exists!" });
 
     const hashed = await bcrypt.hash(password, 10);
+    const normalizedRole = role?.toUpperCase() || "USER";
+
     const newUser = await prisma.user.create({
       data: {
         username,
         email,
         password: hashed,
         role: role?.toUpperCase() || "USER", // default USER
+        isApproved: normalizedRole === "ADMIN" ? true : false,
       },
     });
 
     res.json({
-      message: "User created",
+      message:
+        "Registration successful. Please wait for administrative approval.",
       user: {
         id: newUser.id,
         username: newUser.username,
@@ -131,13 +154,20 @@ export const login = async (req, res) => {
     if (user.resignedAt)
       return res.status(403).json({ message: "This admin has been resigned." });
 
+    if (!user.isApproved && user.role !== "ADMIN") {
+      return res.status(403).json({
+        message:
+          "Account pending administrative approval. Please contact your system administrator.",
+      });
+    }
+
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(400).json({ message: "Incorrect password!" });
 
     const token = jwt.sign(
       { id: user.id, role: user.role }, // ⬅ Add role here
       JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
 
     if (user.role !== "ADMIN" && user.totalOJTHours === 0) {
@@ -159,10 +189,12 @@ export const login = async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
+        isApproved: user.isApproved,
         leave: user.onLeave,
         department: user.department,
         position: user.position,
         supervisor: user.supervisor,
+        manager: user.manager,
         totalOJTHours: user.totalOJTHours,
         remainingWorkHours: user.remainingWorkHours,
       },
@@ -369,7 +401,7 @@ export const changePassword = async (req, res) => {
     const token = jwt.sign(
       { id: updatedUser.id, role: updatedUser.role },
       process.env.JWT_SECRET || JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
 
     return res.json({

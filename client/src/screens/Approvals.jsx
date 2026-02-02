@@ -20,6 +20,7 @@ import EditUserSchedule from "../components/HandleInterns/EditUserSchedule";
 import EditUserScheduleDesktop from "../components/HandleInterns/EditUserScheduleDesktop";
 import useUserSchedule from "../hooks/useUserSchedule.js";
 import useIsDesktop from "../hooks/useIsDesktop.js";
+import PendingApprovals from "../components/PendingApprovals.jsx";
 
 function CustomTabPanel({ children, value, index }) {
   return (
@@ -36,27 +37,26 @@ function a11yProps(index) {
   };
 }
 
-function Approvals() {  
-
+function Approvals() {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Read tab from URL query parameter, default to 0
   const getTabFromUrl = () => {
     const params = new URLSearchParams(location.search);
-    const tab = parseInt(params.get('tab'), 10);
-    return !isNaN(tab) && tab >= 0 && tab <= 3 ? tab : 0;
+    const tab = parseInt(params.get("tab"), 10);
+    return !isNaN(tab) && tab >= 0 && tab <= 4 ? tab : 0;
   };
 
   const [value, setValue] = useState(getTabFromUrl());
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
 
- // Update URL when tab changes
+  // Update URL when tab changes
   const handleChange = (_, newValue) => {
     setValue(newValue);
     const params = new URLSearchParams(location.search);
-    params.set('tab', newValue);
+    params.set("tab", newValue);
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
 
@@ -109,15 +109,27 @@ function Approvals() {
             allowScrollButtonsMobile
             aria-label="Approvals Tabs"
           >
-            <Tab label="Time Adjustments" {...a11yProps(0)} />
-            <Tab label="Time-off Requests" {...a11yProps(1)} />
-            <Tab label="Admin Management" {...a11yProps(2)} />
-            <Tab label="Intern Management" {...a11yProps(3)} />
+            <Tab label="Registration Requests" {...a11yProps(0)} />
+            <Tab label="Time Adjustments" {...a11yProps(1)} />
+            <Tab label="Time-off Requests" {...a11yProps(2)} />
+            <Tab label="Admin Management" {...a11yProps(3)} />
+            <Tab label="Intern Management" {...a11yProps(4)} />
           </Tabs>
         </Box>
 
         {/* ---------- TAB 1 ---------- */}
         <CustomTabPanel value={value} index={0}>
+          <Loader loading={loading}>
+            <h1 className="admin__title">Registration Requests</h1>
+            <p className="admin__description">
+              Verify and authorize new user accounts for system access.
+            </p>
+            <PendingApprovals />
+          </Loader>
+        </CustomTabPanel>
+
+        {/* ---------- TAB 2 ---------- */}
+        <CustomTabPanel value={value} index={1}>
           <Loader loading={loading}>
             <h1 className="admin__title">Time Adjustment Requests</h1>
             <p className="admin__description">
@@ -127,8 +139,8 @@ function Approvals() {
           </Loader>
         </CustomTabPanel>
 
-        {/* ---------- TAB 2 ---------- */}
-        <CustomTabPanel value={value} index={1}>
+        {/* ---------- TAB 3 ---------- */}
+        <CustomTabPanel value={value} index={2}>
           <Loader loading={loading}>
             <h1 className="admin__title">Time-off Requests</h1>
             <p className="admin__description">
@@ -142,8 +154,8 @@ function Approvals() {
           </Loader>
         </CustomTabPanel>
 
-        {/* ---------- TAB 3 ---------- */}
-        <CustomTabPanel value={value} index={2}>
+        {/* ---------- TAB 4 ---------- */}
+        <CustomTabPanel value={value} index={3}>
           <Loader loading={loading}>
             <div>
               <h1 className="admin__title">Admin Management</h1>
@@ -155,8 +167,8 @@ function Approvals() {
           </Loader>
         </CustomTabPanel>
 
-        {/* ---------- TAB 4 ---------- */}
-        <CustomTabPanel value={value} index={3}>
+        {/* ---------- TAB 5 ---------- */}
+        <CustomTabPanel value={value} index={4}>
           <Loader loading={loading}>
             <div>
               <h1 className="admin__title">Handle Interns</h1>

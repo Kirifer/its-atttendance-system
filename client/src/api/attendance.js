@@ -69,6 +69,52 @@ export const lunchIn = async () => {
   }
 };
 
+export const breakOut = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await API.post(
+      "/attendance/break-out",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return res.data;
+  } catch (err) {
+    let message = "Error breaking out";
+    if (err.response?.data?.message) message = err.response.data.message;
+    else if (err.message) message = err.message;
+    throw new Error(message);
+  }
+};
+
+export const breakIn = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await API.post(
+      "/attendance/break-in",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return res.data;
+  } catch (err) {
+    let message = "Error breaking in";
+    if (err.response?.data?.message) message = err.response.data.message;
+    else if (err.message) message = err.message;
+    throw new Error(message);
+  }
+};
+
 export const timeOut = async () => {
   try {
     const token = localStorage.getItem("token");

@@ -28,6 +28,7 @@ model User {
   position           String?
   department         String?
   supervisor         String?
+  manager            String?
   useCustomSchedule  Boolean   @default(false)
   created_at         DateTime  @default(now())
   reset_token        String?
@@ -35,6 +36,7 @@ model User {
   onLeave            Boolean   @default(false) 
   totalOJTHours      Float?     @default(0)
   remainingWorkHours Float?    @default(0)
+  isApproved         Boolean   @default(false)
   resignedAt  DateTime? 
   leaves      Leave[]
   attendance  Attendance[]
@@ -99,11 +101,14 @@ model Attendance {
   timeIn  DateTime?
   lunchOut DateTime?
   lunchIn DateTime?
+  breakOut DateTime?
+  breakIn  DateTime?
   timeOut DateTime?
   status  AttendanceStatus @default(PRESENT)
 
   tardinessMinutes        Int   @default(0)
   lunchTardinessMinutes   Int   @default(0)
+  breakTardinessMinutes   Int @default(0)
   straightWorkHours Float?
   totalWorkHours Float? 
 

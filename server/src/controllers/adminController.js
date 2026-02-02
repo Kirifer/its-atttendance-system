@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { getTimesheetMetadata } from "../utils/timesheetMetadata.js";
+import { updateRemainingWorkHours } from "../utils/hoursOJT/updateRemainingWorkHours.js";
 
 const prisma = new PrismaClient();
 
@@ -127,6 +128,7 @@ export const getAllUsers = async (req, res) => {
         department: true,
         position: true,
         supervisor: true,
+        manager: true,
       },
       orderBy: { created_at: "asc" },
     });
@@ -193,19 +195,17 @@ export const updateOJTHours = async (req, res) => {
       return res.status(400).json({ message: "Not an intern user." });
     }
 
-    const updatedUser = await prisma.user.update({
+    await prisma.user.update({
       where: { id: userId },
       data: { totalOJTHours },
-      select: {
-        totalOJTHours: true,
-        remainingWorkHours: true,
-      },
     });
+
+    const remainingWorkHours = await updateRemainingWorkHours(userId);
 
     res.json({
       message: "OJT hours updated successfully.",
-      totalOJTHours: updatedUser.totalOJTHours,
-      remainingWorkHours: updatedUser.remainingWorkHours ?? 0,
+      totalOJTHours,
+      remainingWorkHours: remainingWorkHours ?? 0,
     });
   } catch (err) {
     console.error(err);
@@ -217,7 +217,7 @@ export const updateOJTHours = async (req, res) => {
 export const updateUserInfo = async (req, res) => {
   try {
     const { id } = req.params;
-    const { department, position, supervisor } = req.body;
+    const { department, position, supervisor, manager } = req.body;
 
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
@@ -230,6 +230,7 @@ export const updateUserInfo = async (req, res) => {
         department: department ?? user.department,
         position: position ?? user.position,
         supervisor: supervisor ?? user.supervisor,
+        manager: manager ?? user.manager,
       },
     });
 

@@ -2,12 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { forgotPassword, verifyOtp } from "../api/auth";
 import "../styles/ForgotPassword.css";
+import Loader from "../components/Loader";
 import API from "../api/api";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  const [loading, setLoading] = useState(false);
   // otp
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState("email");
@@ -18,6 +20,7 @@ function ForgotPassword() {
 
   const handleSubmit = async (e, reason = "initial") => {
     if (e) e.preventDefault();
+    setLoading(true);
     setNewOtp(true);
     try {
       const res = await forgotPassword(email, reason);
@@ -40,11 +43,13 @@ function ForgotPassword() {
       }, 10000);
     } finally {
       setNewOtp(false);
+      setLoading(false);
     }
   };
 
   // handle otp
   const handleVerifyOtp = async () => {
+    setLoading(true);
     try {
       const res = await verifyOtp(email, otp);
 
@@ -61,6 +66,8 @@ function ForgotPassword() {
         err.response?.data?.message || "The OTP code inputted is wrong!";
       setMessage(errorMsg);
       setIsError(true);
+    } finally {
+      setLoading(false);
     }
 
     setTimeout(() => {
@@ -71,6 +78,7 @@ function ForgotPassword() {
 
   return (
     <div className="forgot-background">
+      {loading && <Loader />}
       <form
         onSubmit={(e) => handleSubmit(e, "initial")}
         className="forgot-password-box"

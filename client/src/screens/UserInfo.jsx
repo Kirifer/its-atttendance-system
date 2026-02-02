@@ -6,6 +6,7 @@ import API from "../api/api";
 import { UserContext } from "../context/UserContext";
 import UserTotalOJTHours from "../components/UserTotalOJTHours";
 import DashboardLayout from "../components/DashboardLayout";
+import UserInfoLoader from "../components/UserInfoLoader";
 
 const UserInfo = () => {
   const [user, setUser] = useState(null); // real-time update
@@ -37,6 +38,9 @@ const UserInfo = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
 
+  // loader
+  const [loading, setLoading] = useState(false);
+
   // Fetch user data
   useEffect(() => {
     const getUser = async () => {
@@ -57,22 +61,26 @@ const UserInfo = () => {
     e.preventDefault();
     setPassMsg("");
     setPassErr("");
+    setLoading(true);
 
     if (!oldPassword || !newPassword || !confirmPassword) {
       setPassErr("Please fill out all fields!");
       setTimeout(() => setPassErr(""), 5000);
+      setLoading(false);
       return;
     }
     if (newPassword !== confirmPassword) {
       setPassErr("Passwords do not match!");
       setTimeout(() => setPassErr(""), 5000);
+      setLoading(false);
       return;
     }
     if (oldPassword === newPassword) {
       setPassMsg(
-        "New password is the same as the old password. No changes were made."
+        "New password is the same as the old password. No changes were made.",
       );
       setTimeout(() => setPassMsg(""), 5000);
+      setLoading(false);
       return;
     }
 
@@ -87,6 +95,8 @@ const UserInfo = () => {
     } catch (err) {
       setPassErr(err.message);
       setTimeout(() => setPassErr(""), 5000);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -95,15 +105,18 @@ const UserInfo = () => {
     e.preventDefault();
     setUsernameMsg("");
     setUsernameErr("");
+    setLoading(true);
 
     if (username.length < 3) {
       setUsernameErr("Username must be at least 3 characters long.");
       setTimeout(() => setUsernameErr(""), 5000);
+      setLoading(false);
       return;
     }
     if (username === user.username) {
       setUsernameMsg("Username is the same as before. No changes were made.");
       setTimeout(() => setUsernameMsg(""), 5000);
+      setLoading(false);
       return;
     }
 
@@ -117,6 +130,8 @@ const UserInfo = () => {
     } catch (err) {
       setUsernameErr(err.response?.data?.message || "Username already exists!");
       setTimeout(() => setUsernameErr(""), 5000);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -127,17 +142,20 @@ const UserInfo = () => {
     e.preventDefault();
     setEmailMsg("");
     setEmailErr("");
+    setLoading(true);
 
     if (!emailRegex.test(email)) {
       setEmailErr(
-        "Invalid email format. Must be at least 3 characters and have a valid domain."
+        "Invalid email format. Must be at least 3 characters and have a valid domain.",
       );
       setTimeout(() => setEmailErr(""), 5000);
+      setLoading(false);
       return;
     }
     if (email === user.email) {
       setEmailMsg("Email is the same as before. No changes were made.");
       setTimeout(() => setEmailMsg(""), 5000);
+      setLoading(false);
       return;
     }
 
@@ -151,19 +169,28 @@ const UserInfo = () => {
     } catch (err) {
       setEmailErr(err.response?.data?.message || "Email already exists!");
       setTimeout(() => setEmailErr(""), 5000);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!user) return <div>Loading...</div>;
+  if (!user) return <UserInfoLoader />;
 
   return (
     <DashboardLayout>
+      {loading && <UserInfoLoader />}
       <div className="user-info-container">
         <h2>User Info</h2>
         {/* PFP */}
         {user.profilePic && (
           <img
-            src={`http://localhost:5001/uploads/${user.profilePic}`}
+            src={
+              user.profilePic?.startsWith("http")
+                ? user.profilePic
+                : `${
+                    process.env.REACT_APP_BACKEND_URL || "http://localhost:5001"
+                  }/uploads/${user.profilePic}`
+            }
             alt="Profile"
             style={{
               width: "120px",
