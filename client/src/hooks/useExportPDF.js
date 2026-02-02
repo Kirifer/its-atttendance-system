@@ -71,7 +71,6 @@ export default function useExportPDF() {
       "Lunch Out",
       "Lunch In",
       "Time Out",
-      "Days",
       "TOTAL",
       "ACTUAL",
     ];
@@ -82,7 +81,6 @@ export default function useExportPDF() {
       r["Lunch Out"],
       r["Lunch In"],
       r["Time Out"],
-      r.DAYS,
       r.TOTAL,
       r.ACTUAL,
     ]);
@@ -113,12 +111,16 @@ export default function useExportPDF() {
     };
 
     const ROWS_PER_PAGE = 12;
-    const dataRows = body.slice(0, body.length - 2);
-    const totalOnlyRow = body.slice(body.length - 2);
+    const dataRows = body.slice(0, body.length - 1);
+    const totalOnlyRow = body.slice(body.length - 1);
 
     const chunkedBodies = [];
-    for (let i = 0; i < dataRows.length; i += ROWS_PER_PAGE) {
-      chunkedBodies.push(dataRows.slice(i, i + ROWS_PER_PAGE));
+    if (dataRows.length === 0) {
+      chunkedBodies.push([]);
+    } else {
+      for (let i = 0; i < dataRows.length; i += ROWS_PER_PAGE) {
+        chunkedBodies.push(dataRows.slice(i, i + ROWS_PER_PAGE));
+      }
     }
 
     chunkedBodies[chunkedBodies.length - 1].push(...totalOnlyRow);
@@ -249,14 +251,6 @@ export default function useExportPDF() {
       return;
     }
 
-    const formatMonthYear = (dateStr) => {
-      if (!dateStr) return "unknown_date";
-      const parts = dateStr.split(` `);
-      const month = parts[0];
-      const year = parts[2];
-      return `${month}_${year}`;
-    };
-
     const recordsByUser = records.reduce((acc, record) => {
       const key = record.Intern;
       if (!acc[key]) acc[key] = [];
@@ -268,9 +262,8 @@ export default function useExportPDF() {
 
     if (userKeys.length === 1) {
       const key = userKeys[0];
-      const recordDate = formatMonthYear(recordsByUser[key][0]?.Date);
       const doc = await generatePDFForUser(recordsByUser[key], key);
-      doc.save(`${key}_${recordDate}.pdf`);
+      doc.save(`${key} - Daily Time Records.pdf`);
       return;
     }
 
@@ -278,15 +271,13 @@ export default function useExportPDF() {
       const zip = new JSZip();
 
       for (const key of userKeys) {
-        const recordDate = formatMonthYear(recordsByUser[key][0]?.Date);
         const doc = await generatePDFForUser(recordsByUser[key], key);
         const pdfBlob = doc.output("blob");
-        zip.file(`${key}_${recordDate}.pdf`, pdfBlob);
+        zip.file(`${key} - Daily Time Records.pdf`, pdfBlob);
       }
 
       const zipBlob = await zip.generateAsync({ type: "blob" });
-      const archiveLabel = formatMonthYear(records[0]?.Date);
-      saveAs(zipBlob, `ITS_Attendance_${archiveLabel}.zip`);
+      saveAs(zipBlob, `Interns - Daily Time Records.zip`);
     } catch (err) {
       console.error("Failed to generate ZIP file", err);
       alert("Failed to export multiple PDFs.");
