@@ -59,7 +59,7 @@ const fileTimeAdjustment = async (req, res) => {
 const fetchTimeAdjustments = async (req, res) => {
   try {
     const userId = req.user.id;
-    const isAdmin = req.user.role === "ADMIN";
+    const isAdmin = req.user.role === "ADMIN" || req.user.role === "SUPERVISOR";
 
     const requests = isAdmin
       ? await getTimeAdjustments()
@@ -77,7 +77,11 @@ const fetchTimeAdjustments = async (req, res) => {
       endTime: req.endTime,
 
       user: req.user
-        ? { id: req.user.id, username: req.user.username }
+        ? {
+            id: req.user.id,
+            username: req.user.username,
+            department: req.user.department,
+          }
         : null,
     }));
 
@@ -110,7 +114,7 @@ const updateTimeAdjustmentStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    if (req.user.role !== "ADMIN")
+    if (req.user.role !== "ADMIN" && req.user.role !== "SUPERVISOR")
       return res.status(403).json({ message: "Unauthorized" });
 
     const normalizedStatus = status.toLowerCase();
@@ -172,7 +176,7 @@ const updateTimeAdjustmentStatus = async (req, res) => {
 const deleteTimeAdjustment = async (req, res) => {
   try {
     const { id } = req.params;
-    const isAdmin = req.user.role === "ADMIN";
+    const isAdmin = req.user.role === "ADMIN" || req.user.role === "SUPERVISOR";
 
     if (!isAdmin) return res.status(403).json({ message: "Unauthorized" });
 

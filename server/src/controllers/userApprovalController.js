@@ -16,6 +16,7 @@ export const getPendingUsers = async (req, res) => {
         username: true,
         email: true,
         role: true,
+        department: true,
         created_at: true,
       },
       orderBy: { created_at: "desc" },

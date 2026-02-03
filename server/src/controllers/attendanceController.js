@@ -9,18 +9,13 @@ import { getTodaySchedule } from "../utils/getTodaySchedule.js";
 
 const prisma = new PrismaClient();
 
-export const isAdmin = (req, res, next) => {
-  if (req.user.role !== "ADMIN") {
-    return res.status(403).json({ message: "Admin only" });
-  }
-  next();
-};
+const isStaffRole = (role) => role === "ADMIN" || role === "SUPERVISOR";
 
 export const timeIn = async (req, res) => {
   try {
     const user = req.user;
 
-    if (user.role === "ADMIN") {
+    if (isStaffRole(user.role)) {
       return res
         .status(403)
         .json({ message: "Admins cannot have attendance records" });
@@ -91,7 +86,7 @@ export const lunchOut = async (req, res) => {
   try {
     const user = req.user;
 
-    if (user.role === "ADMIN") {
+    if (isStaffRole(user.role)) {
       return res
         .status(403)
         .json({ message: "Admins cannot have attendance records" });
@@ -134,7 +129,7 @@ export const lunchIn = async (req, res) => {
   try {
     const user = req.user;
 
-    if (user.role === "ADMIN") {
+    if (isStaffRole(user.role)) {
       return res
         .status(403)
         .json({ message: "Admins cannot have attendance records" });
@@ -201,6 +196,14 @@ export const lunchIn = async (req, res) => {
 
 export const breakOut = async (req, res) => {
   try {
+    const user = req.user;
+
+    if (isStaffRole(user.role)) {
+      return res
+        .status(403)
+        .json({ message: "Admins cannot have attendance records" });
+    }
+
     const userId = req.user.id;
     const today = getUTCDay();
 
@@ -231,7 +234,7 @@ export const breakIn = async (req, res) => {
   try {
     const user = req.user;
 
-    if (user.role === "ADMIN") {
+    if (isStaffRole(user.role)) {
       return res
         .status(403)
         .json({ message: "Admins cannot have attendance records" });
@@ -285,6 +288,14 @@ export const breakIn = async (req, res) => {
 
 export const timeOut = async (req, res) => {
   try {
+    const user = req.user;
+
+    if (isStaffRole(user.role)) {
+      return res
+        .status(403)
+        .json({ message: "Admins cannot have attendance records" });
+    }
+
     const userId = req.user.id;
     const today = getUTCDay();
 
@@ -319,7 +330,10 @@ export const getUserAttendance = async (req, res) => {
     const requestedUserId = req.params.userId;
     const loggedInUser = req.user;
 
-    if (loggedInUser.role !== "ADMIN" && loggedInUser.id !== requestedUserId) {
+    if (
+      !isStaffRole(loggedInUser.role) &&
+      loggedInUser.id !== requestedUserId
+    ) {
       return res.status(403).json({ message: "Forbidden" });
     }
 
@@ -351,7 +365,7 @@ export const getUserAttendance = async (req, res) => {
 
 export const getAllAttendance = async (req, res) => {
   try {
-    if (req.user.role !== "ADMIN") {
+    if (!isStaffRole(req.user.role)) {
       return res.status(403).json({ message: "Admins only" });
     }
 

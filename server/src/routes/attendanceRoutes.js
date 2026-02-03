@@ -11,11 +11,11 @@ import {
   getUserAttendance,
   updateAttendance,
   deleteAttendance,
-  isAdmin,
   getLoginStatus,
 } from "../controllers/attendanceController.js";
 import { setUserSchedule } from "../controllers/userScheduleController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
+import { staffOnly } from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 
@@ -26,10 +26,10 @@ router.post("/break-out", verifyToken, breakOut);
 router.post("/break-in", verifyToken, breakIn);
 router.post("/time-out", verifyToken, timeOut);
 router.get("/", verifyToken, getAllAttendance);
-router.get("/attendance-status", authMiddleware, isAdmin, getLoginStatus);
-router.post("/schedule/user", authMiddleware, isAdmin, setUserSchedule);
+router.get("/attendance-status", authMiddleware, staffOnly, getLoginStatus);
+router.post("/schedule/user", authMiddleware, staffOnly, setUserSchedule);
 router.get("/:userId", verifyToken, getUserAttendance);
-router.put("/:id", verifyToken, isAdmin, updateAttendance);
-router.delete("/:id", verifyToken, isAdmin, deleteAttendance);
+router.put("/:id", verifyToken, staffOnly, updateAttendance);
+router.delete("/:id", verifyToken, staffOnly, deleteAttendance);
 
 export default router;
