@@ -34,7 +34,7 @@ function AttBtn({ userId, onAttendanceChange, reload }) {
     breakInLoading,
   } = useBreakInOut(userId, reload, onAttendanceChange, isTimedIn);
 
-  if (role === "ADMIN") return null;
+  if (role === "ADMIN" || role === "SUPERVISOR") return null;
 
   return (
     <div className="att__carousel-wrapper">

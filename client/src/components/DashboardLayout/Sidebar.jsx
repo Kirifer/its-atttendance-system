@@ -124,7 +124,7 @@ export default function Sidebar() {
           </li>
         )} */}
 
-        {user.role === "ADMIN" && (
+        {(user.role === "ADMIN" || user.role === "SUPERVISOR") && (
           <li>
             <NavLink
               to="/approvals"

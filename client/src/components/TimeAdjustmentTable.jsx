@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../api/api";
 import "../styles/TimeAdjustmentTable.css";
 import { showToast } from "./Notification/toast";
+import { getAllStaffUsers } from "../api/auth";
 
 <link
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
@@ -10,9 +11,13 @@ import { showToast } from "./Notification/toast";
 
 function TimeAdjustmentTable() {
   const [allRequests, setAllRequests] = useState([]);
+  const [visibleUserIds, setVisibleUserIds] = useState(null);
   const [filterType, setFilterType] = useState("id");
   const [query, setQuery] = useState("");
   const [expandedId, setExpandedId] = useState(null);
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const isSupervisor = currentUser?.role === "SUPERVISOR";
+  const supervisorDept = currentUser?.department;
 
   const typeLabels = {
     change_log: "Change Log Request",
@@ -39,6 +44,31 @@ function TimeAdjustmentTable() {
   useEffect(() => {
     fetchAllRequests();
   }, []);
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      if (!isSupervisor || !supervisorDept) {
+        setVisibleUserIds(null);
+        return;
+      }
+      try {
+        const users = await getAllStaffUsers();
+        const allowed = new Set(
+          (users || [])
+            .filter(
+              (u) =>
+                u.role === "USER" &&
+                u.department === supervisorDept,
+            )
+            .map((u) => u.id),
+        );
+        setVisibleUserIds(allowed);
+      } catch (err) {
+        setVisibleUserIds(new Set());
+      }
+    };
+    loadUsers();
+  }, [isSupervisor, supervisorDept]);
 
 
   const handleUpdateStatus = async (id, status) => {
@@ -104,7 +134,14 @@ function TimeAdjustmentTable() {
     // creaatedAt: "date submitted",
   };
 
-  const filteredRequests = (allRequests || []).filter((req) => {
+  const scopedRequests =
+    visibleUserIds instanceof Set
+      ? (allRequests || []).filter((r) => visibleUserIds.has(r.user?.id))
+      : isSupervisor && supervisorDept
+      ? []
+      : allRequests || [];
+
+  const filteredRequests = scopedRequests.filter((req) => {
     const value =
       filterType === "id"
         ? String(req.id)

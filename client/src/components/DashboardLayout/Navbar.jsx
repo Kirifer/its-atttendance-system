@@ -60,7 +60,7 @@ export default function Navbar() {
           </li>
         )}
 
-        {user.role === "ADMIN" && (
+        {(user.role === "ADMIN" || user.role === "SUPERVISOR") && (
           <li className="navbar__item">
             <Link to="/approvals">Approvals</Link>
           </li>

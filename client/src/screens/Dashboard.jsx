@@ -34,7 +34,7 @@ function Dashboard() {
             </div>
 
             <div className="dashboard__right">
-              {user.role === "ADMIN" ? (
+              {user.role === "ADMIN" || user.role === "SUPERVISOR" ? (
                 <UserStatusCard reload={reload} />
               ) : (
                 <LogsCard
