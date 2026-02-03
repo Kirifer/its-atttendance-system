@@ -26,10 +26,10 @@ function UserRequestsTable({
       filterType === "type"
         ? req.type
         : filterType === "details"
-        ? req.details
-        : filterType === "status"
-        ? req.status
-        : "";
+          ? req.details
+          : filterType === "status"
+            ? req.status
+            : "";
     return value.toLowerCase().includes(query.toLowerCase());
   });
 
@@ -75,6 +75,8 @@ function UserRequestsTable({
               {filteredRequests.map((req) => {
                 const status = req.status ? req.status.toLowerCase() : "";
 
+                const isExternal = req.attachment?.startsWith("http");
+
                 const baseHost =
                   process.env.REACT_APP_BACKEND_URL || "http://localhost:5001";
 
@@ -84,7 +86,9 @@ function UserRequestsTable({
                   : `/${req.attachment}`;
 
                 const fullAttachmentUrl = req.attachment
-                  ? `${cleanBase}${cleanPath}`
+                  ? isExternal
+                    ? req.attachment
+                    : `${cleanBase}${cleanPath}`
                   : null;
 
                 return (
