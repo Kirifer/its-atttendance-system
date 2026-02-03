@@ -28,14 +28,14 @@ function LeaveForm({ onSubmit }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-  const startDate = new Date(formData.startDate);
-  const endDate = new Date(formData.endDate);
+    const startDate = new Date(formData.startDate);
+    const endDate = new Date(formData.endDate);
 
-  if (endDate < startDate) {
-    setError("End date cannot be earlier than start date.");
-    setSuccess("");
-    return;
-  }
+    if (endDate < startDate) {
+      setError("End date cannot be earlier than start date.");
+      setSuccess("");
+      return;
+    }
 
     // Validate leave type
     const validTypes = ["SICK", "VACATION", "HOLIDAY", "OFFSET"];
@@ -163,7 +163,6 @@ function LeaveForm({ onSubmit }) {
             name="reason"
             value={formData.reason}
             onChange={handleChange}
-            required
           />
         </label>
       </div>
@@ -175,6 +174,7 @@ function LeaveForm({ onSubmit }) {
             type="file"
             name="attachment"
             accept=".pdf,image/*"
+            required
             onChange={(e) =>
               setFormData((prev) => ({
                 ...prev,
