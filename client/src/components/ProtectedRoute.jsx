@@ -1,7 +1,7 @@
 import ErrorPage from "../screens/ErrorPage.jsx";
 import { jwtDecode } from "jwt-decode";
 
-function ProtectedRoute({ children, userOnly, adminOnly = false }) {
+function ProtectedRoute({ children, userOnly, adminOnly = false, staffOnly = false }) {
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -23,6 +23,17 @@ function ProtectedRoute({ children, userOnly, adminOnly = false }) {
     try {
       const decoded = jwtDecode(token); // decode JWT
       if (decoded.role !== "ADMIN") {
+        return <ErrorPage message="" />;
+      }
+    } catch (err) {
+      return <ErrorPage message="Invalid token" />;
+    }
+  }
+
+  if (staffOnly) {
+    try {
+      const decoded = jwtDecode(token);
+      if (!["ADMIN", "SUPERVISOR"].includes(decoded.role)) {
         return <ErrorPage message="" />;
       }
     } catch (err) {

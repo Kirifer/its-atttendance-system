@@ -50,7 +50,7 @@ function App() {
           <Route
             path="/approvals"
             element={
-              <ProtectedRoute adminOnly={true}>
+              <ProtectedRoute staffOnly={true}>
                 <Approvals />
               </ProtectedRoute>
             }
