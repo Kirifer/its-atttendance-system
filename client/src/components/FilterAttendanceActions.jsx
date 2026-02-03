@@ -71,7 +71,7 @@ export default function FilterAttendanceActions({
         </div>
 
         {/* Admin only PDF */}
-        {role === "ADMIN" && (
+        {(role === "ADMIN" || role === "SUPERVISOR") && (
           <button
             className="attendance_export_btn"
             onClick={() => exportPDF(filteredRecords)}

@@ -11,6 +11,7 @@ import usePagination from "../hooks/pagination";
 import Pagination from "./Pagination";
 import Loader from "./Spinner/Loader";
 import "../styles/AttendanceTable.css";
+import { getAllStaffUsers } from "../api/auth";
 
 export default function AttendanceTable({
   userId,
@@ -20,6 +21,8 @@ export default function AttendanceTable({
 }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const role = user?.role;
+  const isStaff = role === "ADMIN" || role === "SUPERVISOR";
+  const [visibleUserIds, setVisibleUserIds] = useState(null);
 
   const [records, setRecords] = useState([]);
   const [editingRecord, setEditingRecord] = useState(null);
@@ -74,7 +77,7 @@ export default function AttendanceTable({
 
       try {
         let res;
-        if (role === "ADMIN") res = await getAllAttendance();
+        if (isStaff) res = await getAllAttendance();
         else res = await getUserAttendance(userId);
 
         let dateFiltered = res.attendance;
@@ -112,7 +115,14 @@ export default function AttendanceTable({
           }
         }
 
-        const formatted = dateFiltered.map((r) => {
+        const scopedRecords =
+          role === "SUPERVISOR"
+            ? visibleUserIds instanceof Set
+              ? dateFiltered.filter((r) => visibleUserIds.has(r.userId))
+              : []
+            : dateFiltered;
+
+        const formatted = scopedRecords.map((r) => {
           const ti = r.timeIn ? new Date(r.timeIn) : null;
           const to = r.timeOut ? new Date(r.timeOut) : null;
 
@@ -138,7 +148,10 @@ export default function AttendanceTable({
             rawLunchOut: r.lunchOut,
             rawLunchIn: r.lunchIn,
 
-            Intern: role === "ADMIN" ? r.user.username : user.username,
+            Intern:
+              role === "ADMIN" || role === "SUPERVISOR"
+                ? r.user.username
+                : user.username,
             Status: r.status,
             Date: new Date(r.date).toLocaleDateString("en-US", options),
             "Time In": ti ? ti.toLocaleTimeString("en-US", timeOptions) : "-",
@@ -187,7 +200,34 @@ export default function AttendanceTable({
     options,
     timeOptions,
     role,
+    visibleUserIds,
+    isStaff,
   ]);
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      if (role !== "SUPERVISOR" || !user?.department) {
+        setVisibleUserIds(null);
+        return;
+      }
+      try {
+        const users = await getAllStaffUsers();
+        const allowed = new Set(
+          (users || [])
+            .filter(
+              (u) =>
+                u.role === "USER" &&
+                u.department === user.department,
+            )
+            .map((u) => u.id),
+        );
+        setVisibleUserIds(allowed);
+      } catch (err) {
+        setVisibleUserIds(new Set());
+      }
+    };
+    loadUsers();
+  }, [role, user?.department]);
 
   const { exportPDF } = useExportPDF();
 
@@ -301,7 +341,7 @@ export default function AttendanceTable({
                         </td>
                       ))}
                     <td>
-                      {role === "ADMIN" && (
+                      {isStaff && (
                         <button
                           className="attendance_edit_btn"
                           onClick={() => openEditPopup(r)}

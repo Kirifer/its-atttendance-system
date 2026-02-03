@@ -15,7 +15,7 @@ function Timesheet() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [timeAdjustments, setTimeAdjustments] = useState([]);
 
-  const isAdmin = user?.role === "ADMIN";
+  const isStaff = user?.role === "ADMIN" || user?.role === "SUPERVISOR";
 
   // fetch requests
   const fetchRequests = async () => {
@@ -58,7 +58,7 @@ function Timesheet() {
   return (
       <DashboardLayout>
         <div className="dashboard-main" style={{ position: "relative" }}>
-          {!isAdmin && (
+          {!isStaff && (
             <div className="time-adjustment-buttons">
               <div className="time-adjustment-container">
                 <button

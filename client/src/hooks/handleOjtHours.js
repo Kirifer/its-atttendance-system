@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { getAllUsers } from "../api/auth";
+import { getAllStaffUsers } from "../api/auth";
 import { getUserOjtHours, setUserOjtHours } from "../api/ojtHours";
 
 export default function useHandleOjtHours() {
@@ -15,7 +15,7 @@ export default function useHandleOjtHours() {
   const [success, setSuccess] = useState(null);
 
   useEffect(() => {
-    if (!user || user.role !== "ADMIN") {
+    if (!user || (user.role !== "ADMIN" && user.role !== "SUPERVISOR")) {
       setError("Admin access only");
       return;
     }
@@ -45,8 +45,14 @@ export default function useHandleOjtHours() {
 
   const fetchUsers = async () => {
     try {
-      const data = await getAllUsers();
-      setUsers(data?.users || data || []);
+      const data = await getAllStaffUsers();
+      const allUsers = data?.users || data || [];
+      const internsOnly = allUsers.filter((u) => u.role === "USER");
+      const scoped =
+        user?.role === "SUPERVISOR" && user?.department
+          ? internsOnly.filter((u) => u.department === user.department)
+          : internsOnly;
+      setUsers(scoped);
     } catch (err) {
       setError(err.message);
     }

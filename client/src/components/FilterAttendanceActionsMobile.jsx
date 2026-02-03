@@ -58,7 +58,7 @@ export default function FilterAttendanceActionsMobile({
       </button>
 
       {/* ADMIN EXPORT (still accessible) */}
-      {role === "ADMIN" && (
+      {(role === "ADMIN" || role === "SUPERVISOR") && (
         <button
           className="attendance_export_btn"
           onClick={() => exportPDF(filteredRecords)}

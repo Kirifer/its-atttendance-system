@@ -36,8 +36,7 @@ export default function useExportPDF() {
     const department = matchedUser?.department ?? "—";
     const position = matchedUser?.position ?? "—";
     const supervisor = matchedUser?.supervisor ?? "—";
-    const manager = matchedUser?.manager ?? "—";
-    const supervisorManager = `${supervisor} / ${manager}`;
+    const supervisorManager = supervisor;
 
     let preparedByName = "—";
     let preparedByPosition = "—";
