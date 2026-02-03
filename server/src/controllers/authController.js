@@ -50,6 +50,8 @@ export const getMe = async (req, res) => {
         username: true,
         email: true,
         role: true,
+        department: true,
+        supervisor: true,
         profilePic: true,
         onLeave: true,
         isApproved: true,
@@ -108,14 +110,18 @@ export const signUp = async (req, res) => {
 
     const hashed = await bcrypt.hash(password, 10);
     const normalizedRole = role?.toUpperCase() || "USER";
+    const allowedRoles = ["USER", "ADMIN", "SUPERVISOR"];
+    const finalRole = allowedRoles.includes(normalizedRole)
+      ? normalizedRole
+      : "USER";
 
     const newUser = await prisma.user.create({
       data: {
         username,
         email,
         password: hashed,
-        role: role?.toUpperCase() || "USER", // default USER
-        isApproved: normalizedRole === "ADMIN" ? true : false,
+        role: finalRole, // default USER
+        isApproved: ["ADMIN", "SUPERVISOR"].includes(finalRole),
       },
     });
 
@@ -194,7 +200,6 @@ export const login = async (req, res) => {
         department: user.department,
         position: user.position,
         supervisor: user.supervisor,
-        manager: user.manager,
         totalOJTHours: user.totalOJTHours,
         remainingWorkHours: user.remainingWorkHours,
       },

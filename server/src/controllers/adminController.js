@@ -88,7 +88,7 @@ export const changeUserRole = async (req, res) => {
       return res.status(400).json({ message: "Cannot change your own role." });
     }
 
-    if (!["ADMIN", "USER"].includes(role)) {
+    if (!["ADMIN", "USER", "SUPERVISOR"].includes(role)) {
       return res.status(400).json({ message: "Invalid role." });
     }
 
@@ -128,7 +128,6 @@ export const getAllUsers = async (req, res) => {
         department: true,
         position: true,
         supervisor: true,
-        manager: true,
       },
       orderBy: { created_at: "asc" },
     });
@@ -217,7 +216,7 @@ export const updateOJTHours = async (req, res) => {
 export const updateUserInfo = async (req, res) => {
   try {
     const { id } = req.params;
-    const { department, position, supervisor, manager } = req.body;
+    const { department, position, supervisor } = req.body;
 
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
@@ -230,7 +229,6 @@ export const updateUserInfo = async (req, res) => {
         department: department ?? user.department,
         position: position ?? user.position,
         supervisor: supervisor ?? user.supervisor,
-        manager: manager ?? user.manager,
       },
     });
 
