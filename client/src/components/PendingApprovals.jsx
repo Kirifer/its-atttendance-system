@@ -8,6 +8,9 @@ const PendingApprovals = () => {
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState("username");
   const [query, setQuery] = useState("");
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const isSupervisor = currentUser?.role === "SUPERVISOR";
+  const supervisorDept = currentUser?.department;
 
   const fetchPending = async () => {
     try {
@@ -61,7 +64,13 @@ const PendingApprovals = () => {
     }
   };
 
-  const filteredUsers = users.filter((user) => {
+  const scopedUsers = isSupervisor
+    ? supervisorDept
+      ? users.filter((u) => u.department === supervisorDept)
+      : []
+    : users;
+
+  const filteredUsers = scopedUsers.filter((user) => {
     const value = filterType === "username" ? user.username : user.email;
     return value?.toLowerCase().includes(query.toLowerCase());
   });

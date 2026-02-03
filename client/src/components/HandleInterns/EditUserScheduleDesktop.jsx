@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import { getAllUsers } from "../../api/auth";
+import { getAllStaffUsers } from "../../api/auth";
 import "../../styles/HandleInterns/EditUserScheduleDesktop.css";
 
 export default function EditUserScheduleDesktop({ userSchedule, user }) {
@@ -19,11 +19,16 @@ export default function EditUserScheduleDesktop({ userSchedule, user }) {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      if (user.role !== "ADMIN") return;
+      if (user.role !== "ADMIN" && user.role !== "SUPERVISOR") return;
       try {
-        const response = await getAllUsers();
+        const response = await getAllStaffUsers();
         const usersArray = response?.users || response || [];
-        setUsers(usersArray);
+        const internsOnly = usersArray.filter((u) => u.role === "USER");
+        const scoped =
+          user?.role === "SUPERVISOR" && user?.department
+            ? internsOnly.filter((u) => u.department === user.department)
+            : internsOnly;
+        setUsers(scoped);
         setSelectedUserId("");
       } catch (err) {
         console.warn("Failed to load users", err);

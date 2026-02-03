@@ -120,6 +120,21 @@ export const getAllUsers = async () => {
   }
 };
 
+export const getAllStaffUsers = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await API.get("/admins/all-users", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data.users || [];
+  } catch (err) {
+    let message = "Error fetching users";
+    if (err.response?.data?.message) message = err.response.data.message;
+    else if (err.message) message = err.message;
+    throw new Error(message);
+  }
+};
+
 // Get all admin users
 export const getAllAdminUsers = async () => {
   try {

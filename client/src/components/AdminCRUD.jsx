@@ -17,7 +17,9 @@ function AdminCRUD() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const currentUserId = localStorage.getItem("userId");
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const currentUserId = currentUser?.id;
+  const isSupervisor = currentUser?.role === "SUPERVISOR";
 
   const fetchUsers = async () => {
     try {
@@ -78,7 +80,6 @@ function AdminCRUD() {
       department: user.department || "",
       position: user.position || "",
       supervisor: user.supervisor || "",
-      manager: user.manager || "",
     });
     setShowModal(true);
   };
@@ -95,7 +96,6 @@ function AdminCRUD() {
         department: selectedUser.department,
         position: selectedUser.position,
         supervisor: selectedUser.supervisor,
-        manager: selectedUser.manager,
       });
       showToast({ message: "User info updated", type: "success", color: "#fff" });
       closeModal();
@@ -163,36 +163,81 @@ function AdminCRUD() {
                   </td>
 
                   <td className="crud-table__actions">
-                    {u.id !== currentUserId && (
+                    {!isSupervisor && (
                       <>
-                        {/* Promote / Demote */}
-                        <span
-                          className={`material-symbols-outlined crud-action crud-action--role ${
-                            u.resignedAt ? "crud-action--disabled" : ""
-                          }`}
-                          title={u.role === "ADMIN" ? "Demote to User" : "Promote to Admin"}
-                          onClick={() =>
-                            !u.resignedAt &&
-                            handleChangeRole(
-                              u.id,
-                              u.role === "ADMIN" ? "USER" : "ADMIN",
-                              u.username
-                            )
-                          }
-                        >
-                          {u.role === "ADMIN" ? "arrow_downward" : "arrow_upward"}
-                        </span>
+                        {u.role === "USER" && (
+                          <span
+                            className={`material-symbols-outlined crud-action crud-action--role ${
+                              u.resignedAt ? "crud-action--disabled" : ""
+                            }`}
+                            title="Promote to Supervisor"
+                            onClick={() => {
+                              if (u.resignedAt) return;
+                              handleChangeRole(u.id, "SUPERVISOR", u.username);
+                            }}
+                          >
+                            arrow_upward
+                          </span>
+                        )}
 
-                        {/* Edit Info */}
-                        <span
-                          className="material-symbols-outlined crud-action crud-action--edit"
-                          title="Edit Info"
-                          onClick={() => openEditModal(u)}
-                        >
-                          edit
-                        </span>
+                        {u.role === "SUPERVISOR" && (
+                          <>
+                            <span
+                              className={`material-symbols-outlined crud-action crud-action--role ${
+                                u.resignedAt ? "crud-action--disabled" : ""
+                              }`}
+                              title="Demote to User"
+                              onClick={() => {
+                                if (u.resignedAt) return;
+                                handleChangeRole(u.id, "USER", u.username);
+                              }}
+                            >
+                              arrow_downward
+                            </span>
+                            <span
+                              className={`material-symbols-outlined crud-action crud-action--role ${
+                                u.resignedAt ? "crud-action--disabled" : ""
+                              }`}
+                              title="Promote to Admin"
+                              onClick={() => {
+                                if (u.resignedAt) return;
+                                handleChangeRole(u.id, "ADMIN", u.username);
+                              }}
+                            >
+                              arrow_upward
+                            </span>
+                          </>
+                        )}
 
-                        {/* Resign / Reinstate */}
+                        {u.role === "ADMIN" && (
+                          <span
+                            className={`material-symbols-outlined crud-action crud-action--role ${
+                              u.resignedAt ? "crud-action--disabled" : ""
+                            }`}
+                            title="Demote to Supervisor"
+                            onClick={() => {
+                              if (u.resignedAt) return;
+                              handleChangeRole(u.id, "SUPERVISOR", u.username);
+                            }}
+                          >
+                            arrow_downward
+                          </span>
+                        )}
+                      </>
+                    )}
+
+                    {(!isSupervisor) || (isSupervisor && u.role !== "ADMIN") ? (
+                      <span
+                        className="material-symbols-outlined crud-action crud-action--edit"
+                        title="Edit Info"
+                        onClick={() => openEditModal(u)}
+                      >
+                        edit
+                      </span>
+                    ) : null}
+
+                    {!isSupervisor && (
+                      <>
                         {u.resignedAt ? (
                           <span
                             className="material-symbols-outlined crud-action crud-action--reinstate"
@@ -242,19 +287,11 @@ function AdminCRUD() {
               }
             />
 
-            <label>Supervisor</label>
+            <label>Supervisor/Manager</label>
             <input
               value={selectedUser.supervisor}
               onChange={(e) =>
                 setSelectedUser({ ...selectedUser, supervisor: e.target.value })
-              }
-            />
-
-            <label>Manager</label>
-            <input
-              value={selectedUser.manager}
-              onChange={(e) =>
-                setSelectedUser({ ...selectedUser, manager: e.target.value })
               }
             />
 

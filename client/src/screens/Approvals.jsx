@@ -21,6 +21,7 @@ import EditUserScheduleDesktop from "../components/HandleInterns/EditUserSchedul
 import useUserSchedule from "../hooks/useUserSchedule.js";
 import useIsDesktop from "../hooks/useIsDesktop.js";
 import PendingApprovals from "../components/PendingApprovals.jsx";
+import { getAllStaffUsers } from "../api/auth";
 
 function CustomTabPanel({ children, value, index }) {
   return (
@@ -40,6 +41,10 @@ function a11yProps(index) {
 function Approvals() {
   const navigate = useNavigate();
   const location = useLocation();
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const isSupervisor = currentUser?.role === "SUPERVISOR";
+  const supervisorDept = currentUser?.department;
+  const [visibleUserIds, setVisibleUserIds] = useState(null);
 
   // Read tab from URL query parameter, default to 0
   const getTabFromUrl = () => {
@@ -68,8 +73,17 @@ function Approvals() {
   const fetchLeaves = async () => {
     try {
       setLoading(true);
+      if (isSupervisor && supervisorDept && visibleUserIds === null) {
+        return;
+      }
       const data = await getAllLeaves();
-      setLeaves(data);
+      if (visibleUserIds instanceof Set) {
+        setLeaves(
+          (data || []).filter((l) => visibleUserIds.has(l.user?.id)),
+        );
+      } else {
+        setLeaves(data);
+      }
     } catch (err) {
       console.error("Error fetching leaves:", err);
     } finally {
@@ -79,7 +93,7 @@ function Approvals() {
 
   useEffect(() => {
     fetchLeaves();
-  }, []);
+  }, [visibleUserIds]);
 
   const handleStatusUpdate = async (id, status) => {
     await updateLeaveStatus(id, status);
@@ -95,6 +109,31 @@ function Approvals() {
   const userSchedule = useUserSchedule();
 
   const isDesktop = useIsDesktop();
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      if (!isSupervisor || !supervisorDept) {
+        setVisibleUserIds(null);
+        return;
+      }
+      try {
+        const users = await getAllStaffUsers();
+        const allowed = new Set(
+          (users || [])
+            .filter(
+              (u) =>
+                u.role === "USER" &&
+                u.department === supervisorDept,
+            )
+            .map((u) => u.id),
+        );
+        setVisibleUserIds(allowed);
+      } catch (err) {
+        setVisibleUserIds(new Set());
+      }
+    };
+    loadUsers();
+  }, [isSupervisor, supervisorDept]);
 
   return (
     <DashboardLayout>
