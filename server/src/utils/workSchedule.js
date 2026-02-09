@@ -21,7 +21,7 @@ export const getWorkSchedule = async (userId, date = new Date()) => {
   const d = String(phTime.getUTCDate()).padStart(2, "0");
   const dateStr = `${y}-${m}-${d}`;
 
-  // Use raw SQL because @db.Date doesn't work well with DateTime comparisons
+  // Query custom schedule for this specific date
   const customResults = await prisma.userSchedule.findMany({
     where: {
       userId: userId,
