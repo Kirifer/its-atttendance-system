@@ -29,6 +29,7 @@ model User {
   position           String?
   department         String?
   supervisor         String?
+  manager            String?
   useCustomSchedule  Boolean   @default(false)
   created_at         DateTime  @default(now())
   reset_token        String?

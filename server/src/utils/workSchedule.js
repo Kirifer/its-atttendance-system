@@ -22,13 +22,18 @@ export const getWorkSchedule = async (userId, date = new Date()) => {
   const dateStr = `${y}-${m}-${d}`;
 
   // Use raw SQL because @db.Date doesn't work well with DateTime comparisons
-  const customResults = await prisma.$queryRaw`
-    SELECT * FROM "UserSchedule"
-    WHERE "userId" = ${userId}
-    AND "scheduleDate"::date = ${dateStr}::date
-    ORDER BY "id" DESC
-    LIMIT 1
-  `;
+  const customResults = await prisma.userSchedule.findMany({
+    where: {
+      userId: userId,
+      scheduleDate: {
+        equals: new Date(dateStr), // Prisma handles the casting to @db.Date automatically
+      },
+    },
+    orderBy: {
+      id: "desc",
+    },
+    take: 1,
+  });
 
   if (customResults && customResults.length > 0) {
     const custom = customResults[0];
