@@ -40,39 +40,39 @@ function UserRequests() {
   const [loading, setLoading] = useState(true);
   const handleChange = (_, newValue) => setValue(newValue);
 
-  const fetchMyRequests = async () => {
-    try {
-      setLoading(true);
-      const response = await API.get("/time-adjustments/my-requests");
-      const myRequests = response.data.requests.filter(
-        (r) => r.userId === user.id
-      );
-      setUserRequests(myRequests);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchMyRequests = async () => {
+      try {
+        setLoading(true);
+        const response = await API.get("/time-adjustments/my-requests");
+        const myRequests = response.data.requests.filter(
+          (r) => r.userId === user.id
+        );
+        setUserRequests(myRequests);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMyRequests();
   }, []);
 
-  const fetchMyLeaves = async () => {
-    try {
-      setLoading(true);
-      const response = await API.get("/leave");
-      const myLeaves = response.data.filter((l) => l.user?.id === user.id);
-      setLeaves(myLeaves);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchMyLeaves = async () => {
+      try {
+        setLoading(true);
+        const response = await API.get("/leave");
+        const myLeaves = response.data.filter((l) => l.user?.id === user.id);
+        setLeaves(myLeaves);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMyLeaves();
   }, []);
 

@@ -19,6 +19,21 @@ export default function useHandleOjtHours() {
       setError("Admin access only");
       return;
     }
+    const fetchUsers = async () => {
+      try {
+        const data = await getAllStaffUsers();
+        const allUsers = data?.users || data || [];
+        const internsOnly = allUsers.filter((u) => u.role === "USER");
+        const scoped =
+          user?.role === "SUPERVISOR" && user?.department
+            ? internsOnly.filter((u) => u.department === user.department)
+            : internsOnly;
+        setUsers(scoped);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
     fetchUsers();
   }, []);
 
@@ -42,21 +57,6 @@ export default function useHandleOjtHours() {
     };
     fetchSingleUserData();
   }, [selectedUsers]);
-
-  const fetchUsers = async () => {
-    try {
-      const data = await getAllStaffUsers();
-      const allUsers = data?.users || data || [];
-      const internsOnly = allUsers.filter((u) => u.role === "USER");
-      const scoped =
-        user?.role === "SUPERVISOR" && user?.department
-          ? internsOnly.filter((u) => u.department === user.department)
-          : internsOnly;
-      setUsers(scoped);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
 
   const filteredUsers = useMemo(() => {
     return users.filter(
