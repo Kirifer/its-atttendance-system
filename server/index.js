@@ -86,11 +86,9 @@ app.get("/api/cron/sync", async (req, res) => {
 app.use(errorHandling);
 
 //server run
-if (process.env.NODE_ENV !== "production") {
-  app.listen(port, () => {
+app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
     console.log("Firebase bucket:", bucket.name);
   });
-}
 
 export default app;
