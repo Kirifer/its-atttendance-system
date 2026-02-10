@@ -8,7 +8,7 @@ export default function UserStatusCard({ reload }) {
   const [users, setUsers] = useState({ loggedIn: [], loggedOut: [] });
   const [loading, setLoading] = useState(true);
   const [visibleUserIds, setVisibleUserIds] = useState(null);
-  const [user, setUser] = useState(() => {
+  const [user] = useState(() => {
     return JSON.parse(localStorage.getItem("user"));
   });
 
@@ -68,7 +68,7 @@ export default function UserStatusCard({ reload }) {
     };
     loadUsers();
   }, [user]);
-  
+
   if (user?.role !== "ADMIN" && user?.role !== "SUPERVISOR") return null;
 
   return (
