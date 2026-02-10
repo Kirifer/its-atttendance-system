@@ -34,8 +34,6 @@ function UserRequests() {
   const [leaveFilterType, setLeaveFilterType] = useState("leaveType");
   const [leaveQuery, setLeaveQuery] = useState("");
 
-  const user = JSON.parse(localStorage.getItem("user"));
-
   const [value, setValue] = useState(0);
   const [loading, setLoading] = useState(true);
   const handleChange = (_, newValue) => setValue(newValue);
