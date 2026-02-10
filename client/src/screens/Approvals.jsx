@@ -58,6 +58,13 @@ function Approvals() {
     setValue(getTabFromUrl());
   }, [location.search]);
 
+  // Read tab from URL query parameter, default to 0
+  const getTabFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    const tab = parseInt(params.get("tab"), 10);
+    return !isNaN(tab) && tab >= 0 && tab <= 4 ? tab : 0;
+  };
+
   const [value, setValue] = useState(getTabFromUrl());
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -94,6 +101,27 @@ function Approvals() {
 
     fetchLeaves();
   }, [visibleUserIds]);
+
+  const fetchLeaves = async () => {
+    try {
+      setLoading(true);
+      if (isSupervisor && supervisorDept && visibleUserIds === null) {
+        return;
+      }
+      const data = await getAllLeaves();
+      if (visibleUserIds instanceof Set) {
+        setLeaves(
+          (data || []).filter((l) => visibleUserIds.has(l.user?.id)),
+        );
+      } else {
+        setLeaves(data);
+      }
+    } catch (err) {
+      console.error("Error fetching leaves:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleStatusUpdate = async (id, status) => {
     await updateLeaveStatus(id, status);
