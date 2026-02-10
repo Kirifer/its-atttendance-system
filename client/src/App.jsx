@@ -1,7 +1,4 @@
 // User log out when server is down through pinging
-import { useEffect } from "react";
-import { pingServer } from "./api/api";
-import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./components/ProtectedRoute";
