@@ -4,8 +4,6 @@ import autoTable from "jspdf-autotable";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { getAllUsersWithRoles, getTimesheetMeta } from "../api/auth";
-import { getUserOjtHours } from "../api/ojtHours";
-import { formatDate } from "react-calendar/dist/shared/dateFormatter.js";
 
 export default function useExportPDF() {
   const [allUsers, setAllUsers] = useState([]);

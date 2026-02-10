@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { resetPassword } from "../api/auth";
 import PasswordInput from "../components/PasswordInput";
 import SuccessPopup from "../components/SuccessPopup";
 import "../styles/ResetPassword.css";

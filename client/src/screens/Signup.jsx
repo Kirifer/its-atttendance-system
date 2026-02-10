@@ -5,7 +5,6 @@ import "../styles/Signup.css";
 import PasswordInput from "../components/PasswordInput";
 import SignupSuccess from "../components/SignupSuccess";
 import Loader from "../components/Loader";
-import API from "../api/api";
 
 function Signup() {
   const [username, setUsername] = useState("");
