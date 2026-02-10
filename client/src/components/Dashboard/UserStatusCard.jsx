@@ -44,8 +44,6 @@ export default function UserStatusCard({ reload }) {
       .finally(() => setLoading(false));
   }, [reload, user]);
 
-  if (user?.role !== "ADMIN" && user?.role !== "SUPERVISOR") return null;
-
   useEffect(() => {
     const loadUsers = async () => {
       if (user?.role !== "SUPERVISOR" || !user?.department) {
@@ -70,6 +68,8 @@ export default function UserStatusCard({ reload }) {
     };
     loadUsers();
   }, [user]);
+  
+  if (user?.role !== "ADMIN" && user?.role !== "SUPERVISOR") return null;
 
   return (
     <div className="user-status-card">
