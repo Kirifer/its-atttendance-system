@@ -3,7 +3,6 @@ import { getAllStaffUsers } from "../api/auth";
 import { getUserOjtHours, setUserOjtHours } from "../api/ojtHours";
 
 export default function useHandleOjtHours() {
-  const user = JSON.parse(localStorage.getItem("user"));
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -15,6 +14,7 @@ export default function useHandleOjtHours() {
   const [success, setSuccess] = useState(null);
 
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
     if (!user || (user.role !== "ADMIN" && user.role !== "SUPERVISOR")) {
       setError("Admin access only");
       return;

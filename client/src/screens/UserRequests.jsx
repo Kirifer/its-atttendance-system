@@ -41,6 +41,8 @@ function UserRequests() {
   const handleChange = (_, newValue) => setValue(newValue);
 
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
     const fetchMyRequests = async () => {
       try {
         setLoading(true);
@@ -60,6 +62,8 @@ function UserRequests() {
   }, []);
 
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
     const fetchMyLeaves = async () => {
       try {
         setLoading(true);

@@ -78,6 +78,10 @@ function Approvals() {
   };
 
   useEffect(() => {
+    const currentUser = JSON.parse(localStorage.getItem("user"));
+    const isSupervisor = currentUser?.role === "SUPERVISOR";
+    const supervisorDept = currentUser?.department;
+
     const fetchLeaves = async () => {
       try {
         setLoading(true);
