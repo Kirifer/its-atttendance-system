@@ -46,14 +46,15 @@ function Approvals() {
   const isSupervisor = currentUser?.role === "SUPERVISOR";
   const supervisorDept = currentUser?.department;
   const [visibleUserIds, setVisibleUserIds] = useState(null);
+  const isAdmin = currentUser?.role === "ADMIN";
 
   // ✅ allow tab 5 now
   const getTabFromUrl = () => {
     const params = new URLSearchParams(location.search);
     const tab = parseInt(params.get("tab"), 10);
-    return !isNaN(tab) && tab >= 0 && tab <= 5 ? tab : 0;
+    const maxTab = isAdmin ? 5 : 4; 
+    return !isNaN(tab) && tab >= 0 && tab <= maxTab ? tab : 0;
   };
-
   const [value, setValue] = useState(getTabFromUrl());
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,9 +78,7 @@ function Approvals() {
       }
       const data = await getAllLeaves();
       if (visibleUserIds instanceof Set) {
-        setLeaves(
-          (data || []).filter((l) => visibleUserIds.has(l.user?.id)),
-        );
+        setLeaves((data || []).filter((l) => visibleUserIds.has(l.user?.id)));
       } else {
         setLeaves(data);
       }
@@ -118,11 +117,7 @@ function Approvals() {
         const users = await getAllStaffUsers();
         const allowed = new Set(
           (users || [])
-            .filter(
-              (u) =>
-                u.role === "USER" &&
-                u.department === supervisorDept,
-            )
+            .filter((u) => u.role === "USER" && u.department === supervisorDept)
             .map((u) => u.id),
         );
         setVisibleUserIds(allowed);
@@ -151,7 +146,7 @@ function Approvals() {
             <Tab label="Time-off Requests" {...a11yProps(2)} />
             <Tab label="Admin Management" {...a11yProps(3)} />
             <Tab label="Intern Management" {...a11yProps(4)} />
-            <Tab label="Edit Attendance" {...a11yProps(5)} /> {/* ✅ NEW TAB */}
+            {isAdmin && <Tab label="Edit Attendance" {...a11yProps(5)} />}
           </Tabs>
         </Box>
 
@@ -256,4 +251,3 @@ function Approvals() {
 }
 
 export default Approvals;
-  

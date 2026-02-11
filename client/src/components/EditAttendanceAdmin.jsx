@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "../api/api";
 import "../styles/AttendanceTable.css";
+import Box from "@mui/material/Box";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import "../styles/EditAttendanceAdmin.css";
 
 function EditAttendanceAdmin() {
   const [users, setUsers] = useState([]);
@@ -8,7 +12,7 @@ function EditAttendanceAdmin() {
   const [date, setDate] = useState("");
   const [records, setRecords] = useState([]);
   const [deletingId, setDeletingId] = useState(null); // ✅ NEW
-
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     timeIn: "",
     lunchOut: "",
@@ -70,42 +74,57 @@ function EditAttendanceAdmin() {
   };
 
   // ================= SAVE =================
-  const handleSubmit = async () => {
-    if (!selectedUser || !date) {
-      alert("Select user and date first.");
-      return;
-    }
+const handleSubmit = async () => {
+  if (!selectedUser || !date) {
+    alert("Select user and date first.");
+    return;
+  }
 
-    try {
-      await axios.post(
-        "/attendance/admin-create",
-        {
-          userId: selectedUser,
-          date,
-          timeIn: buildDateTime(form.timeIn),
-          lunchOut: buildDateTime(form.lunchOut),
-          lunchIn: buildDateTime(form.lunchIn),
-          breakOut: buildDateTime(form.breakOut),
-          breakIn: buildDateTime(form.breakIn),
-          timeOut: buildDateTime(form.timeOut),
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+  try {
+    setSaving(true);
 
-      alert("Attendance saved successfully!");
-      loadAttendance();
-    } catch (err) {
-      console.error(err);
-      alert("Failed saving attendance");
-    }
-  };
+    await axios.post(
+      "/attendance/admin-create",
+      {
+        userId: selectedUser,
+        date,
+        timeIn: buildDateTime(form.timeIn),
+        lunchOut: buildDateTime(form.lunchOut),
+        lunchIn: buildDateTime(form.lunchIn),
+        breakOut: buildDateTime(form.breakOut),
+        breakIn: buildDateTime(form.breakIn),
+        timeOut: buildDateTime(form.timeOut),
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+
+    alert("Attendance saved successfully!");
+  
+    setForm({
+      timeIn: "",
+      lunchOut: "",
+      lunchIn: "",
+      breakOut: "",
+      breakIn: "",
+      timeOut: "",
+    });
+    setDate("");
+    
+    loadAttendance();
+  } catch (err) {
+    console.error(err);
+    alert("Failed saving attendance");
+  } finally {
+    setSaving(false);
+  }
+};
 
   // ================= DELETE (IMPROVED) =================
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete this attendance record?"
+      "Are you sure you want to delete this attendance record?",
     );
 
     if (!confirmDelete) return;
@@ -140,111 +159,120 @@ function EditAttendanceAdmin() {
 
   return (
     <div className="attendance_admin_wrapper">
-      <h2 className="admin__title">Edit Attendance</h2>
-      <p className="admin__description">
-        Create or modify attendance records for users.
-      </p>
+      <Box
+        sx={{ width: "100%", borderBottom: 1, borderColor: "divider", mb: 3 }}
+      >
+        <Tabs value={0} aria-label="Edit Attendance Tabs">
+          <Tab label="Create/Edit Attendance" />
+        </Tabs>
+      </Box>
 
-      {/* USER + DATE */}
-      <div className="attendance_admin_top">
-        <div>
-          <label>User</label>
-          <select
-            value={selectedUser}
-            onChange={(e) => setSelectedUser(e.target.value)}
-          >
-            <option value="">Select user</option>
-            {users
-              .filter((u) => u.role === "USER")
-              .map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.username} ({u.email})
-                </option>
-              ))}
-          </select>
+      <Box sx={{ pt: 2 }}>
+        {/* USER + DATE */}
+        <div className="attendance_admin_top">
+          <div>
+            <label>User</label>
+            <select
+              value={selectedUser}
+              onChange={(e) => setSelectedUser(e.target.value)}
+            >
+              <option value="">Select user</option>
+              {users
+                .filter((u) => u.role === "USER")
+                .map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.username} ({u.email})
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          <div>
+            <label>Date</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
         </div>
 
-        <div>
-          <label>Date</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
+        {/* EDIT INPUTS */}
+        <div className="attendance_admin_table">
+          <div className="attendance_admin_header">
+            <span>Time In</span>
+            <span>Lunch Out</span>
+            <span>Lunch In</span>
+            <span>Break Out</span>
+            <span>Break In</span>
+            <span>Time Out</span>
+          </div>
+
+          <div className="attendance_admin_inputs">
+            <input type="time" name="timeIn" onChange={handleChange} />
+            <input type="time" name="lunchOut" onChange={handleChange} />
+            <input type="time" name="lunchIn" onChange={handleChange} />
+            <input type="time" name="breakOut" onChange={handleChange} />
+            <input type="time" name="breakIn" onChange={handleChange} />
+            <input type="time" name="timeOut" onChange={handleChange} />
+          </div>
         </div>
-      </div>
 
-      {/* EDIT INPUTS */}
-      <div className="attendance_admin_table">
-        <div className="attendance_admin_header">
-          <span>Time In</span>
-          <span>Lunch Out</span>
-          <span>Lunch In</span>
-          <span>Break Out</span>
-          <span>Break In</span>
-          <span>Time Out</span>
-        </div>
+        <button
+          className="attendance_admin_btn"
+          onClick={handleSubmit}
+          disabled={saving}
+        >
+          {saving ? "Saving..." : "Save Attendance"}
+        </button>
 
-        <div className="attendance_admin_inputs">
-          <input type="time" name="timeIn" onChange={handleChange} />
-          <input type="time" name="lunchOut" onChange={handleChange} />
-          <input type="time" name="lunchIn" onChange={handleChange} />
-          <input type="time" name="breakOut" onChange={handleChange} />
-          <input type="time" name="breakIn" onChange={handleChange} />
-          <input type="time" name="timeOut" onChange={handleChange} />
-        </div>
-      </div>
+        {/* ===== EXISTING ATTENDANCE ===== */}
+        {selectedUser && (
+          <div className="attendance_existing_table">
+            <h3>Existing Attendance</h3>
 
-      <button className="attendance_admin_btn" onClick={handleSubmit}>
-        Save Attendance
-      </button>
-
-      {/* ===== EXISTING ATTENDANCE ===== */}
-      {selectedUser && (
-        <div className="attendance_existing_table">
-          <h3>Existing Attendance</h3>
-
-          <table className="attendance_table">
-            <thead>
-              <tr>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Time In</th>
-                <th>Lunch Out</th>
-                <th>Lunch In</th>
-                <th>Break Out</th>
-                <th>Break In</th>
-                <th>Time Out</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {records.map((r) => (
-                <tr key={r.id}>
-                  <td>{r.status}</td>
-                  <td>{formatDate(r.date)}</td>
-                  <td>{formatTime(r.timeIn)}</td>
-                  <td>{formatTime(r.lunchOut)}</td>
-                  <td>{formatTime(r.lunchIn)}</td>
-                  <td>{formatTime(r.breakOut)}</td>
-                  <td>{formatTime(r.breakIn)}</td>
-                  <td>{formatTime(r.timeOut)}</td>
-                  <td>
-                    <button
-                      className="attendance_delete_btn"
-                      disabled={deletingId === r.id}
-                      onClick={() => handleDelete(r.id)}
-                    >
-                      {deletingId === r.id ? "Deleting..." : "Delete"}
-                    </button>
-                  </td>
+            <table className="attendance_table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Time In</th>
+                  <th>Lunch Out</th>
+                  <th>Lunch In</th>
+                  <th>Break Out</th>
+                  <th>Break In</th>
+                  <th>Time Out</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+
+              <tbody>
+                {records.map((r) => (
+                  <tr key={r.id}>
+                    <td>{r.status}</td>
+                    <td>{formatDate(r.date)}</td>
+                    <td>{formatTime(r.timeIn)}</td>
+                    <td>{formatTime(r.lunchOut)}</td>
+                    <td>{formatTime(r.lunchIn)}</td>
+                    <td>{formatTime(r.breakOut)}</td>
+                    <td>{formatTime(r.breakIn)}</td>
+                    <td>{formatTime(r.timeOut)}</td>
+                    <td>
+                      <button
+                        className="attendance_delete_btn"
+                        disabled={deletingId === r.id}
+                        onClick={() => handleDelete(r.id)}
+                      >
+                        {deletingId === r.id ? "Deleting..." : "Delete"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Box>
     </div>
   );
 }
