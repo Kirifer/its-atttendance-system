@@ -10,7 +10,7 @@ import leaveRoutes from "./src/routes/leaveRoutes.js";
 import attendanceRoutes from "./src/routes/attendanceRoutes.js";
 import timeAdjustmentRoutes from "./src/routes/timeAdjustmentRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
-
+import s3Routes from "./src/routes/s3Routes.js";
 import { checkLeaves } from "./src/cron/leaveChecker.js";
 import { cleanSched } from "./src/cron/cleanExpiredSched.js";
 
@@ -81,7 +81,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/leave", leaveRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/admins", adminRoutes);
-
+app.use("/api/s3", s3Routes);
 // ===============================
 // Cron trigger
 // ===============================

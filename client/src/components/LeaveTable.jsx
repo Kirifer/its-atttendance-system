@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/LeaveTable.css";
 import { showToast } from "./Notification/toast";
-
+import { viewDocument } from "../api/getFile";
 <link
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
   rel="stylesheet"
@@ -25,7 +25,6 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
     HALF_DAY: "Half Day",
   };
 
-
   // Custom filter request placeholder names
   const placeholderMap = {
     id: "id",
@@ -41,20 +40,30 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
       filterType === "id"
         ? String(leave.id)
         : filterType === "leaveType"
-        ? leave.leaveType
-        : filterType === "reason"
-        ? leave.reason
-        : filterType === "coverage"
-        ? leave.coverage
-        : filterType === "status"
-        ? leave.status
-        : filterType === "username"
-        ? leave.user?.username || ""
-        : "";
+          ? leave.leaveType
+          : filterType === "reason"
+            ? leave.reason
+            : filterType === "coverage"
+              ? leave.coverage
+              : filterType === "status"
+                ? leave.status
+                : filterType === "username"
+                  ? leave.user?.username || ""
+                  : "";
 
     return value.toLowerCase().includes(query.toLowerCase());
   });
-
+  const handleViewAttachment = async (s3Key) => {
+    try {
+      await viewDocument(s3Key);
+    } catch (error) {
+      showToast({
+        message: "Failed to open attachment",
+        type: "error",
+        color: "#ffffff",
+      });
+    }
+  };
   return (
     <div>
       <div className="leave-table__search">
@@ -135,13 +144,20 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
 
                 <td>
                   {leave.attachment ? (
-                    <a
-                      href={leave.attachment}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={() => handleViewAttachment(leave.attachment)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#007bff",
+                        textDecoration: "underline",
+                        cursor: "pointer",
+                        padding: 0,
+                        font: "inherit",
+                      }}
                     >
                       View / Download
-                    </a>
+                    </button>
                   ) : (
                     "No Attachment"
                   )}
@@ -152,7 +168,7 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                     className="material-symbols-outlined leave-table__approve"
                     onClick={() => {
                       const confirmed = window.confirm(
-                        "Are you sure you want to approve this leave?"
+                        "Are you sure you want to approve this leave?",
                       );
                       if (!confirmed) return;
 
@@ -162,14 +178,14 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                             message: "Leave approved successfully!",
                             type: "success",
                             color: "#ffffff",
-                          })
+                          }),
                         )
                         .catch((err) =>
                           showToast({
                             message: err.message || "Failed to approve leave",
                             type: "error",
                             color: "#ffffff",
-                          })
+                          }),
                         );
                     }}
                     title="Approve"
@@ -181,7 +197,7 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                     className="material-symbols-outlined leave-table__reject"
                     onClick={() => {
                       const confirmed = window.confirm(
-                        "Are you sure you want to reject this leave?"
+                        "Are you sure you want to reject this leave?",
                       );
                       if (!confirmed) return;
 
@@ -191,14 +207,14 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                             message: "Leave rejected successfully!",
                             type: "success",
                             color: "#ffffff",
-                          })
+                          }),
                         )
                         .catch((err) =>
                           showToast({
                             message: err.message || "Failed to reject leave",
                             type: "error",
                             color: "#ffffff",
-                          })
+                          }),
                         );
                     }}
                     title="Reject"
@@ -210,7 +226,7 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                     className="material-symbols-outlined leave-table__delete"
                     onClick={() => {
                       const confirmed = window.confirm(
-                        "Are you sure you want to delete this leave?"
+                        "Are you sure you want to delete this leave?",
                       );
                       if (!confirmed) return;
 
@@ -220,14 +236,14 @@ function LeaveTable({ leaves, onStatusChange, onDelete }) {
                             message: "Leave deleted successfully!",
                             type: "success",
                             color: "#ffffff",
-                          })
+                          }),
                         )
                         .catch((err) =>
                           showToast({
                             message: err.message || "Failed to delete leave",
                             type: "error",
                             color: "#ffffff",
-                          })
+                          }),
                         );
                     }}
                     title="Delete"
