@@ -27,6 +27,8 @@ export default function useExportPDF() {
   }, []);
 
   const generatePDFForUser = async (userRecords, internUsername) => {
+    const sortedRecords = [...userRecords].reverse();
+
     const matchedUser = allUsers.find(
       (u) =>
         u.username?.trim().toLowerCase() ===
@@ -74,7 +76,7 @@ export default function useExportPDF() {
       "ACTUAL HOURS", // I just added "HOURS" as requested by sir khel
     ];
 
-    const body = userRecords.map((r) => [
+    const body = sortedRecords.map((r) => [
       r.Date,
       r["Time In"],
       r["Lunch Out"],
@@ -84,7 +86,7 @@ export default function useExportPDF() {
       r.ACTUAL,
     ]);
 
-    const totalHoursSpent = userRecords
+    const totalHoursSpent = sortedRecords
       .reduce((sum, r) => {
         const hours =
           typeof r.ACTUAL === "string"
