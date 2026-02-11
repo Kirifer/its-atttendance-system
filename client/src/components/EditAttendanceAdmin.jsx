@@ -74,52 +74,52 @@ function EditAttendanceAdmin() {
   };
 
   // ================= SAVE =================
-const handleSubmit = async () => {
-  if (!selectedUser || !date) {
-    alert("Select user and date first.");
-    return;
-  }
+  const handleSubmit = async () => {
+    if (!selectedUser || !date) {
+      alert("Select user and date first.");
+      return;
+    }
 
-  try {
-    setSaving(true);
+    try {
+      setSaving(true);
 
-    await axios.post(
-      "/attendance/admin-create",
-      {
-        userId: selectedUser,
-        date,
-        timeIn: buildDateTime(form.timeIn),
-        lunchOut: buildDateTime(form.lunchOut),
-        lunchIn: buildDateTime(form.lunchIn),
-        breakOut: buildDateTime(form.breakOut),
-        breakIn: buildDateTime(form.breakIn),
-        timeOut: buildDateTime(form.timeOut),
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      },
-    );
+      await axios.post(
+        "/attendance/admin-create",
+        {
+          userId: selectedUser,
+          date,
+          timeIn: buildDateTime(form.timeIn),
+          lunchOut: buildDateTime(form.lunchOut),
+          lunchIn: buildDateTime(form.lunchIn),
+          breakOut: buildDateTime(form.breakOut),
+          breakIn: buildDateTime(form.breakIn),
+          timeOut: buildDateTime(form.timeOut),
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
 
-    alert("Attendance saved successfully!");
-  
-    setForm({
-      timeIn: "",
-      lunchOut: "",
-      lunchIn: "",
-      breakOut: "",
-      breakIn: "",
-      timeOut: "",
-    });
-    setDate("");
-    
-    loadAttendance();
-  } catch (err) {
-    console.error(err);
-    alert("Failed saving attendance");
-  } finally {
-    setSaving(false);
-  }
-};
+      alert("Attendance saved successfully!");
+
+      setForm({
+        timeIn: "",
+        lunchOut: "",
+        lunchIn: "",
+        breakOut: "",
+        breakIn: "",
+        timeOut: "",
+      });
+      setDate("");
+
+      loadAttendance();
+    } catch (err) {
+      console.error(err);
+      alert("Failed saving attendance");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   // ================= DELETE (IMPROVED) =================
   const handleDelete = async (id) => {
@@ -209,12 +209,42 @@ const handleSubmit = async () => {
           </div>
 
           <div className="attendance_admin_inputs">
-            <input type="time" name="timeIn" onChange={handleChange} />
-            <input type="time" name="lunchOut" onChange={handleChange} />
-            <input type="time" name="lunchIn" onChange={handleChange} />
-            <input type="time" name="breakOut" onChange={handleChange} />
-            <input type="time" name="breakIn" onChange={handleChange} />
-            <input type="time" name="timeOut" onChange={handleChange} />
+            <input
+              type="time"
+              name="timeIn"
+              value={form.timeIn}
+              onChange={handleChange}
+            />
+            <input
+              type="time"
+              name="lunchOut"
+              value={form.lunchOut}
+              onChange={handleChange}
+            />
+            <input
+              type="time"
+              name="lunchIn"
+              value={form.lunchIn}
+              onChange={handleChange}
+            />
+            <input
+              type="time"
+              name="breakOut"
+              value={form.breakOut}
+              onChange={handleChange}
+            />
+            <input
+              type="time"
+              name="breakIn"
+              value={form.breakIn}
+              onChange={handleChange}
+            />
+            <input
+              type="time"
+              name="timeOut"
+              value={form.timeOut}
+              onChange={handleChange}
+            />
           </div>
         </div>
 
