@@ -1,11 +1,9 @@
-/* ==================== WRAPPER ==================== */
 .attendance_admin_wrapper {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
 
-/* ==================== TOP SECTION ==================== */
 .attendance_admin_top {
   display: flex;
   gap: 20px;
@@ -44,7 +42,6 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-/* ==================== EDIT INPUTS TABLE ==================== */
 .attendance_admin_table {
   background: #f8f9fa;
   border-radius: 8px;
@@ -88,7 +85,6 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-/* ==================== SAVE BUTTON ==================== */
 .attendance_admin_btn {
   width: 100%;
   padding: 12px 20px;
@@ -111,14 +107,12 @@
   transform: scale(0.98);
 }
 
-/* ✅ ADD THIS */
 .attendance_admin_btn:disabled {
   background-color: #93c5fd;
   cursor: not-allowed;
   opacity: 0.7;
 }
 
-/* ==================== EXISTING ATTENDANCE ==================== */
 .attendance_existing_table {
   margin-top: 40px;
 }
@@ -172,7 +166,6 @@
   color: #555;
 }
 
-/* ==================== DELETE BUTTON ==================== */
 .attendance_delete_btn {
   padding: 6px 16px;
   background-color: #dc3545;
@@ -194,7 +187,34 @@
   cursor: not-allowed;
 }
 
-/* ==================== RESPONSIVE ==================== */
+.attendance_actions_icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.attendance_edit_icon {
+  color: #2e7d32;
+  font-size: 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.attendance_delete_icon {
+  color: #d32f2f;
+  font-size: 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.attendance_edit_icon:hover,
+.attendance_delete_icon:hover {
+  transform: scale(1.15);
+  opacity: 0.85;
+}
+
 @media (max-width: 768px) {
   .attendance_admin_top {
     flex-direction: column;
@@ -225,4 +245,28 @@
     display: block;
     overflow-x: auto;
   }
+}
+
+
+.attendance_cancel_btn_full {
+  width: 100%;
+  padding: 12px 20px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-top: -30px;
+  margin-bottom: 40px;
+}
+
+.attendance_cancel_btn_full:hover {
+  background-color: #c82333;
+}
+
+.attendance_cancel_btn_full:active {
+  transform: scale(0.98);
 }

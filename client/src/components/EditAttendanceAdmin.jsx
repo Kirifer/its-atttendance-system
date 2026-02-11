@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "../api/api";
 import "../styles/AttendanceTable.css";
 import Box from "@mui/material/Box";
@@ -11,8 +11,10 @@ function EditAttendanceAdmin() {
   const [selectedUser, setSelectedUser] = useState("");
   const [date, setDate] = useState("");
   const [records, setRecords] = useState([]);
-  const [deletingId, setDeletingId] = useState(null); // ✅ NEW
+  const [deletingId, setDeletingId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+
   const [form, setForm] = useState({
     timeIn: "",
     lunchOut: "",
@@ -23,33 +25,34 @@ function EditAttendanceAdmin() {
   });
 
   const token = localStorage.getItem("token");
+  const topRef = useRef(null);
 
-  // ================= LOAD USERS =================
+  const scrollToTop = () => {
+    if (topRef.current) {
+      topRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await axios.get("/admins/all-users", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         setUsers(res.data.users || []);
       } catch (err) {
         console.error("Failed loading users:", err);
       }
     };
-
     fetchUsers();
   }, [token]);
 
-  // ================= LOAD ATTENDANCE =================
   const loadAttendance = async () => {
     if (!selectedUser) return;
-
     try {
       const res = await axios.get(`/attendance/${selectedUser}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       setRecords(res.data.attendance || []);
     } catch (err) {
       console.error("Failed loading attendance:", err);
@@ -60,7 +63,6 @@ function EditAttendanceAdmin() {
     loadAttendance();
   }, [selectedUser]);
 
-  // ================= INPUT CHANGE =================
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -73,7 +75,40 @@ function EditAttendanceAdmin() {
     return `${date}T${timeValue}`;
   };
 
-  // ================= SAVE =================
+  const extractTime = (value) => {
+    if (!value) return "";
+    const d = new Date(value);
+    return d.toISOString().substring(11, 16);
+  };
+
+  const resetEditMode = () => {
+    setEditingId(null);
+    setDate("");
+    setForm({
+      timeIn: "",
+      lunchOut: "",
+      lunchIn: "",
+      breakOut: "",
+      breakIn: "",
+      timeOut: "",
+    });
+    scrollToTop();
+  };
+
+  const handleEdit = (record) => {
+    setEditingId(record.id);
+    setDate(record.date?.substring(0, 10) || "");
+    setForm({
+      timeIn: extractTime(record.timeIn),
+      lunchOut: extractTime(record.lunchOut),
+      lunchIn: extractTime(record.lunchIn),
+      breakOut: extractTime(record.breakOut),
+      breakIn: extractTime(record.breakIn),
+      timeOut: extractTime(record.timeOut),
+    });
+    scrollToTop();
+  };
+
   const handleSubmit = async () => {
     if (!selectedUser || !date) {
       alert("Select user and date first.");
@@ -83,36 +118,46 @@ function EditAttendanceAdmin() {
     try {
       setSaving(true);
 
-      await axios.post(
-        "/attendance/admin-create",
-        {
-          userId: selectedUser,
-          date,
-          timeIn: buildDateTime(form.timeIn),
-          lunchOut: buildDateTime(form.lunchOut),
-          lunchIn: buildDateTime(form.lunchIn),
-          breakOut: buildDateTime(form.breakOut),
-          breakIn: buildDateTime(form.breakIn),
-          timeOut: buildDateTime(form.timeOut),
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      if (editingId) {
+        await axios.put(
+          `/attendance/${editingId}`,
+          {
+            date,
+            timeIn: buildDateTime(form.timeIn),
+            lunchOut: buildDateTime(form.lunchOut),
+            lunchIn: buildDateTime(form.lunchIn),
+            breakOut: buildDateTime(form.breakOut),
+            breakIn: buildDateTime(form.breakIn),
+            timeOut: buildDateTime(form.timeOut),
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+        alert("Attendance updated successfully!");
+      } else {
+        await axios.post(
+          "/attendance/admin-create",
+          {
+            userId: selectedUser,
+            date,
+            timeIn: buildDateTime(form.timeIn),
+            lunchOut: buildDateTime(form.lunchOut),
+            lunchIn: buildDateTime(form.lunchIn),
+            breakOut: buildDateTime(form.breakOut),
+            breakIn: buildDateTime(form.breakIn),
+            timeOut: buildDateTime(form.timeOut),
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+        alert("Attendance saved successfully!");
+      }
 
-      alert("Attendance saved successfully!");
-
-      setForm({
-        timeIn: "",
-        lunchOut: "",
-        lunchIn: "",
-        breakOut: "",
-        breakIn: "",
-        timeOut: "",
-      });
-      setDate("");
-
+      resetEditMode();
       loadAttendance();
+      scrollToTop();
     } catch (err) {
       console.error(err);
       alert("Failed saving attendance");
@@ -121,21 +166,17 @@ function EditAttendanceAdmin() {
     }
   };
 
-  // ================= DELETE (IMPROVED) =================
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this attendance record?",
     );
-
     if (!confirmDelete) return;
 
     try {
       setDeletingId(id);
-
       await axios.delete(`/attendance/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       loadAttendance();
     } catch (err) {
       console.error(err);
@@ -145,7 +186,6 @@ function EditAttendanceAdmin() {
     }
   };
 
-  // ================= FORMAT =================
   const formatTime = (value) =>
     value
       ? new Date(value).toLocaleTimeString([], {
@@ -158,23 +198,30 @@ function EditAttendanceAdmin() {
     value ? new Date(value).toLocaleDateString() : "-";
 
   return (
-    <div className="attendance_admin_wrapper">
+    <div
+      ref={topRef}
+      className={`attendance_admin_wrapper ${
+        editingId ? "attendance_edit_mode" : ""
+      }`}
+    >
       <Box
         sx={{ width: "100%", borderBottom: 1, borderColor: "divider", mb: 3 }}
       >
-        <Tabs value={0} aria-label="Edit Attendance Tabs">
+        <Tabs value={0}>
           <Tab label="Create/Edit Attendance" />
         </Tabs>
       </Box>
 
       <Box sx={{ pt: 2 }}>
-        {/* USER + DATE */}
         <div className="attendance_admin_top">
           <div>
             <label>User</label>
             <select
               value={selectedUser}
-              onChange={(e) => setSelectedUser(e.target.value)}
+              onChange={(e) => {
+                setSelectedUser(e.target.value);
+                resetEditMode();
+              }}
             >
               <option value="">Select user</option>
               {users
@@ -197,7 +244,6 @@ function EditAttendanceAdmin() {
           </div>
         </div>
 
-        {/* EDIT INPUTS */}
         <div className="attendance_admin_table">
           <div className="attendance_admin_header">
             <span>Time In</span>
@@ -209,42 +255,15 @@ function EditAttendanceAdmin() {
           </div>
 
           <div className="attendance_admin_inputs">
-            <input
-              type="time"
-              name="timeIn"
-              value={form.timeIn}
-              onChange={handleChange}
-            />
-            <input
-              type="time"
-              name="lunchOut"
-              value={form.lunchOut}
-              onChange={handleChange}
-            />
-            <input
-              type="time"
-              name="lunchIn"
-              value={form.lunchIn}
-              onChange={handleChange}
-            />
-            <input
-              type="time"
-              name="breakOut"
-              value={form.breakOut}
-              onChange={handleChange}
-            />
-            <input
-              type="time"
-              name="breakIn"
-              value={form.breakIn}
-              onChange={handleChange}
-            />
-            <input
-              type="time"
-              name="timeOut"
-              value={form.timeOut}
-              onChange={handleChange}
-            />
+            {Object.keys(form).map((key) => (
+              <input
+                key={key}
+                type="time"
+                name={key}
+                value={form[key]}
+                onChange={handleChange}
+              />
+            ))}
           </div>
         </div>
 
@@ -253,29 +272,30 @@ function EditAttendanceAdmin() {
           onClick={handleSubmit}
           disabled={saving}
         >
-          {saving ? "Saving..." : "Save Attendance"}
+          {saving
+            ? editingId
+              ? "Updating..."
+              : "Saving..."
+            : editingId
+            ? "Update Attendance"
+            : "Save Attendance"}
         </button>
 
-        {/* ===== EXISTING ATTENDANCE ===== */}
+        {editingId && (
+          <button
+            type="button"
+            className="attendance_cancel_btn_full"
+            onClick={resetEditMode}
+          >
+            Cancel Edit
+          </button>
+        )}
+
         {selectedUser && (
           <div className="attendance_existing_table">
             <h3>Existing Attendance</h3>
 
             <table className="attendance_table">
-              <thead>
-                <tr>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th>Time In</th>
-                  <th>Lunch Out</th>
-                  <th>Lunch In</th>
-                  <th>Break Out</th>
-                  <th>Break In</th>
-                  <th>Time Out</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-
               <tbody>
                 {records.map((r) => (
                   <tr key={r.id}>
@@ -287,14 +307,21 @@ function EditAttendanceAdmin() {
                     <td>{formatTime(r.breakOut)}</td>
                     <td>{formatTime(r.breakIn)}</td>
                     <td>{formatTime(r.timeOut)}</td>
-                    <td>
-                      <button
-                        className="attendance_delete_btn"
-                        disabled={deletingId === r.id}
+
+                    <td className="attendance_actions_icons">
+                      <span
+                        className="material-symbols-outlined attendance_edit_icon"
+                        onClick={() => handleEdit(r)}
+                      >
+                        edit
+                      </span>
+
+                      <span
+                        className="material-symbols-outlined attendance_delete_icon"
                         onClick={() => handleDelete(r.id)}
                       >
-                        {deletingId === r.id ? "Deleting..." : "Delete"}
-                      </button>
+                        delete
+                      </span>
                     </td>
                   </tr>
                 ))}
