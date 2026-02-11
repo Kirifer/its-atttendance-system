@@ -1,6 +1,6 @@
 // Accept and decline user time adjustment requests - ADMIN only
 import { PrismaClient } from "@prisma/client";
-import { uploadToFirebase } from "../utils/firebase/uploadToFirebase.js";
+import { uploadToS3 } from "../utils/s3/uploadToS3.js";
 import { getTimeAdjustments } from "../models/timeAdjustment.js";
 
 const prisma = new PrismaClient();
@@ -24,7 +24,7 @@ const fileTimeAdjustment = async (req, res) => {
 
     let attachmentUrl = null;
     if (req.file) {
-      attachmentUrl = await uploadToFirebase(req.file, "time-adjustments");
+      attachmentUrl = await uploadToS3(req.file, "time-adjustments");
     }
 
     // ✅ build data safely

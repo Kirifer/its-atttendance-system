@@ -3,15 +3,17 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+
 import errorHandling from "./src/middlewares/errorHandler.js";
 import authRoutes from "./src/routes/auth.js";
 import leaveRoutes from "./src/routes/leaveRoutes.js";
 import attendanceRoutes from "./src/routes/attendanceRoutes.js";
 import timeAdjustmentRoutes from "./src/routes/timeAdjustmentRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
+
 import { checkLeaves } from "./src/cron/leaveChecker.js";
 import { cleanSched } from "./src/cron/cleanExpiredSched.js";
-import { bucket } from "./src/config/firebase.js";
+
 import pool from "./src/db.js";
 
 dotenv.config();
@@ -23,7 +25,9 @@ const port = process.env.PORT || 5001;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// middlewares
+// ===============================
+// Middlewares
+// ===============================
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -43,14 +47,17 @@ app.use((req, res, next) => {
 });
 
 app.use(cors());
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// serve uploads folder
+// ===============================
+// Static files (local only)
+// ===============================
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-//routes
+// ===============================
+// Routes
+// ===============================
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
@@ -75,21 +82,27 @@ app.use("/api/leave", leaveRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/admins", adminRoutes);
 
-// cron trigger
+// ===============================
+// Cron trigger
+// ===============================
 app.get("/api/cron/sync", async (req, res) => {
   await checkLeaves();
   await cleanSched();
   res.status(200).json({ success: true });
 });
 
-//error handling middleware
+// ===============================
+// Error handling
+// ===============================
 app.use(errorHandling);
 
-//server run
+// ===============================
+// Server start
+// ===============================
 if (process.env.NODE_ENV !== "production") {
   app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
-    console.log("Firebase bucket:", bucket.name);
+    console.log("S3 bucket:", process.env.AWS_BUCKET_NAME || "NOT SET");
   });
 }
 
