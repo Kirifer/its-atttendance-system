@@ -8,7 +8,8 @@ export const getWorkSchedule = async (userId, date = new Date()) => {
   const today = getUTCDay(date);
 
   const day = today.getDay();
-  if (day === 0 || day === 6) return null;
+  // if (day === 0 || day === 6) return null;
+
 
   await deleteExpiredSched(userId, prisma);
 
@@ -48,7 +49,9 @@ export const getWorkSchedule = async (userId, date = new Date()) => {
 
     return { start, end, startTime: custom.startTime, endTime: custom.endTime };
   }
-
+  
+  if (day === 0 || day === 6) return null;
+    
   // Default weekday schedule
   const start = new Date(today);
   const end = new Date(today);
