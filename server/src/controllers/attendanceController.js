@@ -434,8 +434,8 @@ export const updateAttendance = async (req, res) => {
 
 export const createAttendanceAdmin = async (req, res) => {
   try {
-    if (!isStaffRole(req.user.role)) {
-      return res.status(403).json({ message: "Admins only" });
+    if(req.user.role !== "ADMIN"){
+     return res.status(403).json({ message: "Admins only" });
     }
 
     const {
