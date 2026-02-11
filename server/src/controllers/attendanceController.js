@@ -431,6 +431,99 @@ export const updateAttendance = async (req, res) => {
   }
 };
 
+export const createAttendanceAdmin = async (req, res) => {
+  try {
+    if (!isStaffRole(req.user.role)) {
+      return res.status(403).json({ message: "Admins only" });
+    }
+
+    const {
+      userId,
+      date,
+      timeIn,
+      lunchOut,
+      lunchIn,
+      breakOut,
+      breakIn,
+      timeOut,
+      status,
+    } = req.body;
+
+    if (!userId || !date) {
+      return res.status(400).json({ message: "userId and date are required" });
+    }
+
+    const utcDate = new Date(date);
+
+    let attendance = await prisma.attendance.findUnique({
+      where: { userId_date: { userId, date: utcDate } },
+    });
+
+    // 🔁 IF EXISTS → UPDATE (ADMIN UPSERT)
+    if (attendance) {
+      await updateAttStatus(
+        attendance,
+        timeIn,
+        timeOut,
+        lunchOut,
+        lunchIn,
+        breakOut,
+        breakIn,
+        status,
+        true
+      );
+
+      const updated = await recalculateHours(attendance.id);
+
+      return res.json({
+        message: "Attendance updated (admin upsert)",
+        attendance: updated,
+      });
+    }
+
+    // 🆕 CREATE NEW ATTENDANCE
+    const created = await prisma.attendance.create({
+      data: {
+        userId,
+        date: utcDate,
+        timeIn: timeIn ? new Date(timeIn) : null,
+        lunchOut: lunchOut ? new Date(lunchOut) : null,
+        lunchIn: lunchIn ? new Date(lunchIn) : null,
+        breakOut: breakOut ? new Date(breakOut) : null,
+        breakIn: breakIn ? new Date(breakIn) : null,
+        timeOut: timeOut ? new Date(timeOut) : null,
+        status:
+          status && Object.keys(AttendanceStatus).includes(status)
+            ? status
+            : AttendanceStatus.PRESENT,
+      },
+    });
+
+    await updateAttStatus(
+      created,
+      timeIn,
+      timeOut,
+      lunchOut,
+      lunchIn,
+      breakOut,
+      breakIn,
+      created.status,
+      true
+    );
+
+    const updatedHours = await recalculateHours(created.id);
+
+    res.status(201).json({
+      message: "Attendance created by admin",
+      attendance: updatedHours,
+    });
+  } catch (error) {
+    console.error("Admin create attendance error:", error);
+    res.status(500).json({ message: "Error creating attendance" });
+  }
+};
+
+
 export const deleteAttendance = async (req, res) => {
   try {
     const { id } = req.params;
