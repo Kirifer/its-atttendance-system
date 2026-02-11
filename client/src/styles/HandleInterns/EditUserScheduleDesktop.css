@@ -1,58 +1,48 @@
-/* Container */
 .schedule_desktop_container {
   background: #fff;
   padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
   margin-top: 12px;
-  max-width: 100%;
 }
 
-/* Title */
 .schedule_title {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 12px;
 }
 
-/* Messages */
 .schedule_error {
   color: #dc2626;
   font-size: 14px;
   margin-bottom: 8px;
 }
-
 .schedule_success {
   color: #16a34a;
   font-size: 14px;
   margin-bottom: 8px;
 }
 
-/* Horizontal layout */
 .schedule_horizontal_group {
   display: flex;
   gap: 12px;
   align-items: flex-end;
 }
 
-/* Fields */
 .schedule_field {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-/* Labels */
-.schedule_field label {
+.field_label {
   font-size: 13px;
   font-weight: 500;
   color: #6b7280;
   margin-bottom: 4px;
 }
 
-/* Inputs & Select */
-.schedule_field input,
-.schedule_field select {
+.schedule_field input {
   height: 36px;
   padding: 6px 10px;
   font-size: 15px;
@@ -60,44 +50,150 @@
   border: 1px solid #d1d5db;
   outline: none;
   box-sizing: border-box;
-  background: #fff;
 }
 
-/* Focus */
-.schedule_field input:focus,
-.schedule_field select:focus {
+.schedule_field input:focus {
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
 }
 
-/* Action */
-.schedule_field.action {
-  flex: 0.7;
+.schedule_field.user_list_wrapper {
+  position: relative;
+  flex: 2;
 }
 
-/* Save button */
-.schedule_save_btn {
-  height: 36px;
-  padding: 0 14px;
-  font-size: 15px;
-  font-weight: 500;
+/* User Selection Container */
+.user_chip_container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid #d1d5db;
   border-radius: 6px;
-  border: none;
-  background: #1a5dac;
-  color: #fff;
-  cursor: pointer;
+  min-height: 36px;
+  height: auto;
+  box-sizing: border-box;
+  cursor: text;
+  transition: all 0.2s;
 }
 
-.schedule_save_btn:hover {
-  background: #0066d3;
+.user_chip_container:focus-within {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+  outline: none;
 }
 
-.schedule_save_btn:disabled {
-  opacity: 0.9;
+.user_chip_container.locked:focus-within {
+  border-color: #d1d5db;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
-/* Responsive fallback */
+/* Chips */
+.user_chip {
+  display: flex;
+  align-items: center;
+  background: #e8f0fe;
+  color: #1967d2;
+  padding: 0 6px;
+  height: 24px;
+  border-radius: 4px;
+  font-size: 13px;
+  margin: 2px 0;
+}
+
+.user_chip.all_chip {
+  background: #1a5dac;
+  color: #fff;
+  font-weight: 600;
+}
+
+.user_chip button {
+  background: none;
+  border: none;
+  color: inherit;
+  margin-left: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Inner Input */
+.user_search_input {
+  border: none !important;
+  outline: none !important;
+  flex: 1;
+  min-width: 150px;
+  height: 34px !important;
+  font-size: 15px !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.user_search_input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.user_chip_container.locked {
+  background-color: #f3f4f6;
+  cursor: not-allowed !important;
+}
+
+.user_chip_container.locked .user_search_input {
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+.user_chip.all_chip button {
+  cursor: pointer;
+}
+
+/* Dropdown */
+.user_dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 2px;
+}
+
+.user_dropdown_item {
+  padding: 10px;
+  cursor: pointer;
+}
+.user_dropdown_item:hover {
+  background-color: #f1f3f4;
+  color: #1a73e8;
+}
+.user_no_results {
+  padding: 10px;
+  color: #666;
+  font-style: italic;
+}
+
+.schedule_save_btn {
+  height: 36px;
+  padding: 0 14px;
+  background: #1a5dac;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.schedule_save_btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 1024px) {
   .schedule_horizontal_group {
     flex-direction: column;

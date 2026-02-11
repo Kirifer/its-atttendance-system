@@ -1,54 +1,34 @@
-import { useEffect, useState } from "react";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
 export default function UserTotalOJTHours() {
-  const [remainingHours, setRemainingHours] = useState(null);
-  const [totalHours, setTotalHours] = useState(null);
-  const [role, setRole] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { user, loading: contextLoading } = useContext(UserContext);
 
-  useEffect(() => {
-    const fetchMe = async () => {
-      try {
-        const token = localStorage.getItem("token");
+  const cachedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const isAdmin = user?.role === "ADMIN" || cachedUser?.role === "ADMIN";
 
-        const res = await fetch("http://localhost:5001/api/auth/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  if (isAdmin) return null;
 
-        if (!res.ok) throw new Error("Failed to fetch user data");
+  if (contextLoading) {
+    return (
+      <p style={{ textAlign: "center" }}>Loading User's Total OJT Hours...</p>
+    );
+  }
 
-        const data = await res.json();
-        setRole(data.role);
-        setTotalHours(data.totalOJTHours);
-        setRemainingHours(data.remainingWorkHours);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMe();
-  }, []);
-
-  if (loading) return <p>Loading User's Total OJT Hours...</p>;
-  if (error) return <p>Error: {error}</p>;
-
-  if (role !== "USER") return null;
+  if (!user || user.role !== "USER") return null;
 
   return (
     <div style={{ textAlign: "center", margin: "20px" }}>
       <h3>OJT Hours</h3>
-      {totalHours === null ? (
+      {user.totalOJTHours === null || user.totalOJTHours === 0 ? (
         <p>The admin hasn’t set your Total OJT hours yet.</p>
       ) : (
         <>
-          <p>Total: {totalHours} hours</p>
+          <p>Total: {user.totalOJTHours} hours</p>
           <p>
-            Remaining: {remainingHours !== null ? remainingHours : "0"} hours
+            Remaining:{" "}
+            {user.remainingWorkHours !== null ? user.remainingWorkHours : "0"}{" "}
+            hours
           </p>
         </>
       )}

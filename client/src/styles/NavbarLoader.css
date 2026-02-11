@@ -1,0 +1,22 @@
+.navbar-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navbar-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.2);
+  border-top: 4px solid #000;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,4 +1,5 @@
 import "../styles/UserRequestTable.css";
+import { viewDocument } from "../api/getFile";
 
 function UserRequestsTable({
   requests,
@@ -26,12 +27,20 @@ function UserRequestsTable({
       filterType === "type"
         ? req.type
         : filterType === "details"
-        ? req.details
-        : filterType === "status"
-        ? req.status
-        : "";
+          ? req.details
+          : filterType === "status"
+            ? req.status
+            : "";
     return value.toLowerCase().includes(query.toLowerCase());
   });
+
+  const handleViewAttachment = async (s3Key) => {
+    try {
+      await viewDocument(s3Key);
+    } catch (error) {
+      console.error("Failed to open attachment:", error);
+    }
+  };
 
   return (
     <>
@@ -74,12 +83,22 @@ function UserRequestsTable({
             <tbody>
               {filteredRequests.map((req) => {
                 const status = req.status ? req.status.toLowerCase() : "";
-                const fullAttachmentUrl = req.attachment
-                  ? `${
-                      process.env.REACT_APP_BACKEND_URL ||
-                      "http://localhost:5001"
-                    }${req.attachment}`
-                  : null;
+
+                // const isExternal = req.attachment?.startsWith("http");
+
+                // const baseHost =
+                //   process.env.REACT_APP_BACKEND_URL || "http://localhost:5001";
+
+                // const cleanBase = baseHost.replace(/\/$/, "");
+                // const cleanPath = req.attachment?.startsWith("/")
+                //   ? req.attachment
+                //   : `/${req.attachment}`;
+
+                // const fullAttachmentUrl = req.attachment
+                //   ? isExternal
+                //     ? req.attachment
+                //     : `${cleanBase}${cleanPath}`
+                //   : null;
 
                 return (
                   <tr key={req.id}>
@@ -108,14 +127,21 @@ function UserRequestsTable({
                       data-label="Attachment"
                       style={{ whiteSpace: "nowrap" }}
                     >
-                      {fullAttachmentUrl ? (
-                        <a
-                          href={fullAttachmentUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                      {req.attachment ? (
+                        <button
+                          onClick={() => handleViewAttachment(req.attachment)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "#007bff",
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                            padding: 0,
+                            font: "inherit",
+                          }}
                         >
                           View / Download
-                        </a>
+                        </button>
                       ) : (
                         "No Attachment"
                       )}

@@ -3,7 +3,7 @@ import { toast, Bounce } from "react-toastify";
 export const showToast = ({
   message,
   icon = "🔔",
-  color = "#333",
+  color = "#ffffff",
   type = "default",
 }) => {
   const validTypes = ["default", "success", "info", "warning", "error"];

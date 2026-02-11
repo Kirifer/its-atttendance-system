@@ -1,0 +1,177 @@
+.set_ojthours_btn {
+  padding: 10px 16px;
+  background: #1a5dac;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+.set_ojthours_btn:hover {
+  background: #0066d3;
+}
+
+.set_ojthours_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.set_ojthours_popup {
+  background: #fff;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 380px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.25s ease-in-out;
+  font-family: "Inter", sans-serif;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.set_ojthours_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.set_ojthours_header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* not used for now but plzzzz dont remove plzz ty */
+
+/* .set_ojthours_view_link {
+  font-size: 13px;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.set_ojthours_view_link:hover {
+  text-decoration: underline;
+} */
+
+.set_ojthours_popup label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.set_ojthours_popup input {
+  width: 100%;
+  max-width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 14px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.set_ojthours_popup input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.set_ojthours_user_list {
+  list-style: none;
+  padding: 0;
+  margin: -6px 0 14px 0;
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.set_ojthours_user_list li {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.set_ojthours_user_list li:hover {
+  background: #f2f6ff;
+}
+
+.set_ojthours_remaining {
+  font-size: 13px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.set_ojthours_error {
+  font-size: 13px;
+  color: #d9534f;
+  margin-bottom: 10px;
+}
+
+.set_ojthours_success {
+  font-size: 13px;
+  color: green;
+  margin-bottom: 10px;
+}
+
+.set_ojthours_buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.set_ojthours_buttons button {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.set_ojthours_buttons button:first-child {
+  background: #007bff;
+  color: #fff;
+}
+
+.set_ojthours_buttons button:first-child:hover {
+  background: #0066d3;
+}
+
+.set_ojthours_buttons button:last-child {
+  background: #f0f0f0;
+}
+
+.set_ojthours_buttons button:last-child:hover {
+  background: #e0e0e0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

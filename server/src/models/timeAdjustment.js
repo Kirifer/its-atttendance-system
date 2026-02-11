@@ -1,7 +1,12 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-async function createTimeAdjustment(userId, type, details, attachment = null) {
+export async function createTimeAdjustment(
+  userId,
+  type,
+  details,
+  attachment = null
+) {
   return await prisma.timeAdjustment.create({
     data: {
       userId,
@@ -13,7 +18,7 @@ async function createTimeAdjustment(userId, type, details, attachment = null) {
   });
 }
 
-async function getTimeAdjustments(userId = null) {
+export async function getTimeAdjustments(userId = null) {
   if (userId) {
     return await prisma.timeAdjustment.findMany({
       where: { userId },
@@ -26,8 +31,3 @@ async function getTimeAdjustments(userId = null) {
     include: { user: true },
   });
 }
-
-module.exports = {
-  createTimeAdjustment,
-  getTimeAdjustments,
-};

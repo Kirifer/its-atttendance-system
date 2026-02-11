@@ -11,6 +11,7 @@ import usePagination from "../hooks/pagination";
 import Pagination from "./Pagination";
 import Loader from "./Spinner/Loader";
 import "../styles/AttendanceTable.css";
+import { getAllStaffUsers } from "../api/auth";
 
 export default function AttendanceTable({
   userId,
@@ -20,6 +21,8 @@ export default function AttendanceTable({
 }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const role = user?.role;
+  const isStaff = role === "ADMIN" || role === "SUPERVISOR";
+  const [visibleUserIds, setVisibleUserIds] = useState(null);
 
   const [records, setRecords] = useState([]);
   const [editingRecord, setEditingRecord] = useState(null);
@@ -37,14 +40,8 @@ export default function AttendanceTable({
     customEnd: "",
   });
 
-  const {
-    filterType,
-    filterWeek,
-    searchField,
-    query,
-    customStart,
-    customEnd,
-  } = filters;
+  const { filterType, filterWeek, searchField, query, customStart, customEnd } =
+    filters;
 
   const options = useMemo(
     () => ({
@@ -52,7 +49,7 @@ export default function AttendanceTable({
       month: "short",
       day: "numeric",
     }),
-    []
+    [],
   );
 
   const timeOptions = useMemo(
@@ -62,7 +59,7 @@ export default function AttendanceTable({
       second: "2-digit",
       hour12: false,
     }),
-    []
+    [],
   );
 
   const reload = () => setReloadCounter((prev) => prev + 1);
@@ -80,7 +77,7 @@ export default function AttendanceTable({
 
       try {
         let res;
-        if (role === "ADMIN") res = await getAllAttendance();
+        if (isStaff) res = await getAllAttendance();
         else res = await getUserAttendance(userId);
 
         let dateFiltered = res.attendance;
@@ -100,7 +97,7 @@ export default function AttendanceTable({
           });
 
           dateFiltered = monthFiltered.filter(
-            (r) => getWeekOfMonth(new Date(r.date)) === filterWeek
+            (r) => getWeekOfMonth(new Date(r.date)) === filterWeek,
           );
         }
 
@@ -118,16 +115,24 @@ export default function AttendanceTable({
           }
         }
 
-        const formatted = dateFiltered.map((r) => {
+        const scopedRecords =
+          role === "SUPERVISOR"
+            ? visibleUserIds instanceof Set
+              ? dateFiltered.filter((r) => visibleUserIds.has(r.userId))
+              : []
+            : dateFiltered;
+
+        const formatted = scopedRecords.map((r) => {
           const ti = r.timeIn ? new Date(r.timeIn) : null;
           const to = r.timeOut ? new Date(r.timeOut) : null;
 
           const lo = r.lunchOut ? new Date(r.lunchOut) : null;
           const li = r.lunchIn ? new Date(r.lunchIn) : null;
 
-          // const workMinutes = ti && to ? Math.round((to - ti) / 1000 / 60) : null;
+          const bo = r.breakOut ? new Date(r.breakOut) : null;
+          const bi = r.breakIn ? new Date(r.breakIn) : null;
 
-          // const lunchMinutes = 60;
+          const breakTardyMinutes = r.breakTardinessMinutes || 0;
 
           const lunchTardyMinutes = r.lunchTardinessMinutes || 0;
 
@@ -143,18 +148,32 @@ export default function AttendanceTable({
             rawLunchOut: r.lunchOut,
             rawLunchIn: r.lunchIn,
 
-            Intern: role === "ADMIN" ? r.user.username : user.username,
+            Intern:
+              role === "ADMIN" || role === "SUPERVISOR"
+                ? r.user.username
+                : user.username,
             Status: r.status,
             Date: new Date(r.date).toLocaleDateString("en-US", options),
             "Time In": ti ? ti.toLocaleTimeString("en-US", timeOptions) : "-",
             "Lunch Out": lo ? lo.toLocaleTimeString("en-US", timeOptions) : "-",
             "Lunch In": li ? li.toLocaleTimeString("en-US", timeOptions) : "-",
+            "Break Out": bo ? bo.toLocaleTimeString("en-US", timeOptions) : "-",
+            "Break In": bi ? bi.toLocaleTimeString("en-US", timeOptions) : "-",
             "Time Out": to ? to.toLocaleTimeString("en-US", timeOptions) : "-",
-            "Lunch Tardy": lunchTardyMinutes > 0 ? `${lunchTardyMinutes} mins` : "-",
+            "Lunch Tardy":
+              lunchTardyMinutes > 0 ? `${lunchTardyMinutes} mins` : "-",
+            "Break Tardy":
+              breakTardyMinutes > 0 ? `${breakTardyMinutes} mins` : "-",  
             Tardiness: tardyMinutes > 0 ? `${tardyMinutes} mins` : "-",
             DAYS: presentDays,
-            TOTAL: r.straightWorkHours !== null ? formatHoursToHHMM(r.straightWorkHours) : "-",
-            ACTUAL: r.totalWorkHours !== null ? formatHoursToHHMM(r.totalWorkHours) : "-",
+            TOTAL:
+              r.straightWorkHours !== null
+                ? formatHoursToHHMM(r.straightWorkHours)
+                : "-",
+            ACTUAL:
+              r.totalWorkHours !== null
+                ? formatHoursToHHMM(r.totalWorkHours)
+                : "-",
           };
         });
 
@@ -181,7 +200,34 @@ export default function AttendanceTable({
     options,
     timeOptions,
     role,
+    visibleUserIds,
+    isStaff,
   ]);
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      if (role !== "SUPERVISOR" || !user?.department) {
+        setVisibleUserIds(null);
+        return;
+      }
+      try {
+        const users = await getAllStaffUsers();
+        const allowed = new Set(
+          (users || [])
+            .filter(
+              (u) =>
+                u.role === "USER" &&
+                u.department === user.department,
+            )
+            .map((u) => u.id),
+        );
+        setVisibleUserIds(allowed);
+      } catch (err) {
+        setVisibleUserIds(new Set());
+      }
+    };
+    loadUsers();
+  }, [role, user?.department]);
 
   const { exportPDF } = useExportPDF();
 
@@ -225,7 +271,7 @@ export default function AttendanceTable({
           onFilterChange={setFilters}
         />
       )}
-      
+
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
@@ -235,71 +281,83 @@ export default function AttendanceTable({
       />
 
       <Loader loading={loading}>
-      {records.length === 0 ? (
-        <p className="attendance_message">
-          No attendance for this{" "}
-          {filterType === "Month" ? "month" : `week ${filterWeek}`}
-        </p>
-      ) : (
-        <div className="attendance_container">
-          <table className="attendance_tbl">
-            <thead>
-              <tr>
-                {Object.keys(records[0])
-                  .filter(
-                    (col) =>
-                      !["rawDate", "rawTimeIn", "rawTimeOut", "rawLunchOut", "rawLunchIn", "id"].includes(
-                        col
-                      )
-                  )
-                  .map((col) => (
-                    <th key={col}>{col}</th>
-                  ))}
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedData.map((r, i) => (
-                <tr key={i}>
-                  {Object.keys(r)
+        {records.length === 0 ? (
+          <p className="attendance_message">
+            No attendance for this{" "}
+            {filterType === "Month" ? "month" : `week ${filterWeek}`}
+          </p>
+        ) : (
+          <div className="attendance_container">
+            <table className="attendance_tbl">
+              <thead>
+                <tr>
+                  {Object.keys(records[0])
                     .filter(
                       (col) =>
-                        !["rawDate", "rawTimeIn", "rawTimeOut", "rawLunchOut", "rawLunchIn", "id"].includes(
-                          col
-                        )
+                        ![
+                          "rawDate",
+                          "rawTimeIn",
+                          "rawTimeOut",
+                          "rawLunchOut",
+                          "rawLunchIn",
+                          "rawBreakOut",
+                          "rawBreakIn",
+                          "id",
+                        ].includes(col),
                     )
                     .map((col) => (
-                      <td key={col} data-label={col}>
-                        {col === "Status" ? (
-                          <span
-                            className={`attendance_status-${r[col]
-                              .toLowerCase()
-                              .replace("_", "-")}`}
-                          >
-                            {formatAttStatus(r[col])}
-                          </span>
-                        ) : (
-                          r[col]
-                        )}
-                      </td>
+                      <th key={col}>{col}</th>
                     ))}
-                  <td>
-                    {role === "ADMIN" && (
-                      <button
-                        className="attendance_edit_btn"
-                        onClick={() => openEditPopup(r)}
-                      >
-                        Edit
-                      </button>
-                    )}
-                  </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {paginatedData.map((r, i) => (
+                  <tr key={i}>
+                    {Object.keys(r)
+                      .filter(
+                        (col) =>
+                          ![
+                            "rawDate",
+                            "rawTimeIn",
+                            "rawTimeOut",
+                            "rawLunchOut",
+                            "rawLunchIn",
+                            "id",
+                          ].includes(col),
+                      )
+                      .map((col) => (
+                        <td key={col} data-label={col}>
+                          {col === "Status" ? (
+                            <span
+                              className={`attendance_status-${r[col]
+                                .toLowerCase()
+                                .replace("_", "-")}`}
+                            >
+                              {formatAttStatus(r[col])}
+                            </span>
+                          ) : (
+                            r[col]
+                          )}
+                        </td>
+                      ))}
+                    <td>
+                      {isStaff && (
+                        <button
+                          className="attendance_edit_btn"
+                          onClick={() => openEditPopup(r)}
+                        >
+                          Edit
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </Loader>
-      
+
       {editingRecord && (
         <EditAttendancePopup
           record={editingRecord}

@@ -1,0 +1,101 @@
+=======Install packages on both client and server!=======
+
+-----For client-----
+cd client
+npm install
+
+
+-----For server-----
+cd server
+npm install
+
+
+
+
+=======After successful installation, you might get an error=======
+
+-----client .env (place on root of client)-----
+REACT_APP_API_URL=5001
+PORT=5000
+GENERATE_SOURCEMAP=false
+DISABLE_ESLINT_PLUGIN=true
+
+
+-----server .env (place on root of server)-----
+# Database
+PORT=5001
+PG_USER=
+PG_HOST=
+PG_DATABASE=
+PG_PASSWORD=
+PG_PORT=5432
+JWT_SECRET=supersecretkey
+DATABASE_URL=""
+
+# OTP
+EMAIL_USER=@gmail.com
+EMAIL_PASS=
+FRONTEND_URL=
+
+# Firebase
+FIREBASE_PROJECT_ID=
+FIREBASE_CLIENT_EMAIL=
+FIREBASE_PRIVATE_KEY=""
+FIREBASE_STORAGE_BUCKET=
+
+
+
+
+=======Local testing database guide=======
+
+- Open pgAdmin or psql and connect to your PostgreSQL server.
+- Create the database its-attttendance-system if it doesn't exist under "Databases" in your postgresql username.
+- Right-click its-attendance-system database and select Query Tool.
+- Copy and paste the following SQL code below into the Query Editor and execute it.
+
+
+CREATE TABLE IF NOT EXISTS users (
+id SERIAL PRIMARY KEY,
+username VARCHAR(50) UNIQUE NOT NULL,
+email VARCHAR(100) UNIQUE NOT NULL,
+password VARCHAR(255) NOT NULL,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-----Reset Password add in its-attttendance-system database using Query Tool-----
+
+ALTER TABLE users
+ADD COLUMN reset_token TEXT,
+ADD COLUMN reset_token_expiry TIMESTAMP;
+
+
+
+
+=======Production database template=======
+
+-----Just simply copy the following-----
+
+
+CREATE TABLE IF NOT EXISTS playing_with_neon(id SERIAL PRIMARY KEY, name TEXT NOT NULL, value REAL);
+INSERT INTO playing_with_neon(name, value)
+SELECT LEFT(md5(i::TEXT), 10), random() FROM generate_series(1, 10) s(i);
+SELECT * FROM playing_with_neon;
+
+ALTER TABLE "Attendance"
+DROP CONSTRAINT "Attendance_userId_fkey",
+ADD CONSTRAINT "Attendance_userId_fkey"
+FOREIGN KEY ("userId") REFERENCES "User"(id)
+ON DELETE CASCADE;
+
+ALTER TABLE "TimeAdjustment"
+DROP CONSTRAINT "TimeAdjustment_userId_fkey",
+ADD CONSTRAINT "TimeAdjustment_userId_fkey"
+FOREIGN KEY ("userId") REFERENCES "User"(id)
+ON DELETE CASCADE;
+
+ALTER TABLE "UserSchedule"
+DROP CONSTRAINT "UserSchedule_userId_fkey",
+ADD CONSTRAINT "UserSchedule_userId_fkey"
+FOREIGN KEY ("userId") REFERENCES "User"(id)
+ON DELETE CASCADE;

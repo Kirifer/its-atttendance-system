@@ -63,7 +63,7 @@ function Footer() {
 
               <a
                 className="footer__social footer__social--linkedin"
-                href="https://www.linkedin.com/company/it-squarehub-global-services/"
+                href="https://www.linkedin.com/company/itsquarehub/"
                 target="_blank"
                 rel="noopener noreferrer"
               >

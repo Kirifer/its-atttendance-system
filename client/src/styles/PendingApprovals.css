@@ -1,0 +1,93 @@
+.pending-table-container {
+  width: 100%;
+  max-height: 400px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pending-table {
+  min-width: 800px;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  table-layout: fixed;
+  white-space: nowrap;
+  margin: auto;
+}
+
+.pending-table th {
+  color: black;
+  padding: 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.pending-table td {
+  padding: 12px;
+  border-bottom: 1px solid #8b8b8b;
+  white-space: nowrap;
+  display: table-cell;
+}
+
+.pending-table__actions .material-symbols-outlined {
+  cursor: pointer;
+  font-size: 24px;
+  margin-right: 8px;
+  vertical-align: middle;
+  transition: 0.2s;
+}
+
+.pending-table__actions .material-symbols-outlined:hover {
+  opacity: 0.7;
+}
+
+.pending-table__approve {
+  color: #4caf50;
+}
+
+.pending-table__delete {
+  color: #d9534f;
+}
+
+@media (max-width: 600px) {
+  .pending-table th,
+  .pending-table td {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .pending-table__actions .material-symbols-outlined {
+    font-size: 20px;
+    margin-right: 6px;
+  }
+}
+
+.pending-table__search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.pending-table__dropdown,
+.pending-table__input {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+@media (max-width: 600px) {
+  .pending-table__search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pending-table__dropdown {
+    width: 100%;
+    max-width: 140px;
+  }
+
+  .pending-table__input {
+    width: 100%;
+    max-width: 220px;
+  }
+}

@@ -23,7 +23,8 @@ export default function useUserSchedule() {
         computedWeekday = d.getDay();
       }
 
-      const res = await API.post("/attendance/schedule/user", {
+      // FIXED: Changed endpoint to match backend route
+      const res = await API.post("/admins/set-schedule", {
         userId,
         weekday: computedWeekday,
         startTime,
@@ -31,7 +32,7 @@ export default function useUserSchedule() {
         date,
       });
 
-      triggerReload(); 
+      triggerReload();
       return res.data;
     } catch (err) {
       console.error(err);
@@ -63,7 +64,7 @@ export default function useUserSchedule() {
         status,
       });
 
-      triggerReload(); 
+      triggerReload();
       return res.data;
     } catch (err) {
       console.error(err);
@@ -75,7 +76,6 @@ export default function useUserSchedule() {
   };
 
   return {
- 
     loading,
     error,
     reload,

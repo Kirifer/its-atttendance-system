@@ -1,24 +1,43 @@
 export const getTodaySchedule = async (userId, prisma) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = new Date();
+  // PH is UTC+8
+  const phTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
 
-  const weekday = today.getDay();
+  const y = phTime.getUTCFullYear();
+  const m = String(phTime.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(phTime.getUTCDate()).padStart(2, "0");
 
-  // 1️⃣ Try date-based schedule
-  const dateSchedule = await prisma.userSchedule.findFirst({
+  const phDateStr = `${y}-${m}-${d}`;
+
+  // Query custom schedule for this specific date
+  const customSchedule = await prisma.userSchedule.findMany({
     where: {
-      userId,
+      userId: userId,
       scheduleDate: {
-        gte: today,
-        lte: new Date(today.getTime() + 86400000 - 1),
+        equals: new Date(phDateStr),
       },
     },
+    orderBy: {
+      id: "desc",
+    },
+    take: 1,
   });
 
-  if (dateSchedule) return dateSchedule;
+  if (customSchedule && customSchedule.length > 0) {
+    const cs = customSchedule[0];
+    if (!cs.startTime || !cs.endTime) return null;
+    return cs;
+  }
 
-  // 2️⃣ Fallback to weekday schedule
-  return prisma.userSchedule.findFirst({
-    where: { userId, weekday },
-  });
+  const dayOfWeek = phTime.getUTCDay();
+  if (dayOfWeek === 0 || dayOfWeek === 6) return null; // Weekend
+
+  // Return default schedules (same as getWorkSchedule)
+  if (dayOfWeek === 3) {
+    // Wednesday
+    return { startTime: "10:00", endTime: "19:00" };
+  } else {
+    // Regular weekday
+    return { startTime: "09:00", endTime: "18:00" };
+  }
 };

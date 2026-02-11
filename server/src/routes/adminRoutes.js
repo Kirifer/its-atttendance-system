@@ -1,5 +1,6 @@
 import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
+import { adminOnly, staffOnly } from "../middlewares/roleMiddleware.js";
 import {
   getAdmins,
   resignAdmin,
@@ -11,41 +12,41 @@ import {
   updateUserInfo,
   getTimesheetMeta,
 } from "../controllers/adminController.js";
+import {
+  getPendingUsers,
+  approveUser,
+  rejectUser,
+} from "../controllers/userApprovalController.js";
+import { setUserSchedule } from "../controllers/userScheduleController.js";
 
 const router = express.Router();
 
-// admin only middleware
-const adminOnly = (req, res, next) => {
-  if (req.user.role !== "ADMIN") {
-    return res.status(403).json({ message: "Admins only" });
-  }
-  next();
-};
+router.get("/", authMiddleware, staffOnly, getAdmins);
 
-router.get("/", authMiddleware, adminOnly, getAdmins);
+// Approve newly created user at signup
+router.get("/pending-users", authMiddleware, staffOnly, getPendingUsers);
+router.patch("/approve/:userId", authMiddleware, staffOnly, approveUser);
+router.delete("/reject/:userId", authMiddleware, staffOnly, rejectUser);
 
 router.put("/resign/:id", authMiddleware, adminOnly, resignAdmin);
 router.put("/reinstate/:id", authMiddleware, adminOnly, reinstateAdmin);
 
 router.put("/change-role/:id", authMiddleware, adminOnly, changeUserRole);
 
-router.get("/all-users", authMiddleware, adminOnly, getAllUsers);
+router.get("/all-users", authMiddleware, staffOnly, getAllUsers);
 
-router.get("/ojt/:userId", authMiddleware, adminOnly, getOJTHours);
-router.put("/ojt/:userId", authMiddleware, adminOnly, updateOJTHours);
+router.get("/ojt/:userId", authMiddleware, staffOnly, getOJTHours);
+router.put("/ojt/:userId", authMiddleware, staffOnly, updateOJTHours);
 
-router.put(
-  "/update-user-info/:id",
-  authMiddleware,
-  adminOnly,
-  updateUserInfo
-);
+router.put("/update-user-info/:id", authMiddleware, staffOnly, updateUserInfo);
 
 router.get(
   "/timesheet-meta/:userId",
   authMiddleware,
-  adminOnly,
-  getTimesheetMeta
+  staffOnly,
+  getTimesheetMeta,
 );
+
+router.post("/set-schedule", authMiddleware, staffOnly, setUserSchedule);
 
 export default router;

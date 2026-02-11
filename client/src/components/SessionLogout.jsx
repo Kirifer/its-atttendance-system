@@ -8,12 +8,19 @@ const SessionLogout = ({ children }) => {
   const handleForceLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    if (window.location.pathname !== "/") {
+
+    const publicPages = ["/", "/sign-up", "/forgot-password"];
+    const currentPath = window.location.pathname;
+    const isPublicPage = publicPages.some((page) =>
+      currentPath.startsWith(page),
+    );
+
+    if (!isPublicPage) {
       window.location.href = "/";
     }
   };
 
-  // 🔐 Token check (ONCE)
+  // Token check (ONCE)
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -34,7 +41,7 @@ const SessionLogout = ({ children }) => {
     }
   }, []);
 
-  // 🌐 Server heartbeat (SLOW)
+  // Server heartbeat (SLOW)
   useEffect(() => {
     const ping = async () => {
       try {

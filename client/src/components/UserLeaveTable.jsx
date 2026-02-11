@@ -1,5 +1,5 @@
 import "../styles/UserLeaveTable.css";
-
+import { viewDocument } from "../api/getFile";
 function UserLeaveTable({
   leaves,
   filterType: leaveFilterType,
@@ -14,7 +14,6 @@ function UserLeaveTable({
     OFFSET: "Offset Hours",
   };
 
-
   const leavePlaceholderMap = {
     leaveType: "request type",
     reason: "reason",
@@ -26,17 +25,25 @@ function UserLeaveTable({
       leaveFilterType === "id"
         ? String(leave.id)
         : leaveFilterType === "leaveType"
-        ? leave.leaveType
-        : leaveFilterType === "reason"
-        ? leave.reason
-        : leaveFilterType === "coverage"
-        ? leave.coverage
-        : leaveFilterType === "status"
-        ? leave.status
-        : "";
+          ? leave.leaveType
+          : leaveFilterType === "reason"
+            ? leave.reason
+            : leaveFilterType === "coverage"
+              ? leave.coverage
+              : leaveFilterType === "status"
+                ? leave.status
+                : "";
 
     return value.toLowerCase().includes(leaveQuery.toLowerCase());
   });
+
+  const handleViewAttachment = async (s3Key) => {
+    try {
+      await viewDocument(s3Key);
+    } catch (error) {
+      console.error("Failed to open attachment:", error);
+    }
+  };
 
   return (
     <>
@@ -80,12 +87,20 @@ function UserLeaveTable({
             <tbody>
               {filteredLeaves.map((leave) => {
                 const status = leave.status ? leave.status.toLowerCase() : "";
-                const fullAttachmentUrl = leave.attachment
-                  ? `${
-                      process.env.REACT_APP_BACKEND_URL ||
-                      "http://localhost:5001"
-                    }${leave.attachment}`
-                  : null;
+
+                // const baseHost =
+                //   process.env.REACT_APP_BACKEND_URL || "http://localhost:5001";
+
+                // const cleanBase = baseHost.replace(/\/$/, "");
+                // const cleanPath = leave.attachment?.startsWith("/")
+                //   ? leave.attachment
+                //   : `/${leave.attachment}`;
+
+                // const fullAttachmentUrl = leave.attachment?.startsWith("http")
+                //   ? leave.attachment
+                //   : leave.attachment
+                //     ? `${cleanBase}${cleanPath}`
+                //     : null;
 
                 return (
                   <tr key={leave.id}>
@@ -114,14 +129,21 @@ function UserLeaveTable({
                       data-label="Attachment"
                       style={{ whiteSpace: "nowrap" }}
                     >
-                      {fullAttachmentUrl ? (
-                        <a
-                          href={fullAttachmentUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                      {leave.attachment ? (
+                        <button
+                          onClick={() => handleViewAttachment(leave.attachment)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "#007bff",
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                            padding: 0,
+                            font: "inherit",
+                          }}
                         >
                           View / Download
-                        </a>
+                        </button>
                       ) : (
                         "No Attachment"
                       )}

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useContext } from "react";
 import UserDropDownMenu from "../UserDropdownMenu";
 import { NavLink } from "react-router-dom";
 import { UserContext } from "../../context/UserContext";
+import "../../styles/SidebarLoader.css";
 
 export default function Sidebar() {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -47,7 +48,17 @@ export default function Sidebar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (loading) return <div className="sidebar-loading">Loading...</div>;
+  if (loading)
+    return (
+      <aside
+        className={`dashboard__sidebar ${sidebarExpanded ? "expanded" : "collapsed"}`}
+      >
+        <div className="sidebar-loading">
+          <div className="sidebar-spinner"></div>
+        </div>
+      </aside>
+    );
+
   if (!user) return null;
 
   return (
@@ -83,17 +94,21 @@ export default function Sidebar() {
           </NavLink>
         </li>
 
-        <li>
-          <NavLink
-            to="/time-off"
-            className={({ isActive }) => (isActive ? "active-link" : undefined)}
-          >
-            <span className="material-symbols-outlined">
-              nest_clock_farsight_analog
-            </span>
-            Time-off
-          </NavLink>
-        </li>
+        {user.role === "USER" && (
+          <li>
+            <NavLink
+              to="/time-off"
+              className={({ isActive }) =>
+                isActive ? "active-link" : undefined
+              }
+            >
+              <span className="material-symbols-outlined">
+                nest_clock_farsight_analog
+              </span>
+              Time-off
+            </NavLink>
+          </li>
+        )}
 
         {/* {user.role === "ADMIN" && (
           <li>
@@ -109,7 +124,7 @@ export default function Sidebar() {
           </li>
         )} */}
 
-        {user.role === "ADMIN" && (
+        {(user.role === "ADMIN" || user.role === "SUPERVISOR") && (
           <li>
             <NavLink
               to="/approvals"

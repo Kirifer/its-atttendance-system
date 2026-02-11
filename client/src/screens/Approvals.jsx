@@ -20,6 +20,9 @@ import EditUserSchedule from "../components/HandleInterns/EditUserSchedule";
 import EditUserScheduleDesktop from "../components/HandleInterns/EditUserScheduleDesktop";
 import useUserSchedule from "../hooks/useUserSchedule.js";
 import useIsDesktop from "../hooks/useIsDesktop.js";
+import PendingApprovals from "../components/PendingApprovals.jsx";
+import { getAllStaffUsers } from "../api/auth";
+import EditAttendanceAdmin from "../components/EditAttendanceAdmin"; // ✅ NEW
 
 function CustomTabPanel({ children, value, index }) {
   return (
@@ -36,31 +39,32 @@ function a11yProps(index) {
   };
 }
 
-function Approvals() {  
-
+function Approvals() {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Read tab from URL query parameter, default to 0
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const isSupervisor = currentUser?.role === "SUPERVISOR";
+  const supervisorDept = currentUser?.department;
+  const [visibleUserIds, setVisibleUserIds] = useState(null);
+
+  // ✅ allow tab 5 now
   const getTabFromUrl = () => {
     const params = new URLSearchParams(location.search);
-    const tab = parseInt(params.get('tab'), 10);
-    return !isNaN(tab) && tab >= 0 && tab <= 3 ? tab : 0;
+    const tab = parseInt(params.get("tab"), 10);
+    return !isNaN(tab) && tab >= 0 && tab <= 5 ? tab : 0;
   };
 
   const [value, setValue] = useState(getTabFromUrl());
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
 
- // Update URL when tab changes
   const handleChange = (_, newValue) => {
     setValue(newValue);
     const params = new URLSearchParams(location.search);
-    params.set('tab', newValue);
+    params.set("tab", newValue);
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
 
-  // Sync state with URL on page load/refresh
   useEffect(() => {
     setValue(getTabFromUrl());
   }, [location.search]);
@@ -68,8 +72,17 @@ function Approvals() {
   const fetchLeaves = async () => {
     try {
       setLoading(true);
+      if (isSupervisor && supervisorDept && visibleUserIds === null) {
+        return;
+      }
       const data = await getAllLeaves();
-      setLeaves(data);
+      if (visibleUserIds instanceof Set) {
+        setLeaves(
+          (data || []).filter((l) => visibleUserIds.has(l.user?.id)),
+        );
+      } else {
+        setLeaves(data);
+      }
     } catch (err) {
       console.error("Error fetching leaves:", err);
     } finally {
@@ -79,7 +92,7 @@ function Approvals() {
 
   useEffect(() => {
     fetchLeaves();
-  }, []);
+  }, [visibleUserIds]);
 
   const handleStatusUpdate = async (id, status) => {
     await updateLeaveStatus(id, status);
@@ -93,8 +106,32 @@ function Approvals() {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userSchedule = useUserSchedule();
-
   const isDesktop = useIsDesktop();
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      if (!isSupervisor || !supervisorDept) {
+        setVisibleUserIds(null);
+        return;
+      }
+      try {
+        const users = await getAllStaffUsers();
+        const allowed = new Set(
+          (users || [])
+            .filter(
+              (u) =>
+                u.role === "USER" &&
+                u.department === supervisorDept,
+            )
+            .map((u) => u.id),
+        );
+        setVisibleUserIds(allowed);
+      } catch (err) {
+        setVisibleUserIds(new Set());
+      }
+    };
+    loadUsers();
+  }, [isSupervisor, supervisorDept]);
 
   return (
     <DashboardLayout>
@@ -109,15 +146,28 @@ function Approvals() {
             allowScrollButtonsMobile
             aria-label="Approvals Tabs"
           >
-            <Tab label="Time Adjustments" {...a11yProps(0)} />
-            <Tab label="Time-off Requests" {...a11yProps(1)} />
-            <Tab label="Admin Management" {...a11yProps(2)} />
-            <Tab label="Intern Management" {...a11yProps(3)} />
+            <Tab label="Registration Requests" {...a11yProps(0)} />
+            <Tab label="Time Adjustments" {...a11yProps(1)} />
+            <Tab label="Time-off Requests" {...a11yProps(2)} />
+            <Tab label="Admin Management" {...a11yProps(3)} />
+            <Tab label="Intern Management" {...a11yProps(4)} />
+            <Tab label="Edit Attendance" {...a11yProps(5)} /> {/* ✅ NEW TAB */}
           </Tabs>
         </Box>
 
         {/* ---------- TAB 1 ---------- */}
         <CustomTabPanel value={value} index={0}>
+          <Loader loading={loading}>
+            <h1 className="admin__title">Registration Requests</h1>
+            <p className="admin__description">
+              Verify and authorize new user accounts for system access.
+            </p>
+            <PendingApprovals />
+          </Loader>
+        </CustomTabPanel>
+
+        {/* ---------- TAB 2 ---------- */}
+        <CustomTabPanel value={value} index={1}>
           <Loader loading={loading}>
             <h1 className="admin__title">Time Adjustment Requests</h1>
             <p className="admin__description">
@@ -127,8 +177,8 @@ function Approvals() {
           </Loader>
         </CustomTabPanel>
 
-        {/* ---------- TAB 2 ---------- */}
-        <CustomTabPanel value={value} index={1}>
+        {/* ---------- TAB 3 ---------- */}
+        <CustomTabPanel value={value} index={2}>
           <Loader loading={loading}>
             <h1 className="admin__title">Time-off Requests</h1>
             <p className="admin__description">
@@ -142,8 +192,8 @@ function Approvals() {
           </Loader>
         </CustomTabPanel>
 
-        {/* ---------- TAB 3 ---------- */}
-        <CustomTabPanel value={value} index={2}>
+        {/* ---------- TAB 4 ---------- */}
+        <CustomTabPanel value={value} index={3}>
           <Loader loading={loading}>
             <div>
               <h1 className="admin__title">Admin Management</h1>
@@ -155,8 +205,8 @@ function Approvals() {
           </Loader>
         </CustomTabPanel>
 
-        {/* ---------- TAB 4 ---------- */}
-        <CustomTabPanel value={value} index={3}>
+        {/* ---------- TAB 5 ---------- */}
+        <CustomTabPanel value={value} index={4}>
           <Loader loading={loading}>
             <div>
               <h1 className="admin__title">Handle Interns</h1>
@@ -189,9 +239,21 @@ function Approvals() {
             </div>
           </Loader>
         </CustomTabPanel>
+
+        {/* ---------- TAB 6 (NEW) ---------- */}
+        <CustomTabPanel value={value} index={5}>
+          <Loader loading={loading}>
+            <h1 className="admin__title">Edit Attendance</h1>
+            <p className="admin__description">
+              Create or modify attendance records for users.
+            </p>
+            <EditAttendanceAdmin />
+          </Loader>
+        </CustomTabPanel>
       </div>
     </DashboardLayout>
   );
 }
 
 export default Approvals;
+  

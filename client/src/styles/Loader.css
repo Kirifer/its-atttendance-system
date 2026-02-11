@@ -1,0 +1,43 @@
+.loader {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999; /* Prevent other css from bypassing */
+  pointer-events: all; /* Prevents click when loader is active */
+}
+
+.spinner {
+  border: 8px solid rgba(0, 0, 0, 0.2);
+  border-top: 8px solid #62a6ff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile Portrait */
+@media (max-width: 480px) and (orientation: portrait) {
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border-width: 6px;
+  }
+}
+
+/* Mobile Landscape */
+@media (max-width: 812px) and (orientation: landscape) {
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 5px;
+  }
+}

@@ -1,6 +1,7 @@
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../../context/UserContext";
+import "../../styles/NavbarLoader.css";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -8,6 +9,7 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const { user, setUser } = useContext(UserContext);
+  const [loading, setLoading] = useState(true);
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
@@ -15,6 +17,19 @@ export default function Navbar() {
     setUser(null);
     navigate("/");
   };
+
+  useEffect(() => {
+    if (user) setLoading(false);
+  }, [user]);
+
+  if (loading)
+    return (
+      <nav className="navbar">
+        <div className="navbar-loading">
+          <div className="navbar-spinner"></div>
+        </div>
+      </nav>
+    );
 
   if (!user) return null;
 
@@ -39,11 +54,13 @@ export default function Navbar() {
           <Link to="/timesheet">Timesheet</Link>
         </li>
 
-        <li className="navbar__item">
-          <Link to="/time-off">Time-off</Link>
-        </li>
+        {user.role === "USER" && (
+          <li className="navbar__item">
+            <Link to="/time-off">Time-off</Link>
+          </li>
+        )}
 
-        {user.role === "ADMIN" && (
+        {(user.role === "ADMIN" || user.role === "SUPERVISOR") && (
           <li className="navbar__item">
             <Link to="/approvals">Approvals</Link>
           </li>
