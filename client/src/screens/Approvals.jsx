@@ -23,6 +23,7 @@ import useIsDesktop from "../hooks/useIsDesktop.js";
 import PendingApprovals from "../components/PendingApprovals.jsx";
 import { getAllStaffUsers } from "../api/auth";
 import EditAttendanceAdmin from "../components/EditAttendanceAdmin"; // ✅ NEW
+import ArchiveList from "../components/ArchiveList";
 
 function CustomTabPanel({ children, value, index }) {
   return (
@@ -48,13 +49,14 @@ function Approvals() {
   const [visibleUserIds, setVisibleUserIds] = useState(null);
   const isAdmin = currentUser?.role === "ADMIN";
 
-  // ✅ allow tab 5 now
+  // ✅ updated maxTab (new Archive List tab added)
   const getTabFromUrl = () => {
     const params = new URLSearchParams(location.search);
     const tab = parseInt(params.get("tab"), 10);
-    const maxTab = isAdmin ? 5 : 4; 
+    const maxTab = isAdmin ? 6 : 4;
     return !isNaN(tab) && tab >= 0 && tab <= maxTab ? tab : 0;
   };
+
   const [value, setValue] = useState(getTabFromUrl());
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,25 +69,23 @@ function Approvals() {
   };
 
   const fetchLeaves = useCallback(async () => {
-      try {
-        setLoading(true);
-        if (isSupervisor && supervisorDept && visibleUserIds === null) {
-          return;
-        }
-        const data = await getAllLeaves();
-        if (visibleUserIds instanceof Set) {
-          setLeaves(
-            (data || []).filter((l) => visibleUserIds.has(l.user?.id)),
-          );
-        } else {
-          setLeaves(data);
-        }
-      } catch (err) {
-        console.error("Error fetching leaves:", err);
-      } finally {
-        setLoading(false);
+    try {
+      setLoading(true);
+      if (isSupervisor && supervisorDept && visibleUserIds === null) {
+        return;
       }
-    }, [isSupervisor, supervisorDept, visibleUserIds]);
+      const data = await getAllLeaves();
+      if (visibleUserIds instanceof Set) {
+        setLeaves((data || []).filter((l) => visibleUserIds.has(l.user?.id)));
+      } else {
+        setLeaves(data);
+      }
+    } catch (err) {
+      console.error("Error fetching leaves:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [isSupervisor, supervisorDept, visibleUserIds]);
 
   useEffect(() => {
     fetchLeaves();
@@ -145,6 +145,7 @@ function Approvals() {
             <Tab label="Admin Management" {...a11yProps(3)} />
             <Tab label="Intern Management" {...a11yProps(4)} />
             {isAdmin && <Tab label="Edit Attendance" {...a11yProps(5)} />}
+            {isAdmin && <Tab label="Archive List" {...a11yProps(6)} />}
           </Tabs>
         </Box>
 
@@ -233,7 +234,7 @@ function Approvals() {
           </Loader>
         </CustomTabPanel>
 
-        {/* ---------- TAB 6 (NEW) ---------- */}
+        {/* ---------- TAB 6 ---------- */}
         <CustomTabPanel value={value} index={5}>
           <Loader loading={loading}>
             <h1 className="admin__title">Edit Attendance</h1>
@@ -242,6 +243,12 @@ function Approvals() {
             </p>
             <EditAttendanceAdmin />
           </Loader>
+        </CustomTabPanel>
+
+        {/* ---------- TAB 7 (NEW ARCHIVE LIST) ---------- */}
+        {/* ---------- TAB 7 (ARCHIVE LIST) ---------- */}
+        <CustomTabPanel value={value} index={6}>
+          <ArchiveList />
         </CustomTabPanel>
       </div>
     </DashboardLayout>

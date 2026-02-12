@@ -43,7 +43,11 @@ function AdminCRUD() {
     try {
       await API.put(`/admins/resign/${id}`);
       fetchUsers();
-      showToast({ message: `${username} resigned`, type: "success", color: "#fff" });
+      showToast({
+        message: `${username} resigned`,
+        type: "success",
+        color: "#fff",
+      });
     } catch (err) {
       showToast({ message: "Failed to resign", type: "error", color: "#fff" });
     }
@@ -54,9 +58,17 @@ function AdminCRUD() {
     try {
       await API.put(`/admins/reinstate/${id}`);
       fetchUsers();
-      showToast({ message: `${username} reinstated`, type: "success", color: "#fff" });
+      showToast({
+        message: `${username} reinstated`,
+        type: "success",
+        color: "#fff",
+      });
     } catch (err) {
-      showToast({ message: "Failed to reinstate", type: "error", color: "#fff" });
+      showToast({
+        message: "Failed to reinstate",
+        type: "error",
+        color: "#fff",
+      });
     }
   };
 
@@ -67,7 +79,49 @@ function AdminCRUD() {
       fetchUsers();
       showToast({ message: "Role updated", type: "success", color: "#fff" });
     } catch {
-      showToast({ message: "Failed to change role", type: "error", color: "#fff" });
+      showToast({
+        message: "Failed to change role",
+        type: "error",
+        color: "#fff",
+      });
+    }
+  };
+
+  const handleArchive = async (id, username) => {
+    if (!window.confirm(`Archive ${username}?`)) return;
+    try {
+      await API.put(`/admins/archive/${id}`);
+      fetchUsers();
+      showToast({
+        message: `${username} archived`,
+        type: "success",
+        color: "#fff",
+      });
+    } catch {
+      showToast({
+        message: "Failed to archive user",
+        type: "error",
+        color: "#fff",
+      });
+    }
+  };
+
+  const handleUnarchive = async (id, username) => {
+    if (!window.confirm(`Unarchive ${username}?`)) return;
+    try {
+      await API.put(`/admins/unarchive/${id}`);
+      fetchUsers();
+      showToast({
+        message: `${username} unarchived`,
+        type: "success",
+        color: "#fff",
+      });
+    } catch {
+      showToast({
+        message: "Failed to unarchive user",
+        type: "error",
+        color: "#fff",
+      });
     }
   };
 
@@ -96,11 +150,19 @@ function AdminCRUD() {
         position: selectedUser.position,
         supervisor: selectedUser.supervisor,
       });
-      showToast({ message: "User info updated", type: "success", color: "#fff" });
+      showToast({
+        message: "User info updated",
+        type: "success",
+        color: "#fff",
+      });
       closeModal();
       fetchUsers();
     } catch {
-      showToast({ message: "Failed to update user", type: "error", color: "#fff" });
+      showToast({
+        message: "Failed to update user",
+        type: "error",
+        color: "#fff",
+      });
     } finally {
       setSaving(false);
     }
@@ -119,26 +181,26 @@ function AdminCRUD() {
   return (
     <>
       <div className="crud-table-container">
-  {/* FIXED SEARCH */}
-  <div className="crud-table__search-wrapper">
-    <div className="crud-table__search">
-      <select
-        value={filterType}
-        onChange={(e) => setFilterType(e.target.value)}
-        className="crud-table__dropdown"
-      >
-        <option value="username">Username</option>
-        <option value="email">Email</option>
-      </select>
+        {/* FIXED SEARCH */}
+        <div className="crud-table__search-wrapper">
+          <div className="crud-table__search">
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="crud-table__dropdown"
+            >
+              <option value="username">Username</option>
+              <option value="email">Email</option>
+            </select>
 
-      <input
-        placeholder={`Search by ${filterType}`}
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        className="crud-table__input"
-      />
-    </div>
-  </div>
+            <input
+              placeholder={`Search by ${filterType}`}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="crud-table__input"
+            />
+          </div>
+        </div>
         <div className="crud-table-scroll">
           <table className="crud-table">
             <thead>
@@ -157,7 +219,13 @@ function AdminCRUD() {
                   <td>{u.username}</td>
                   <td>{u.email}</td>
                   <td>{u.role}</td>
-                  <td className={u.resignedAt ? "crud-table__status--rejected" : "crud-table__status--approved"}>
+                  <td
+                    className={
+                      u.resignedAt
+                        ? "crud-table__status--rejected"
+                        : "crud-table__status--approved"
+                    }
+                  >
                     {u.resignedAt ? "Resigned" : "Active"}
                   </td>
 
@@ -225,7 +293,7 @@ function AdminCRUD() {
                       </>
                     )}
 
-                    {(!isSupervisor) || (isSupervisor && u.role !== "ADMIN") ? (
+                    {!isSupervisor || (isSupervisor && u.role !== "ADMIN") ? (
                       <span
                         className="material-symbols-outlined crud-action crud-action--edit"
                         title="Edit Info"
@@ -254,6 +322,15 @@ function AdminCRUD() {
                             person_remove
                           </span>
                         )}
+
+                        {/* ✅ ADDED ARCHIVE BUTTON */}
+                        <span
+                          className="material-symbols-outlined crud-action crud-action--archive"
+                          title="Archive User"
+                          onClick={() => handleArchive(u.id, u.username)}
+                        >
+                          archive
+                        </span>
                       </>
                     )}
                   </td>
@@ -295,7 +372,9 @@ function AdminCRUD() {
             />
 
             <div className="admin-modal__actions">
-              <button onClick={closeModal} disabled={saving}>Cancel</button>
+              <button onClick={closeModal} disabled={saving}>
+                Cancel
+              </button>
               <button onClick={handleSaveInfo} disabled={saving}>
                 {saving ? "Saving..." : "Save"}
               </button>
