@@ -34,47 +34,46 @@ function UserRequests() {
   const [leaveFilterType, setLeaveFilterType] = useState("leaveType");
   const [leaveQuery, setLeaveQuery] = useState("");
 
-  const user = JSON.parse(localStorage.getItem("user"));
-
   const [value, setValue] = useState(0);
   const [loading, setLoading] = useState(true);
   const handleChange = (_, newValue) => setValue(newValue);
-
-  const fetchMyRequests = async () => {
-    try {
-      setLoading(true);
-      const response = await API.get("/time-adjustments/my-requests");
-      const myRequests = response.data.requests.filter(
-        (r) => r.userId === user.id
-      );
-      setUserRequests(myRequests);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
+    const fetchMyRequests = async () => {
+      try {
+        setLoading(true);
+        const response = await API.get("/time-adjustments/my-requests");
+        const myRequests = response.data.requests.filter(
+          (r) => r.userId === user.id
+        );
+        setUserRequests(myRequests);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMyRequests();
-  }, []);
-
-  const fetchMyLeaves = async () => {
-    try {
-      setLoading(true);
-      const response = await API.get("/leave");
-      const myLeaves = response.data.filter((l) => l.user?.id === user.id);
-      setLeaves(myLeaves);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [user.id]);
 
   useEffect(() => {
+    const fetchMyLeaves = async () => {
+      try {
+        setLoading(true);
+        const response = await API.get("/leave");
+        const myLeaves = response.data.filter((l) => l.user?.id === user.id);
+        setLeaves(myLeaves);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMyLeaves();
-  }, []);
+  }, [user.id]);
 
   return (
     <DashboardLayout>

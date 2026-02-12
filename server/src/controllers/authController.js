@@ -233,7 +233,10 @@ export const forgotPassword = async (req, res) => {
     }
 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      pool: true,
+      host: "mail.privateemail.com",
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -242,6 +245,7 @@ export const forgotPassword = async (req, res) => {
 
     await transporter.sendMail({
       to: email,
+      sender: process.env.EMAIL_USER,
       subject: "IT Squarehub Password Reset OTP",
       html: `
           <h3>Password Reset OTP Code</h3>

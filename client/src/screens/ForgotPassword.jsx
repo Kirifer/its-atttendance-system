@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { forgotPassword, verifyOtp } from "../api/auth";
 import "../styles/ForgotPassword.css";
 import Loader from "../components/Loader";
-import API from "../api/api";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");

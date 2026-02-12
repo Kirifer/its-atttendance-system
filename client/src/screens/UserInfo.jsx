@@ -10,7 +10,7 @@ import UserInfoLoader from "../components/UserInfoLoader";
 
 const UserInfo = () => {
   const [user, setUser] = useState(null); // real-time update
-  const { user: contextUser, setUser: setContextUser } =
+  const { setUser: setContextUser } =
     useContext(UserContext);
 
   // Edit state

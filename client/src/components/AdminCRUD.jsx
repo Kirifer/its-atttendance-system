@@ -18,7 +18,6 @@ function AdminCRUD() {
   const [saving, setSaving] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
-  const currentUserId = currentUser?.id;
   const isSupervisor = currentUser?.role === "SUPERVISOR";
 
   const fetchUsers = async () => {

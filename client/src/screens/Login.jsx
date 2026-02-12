@@ -6,7 +6,6 @@ import { UserContext } from "../context/UserContext";
 import "../styles/Login.css";
 import PasswordInput from "../components/PasswordInput";
 import Loader from "../components/Loader";
-import API from "../api/api";
 
 function Login() {
   const [email, setEmail] = useState("");

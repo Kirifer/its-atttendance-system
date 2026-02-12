@@ -16,7 +16,6 @@ export default function SetOJTHoursDesktop() {
     setTotalOJTHours,
     remainingWorkHours,
     saveOjtHours,
-    resetState,
     clearMessages,
     loading,
     error,

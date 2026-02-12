@@ -9,27 +9,27 @@ import "../styles/TimeAdjustmentModal.css";
 
 function Timesheet() {
   const user = JSON.parse(localStorage.getItem("user"));
-  const [reload, setReload] = useState(false);
+  const [reload] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [timeAdjustments, setTimeAdjustments] = useState([]);
+  const [setTimeAdjustments] = useState([]);
 
   const isStaff = user?.role === "ADMIN" || user?.role === "SUPERVISOR";
 
-  // fetch requests
-  const fetchRequests = async () => {
-    try {
-      const response = await API.get("/time-adjustments");
-      setTimeAdjustments(response.data.requests);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
+    // fetch requests
+    const fetchRequests = async () => {
+      try {
+        const response = await API.get("/time-adjustments");
+        setTimeAdjustments(response.data.requests);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
     fetchRequests();
-  }, []);
+  }, [setTimeAdjustments]);
 
   // Date range
   const firstDay = new Date(

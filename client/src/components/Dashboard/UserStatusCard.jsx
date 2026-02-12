@@ -27,7 +27,7 @@ export default function UserStatusCard({ reload }) {
       .then((data) => setUsers(data))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
-  }, [reload, isAdminOrSupervisor]);
+  }, [reload, isAdminOrSupervisor, user]);
 
   /* ===============================
      Load visible users for supervisor

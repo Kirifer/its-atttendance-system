@@ -27,7 +27,7 @@ export default function FiledLeavesCard() {
     };
 
     loadData();
-  }, []);
+  }, [leaves]);
 
   return (
     <div className="filed-leaves-card">
