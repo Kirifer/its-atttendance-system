@@ -11,7 +11,6 @@ function EditAttendanceAdmin() {
   const [selectedUser, setSelectedUser] = useState("");
   const [date, setDate] = useState("");
   const [records, setRecords] = useState([]);
-  const [setDeletingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
@@ -173,7 +172,6 @@ function EditAttendanceAdmin() {
     if (!confirmDelete) return;
 
     try {
-      setDeletingId(id);
       await axios.delete(`/attendance/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -181,8 +179,6 @@ function EditAttendanceAdmin() {
     } catch (err) {
       console.error(err);
       alert("Failed deleting attendance");
-    } finally {
-      setDeletingId(null);
     }
   };
 
