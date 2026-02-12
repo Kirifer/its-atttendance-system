@@ -22,6 +22,7 @@ import useUserSchedule from "../hooks/useUserSchedule.js";
 import useIsDesktop from "../hooks/useIsDesktop.js";
 import PendingApprovals from "../components/PendingApprovals.jsx";
 import { getAllStaffUsers } from "../api/auth";
+import EditAttendanceAdmin from "../components/EditAttendanceAdmin"; // ✅ NEW
 
 function CustomTabPanel({ children, value, index }) {
   return (
@@ -45,31 +46,19 @@ function Approvals() {
   const isSupervisor = currentUser?.role === "SUPERVISOR";
   const supervisorDept = currentUser?.department;
   const [visibleUserIds, setVisibleUserIds] = useState(null);
+  const isAdmin = currentUser?.role === "ADMIN";
 
-  // Sync state with URL on page load/refresh
-  useEffect(() => {
-    // Read tab from URL query parameter, default to 0
-    const getTabFromUrl = () => {
-      const params = new URLSearchParams(location.search);
-      const tab = parseInt(params.get("tab"), 10);
-      return !isNaN(tab) && tab >= 0 && tab <= 4 ? tab : 0;
-    };
-
-    setValue(getTabFromUrl());
-  }, [location.search]);
-
-  // Read tab from URL query parameter, default to 0
+  // ✅ allow tab 5 now
   const getTabFromUrl = () => {
     const params = new URLSearchParams(location.search);
     const tab = parseInt(params.get("tab"), 10);
-    return !isNaN(tab) && tab >= 0 && tab <= 4 ? tab : 0;
+    const maxTab = isAdmin ? 5 : 4; 
+    return !isNaN(tab) && tab >= 0 && tab <= maxTab ? tab : 0;
   };
-
   const [value, setValue] = useState(getTabFromUrl());
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Update URL when tab changes
   const handleChange = (_, newValue) => {
     setValue(newValue);
     const params = new URLSearchParams(location.search);
@@ -114,9 +103,7 @@ function Approvals() {
       }
       const data = await getAllLeaves();
       if (visibleUserIds instanceof Set) {
-        setLeaves(
-          (data || []).filter((l) => visibleUserIds.has(l.user?.id)),
-        );
+        setLeaves((data || []).filter((l) => visibleUserIds.has(l.user?.id)));
       } else {
         setLeaves(data);
       }
@@ -139,7 +126,6 @@ function Approvals() {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userSchedule = useUserSchedule();
-
   const isDesktop = useIsDesktop();
 
   useEffect(() => {
@@ -152,11 +138,7 @@ function Approvals() {
         const users = await getAllStaffUsers();
         const allowed = new Set(
           (users || [])
-            .filter(
-              (u) =>
-                u.role === "USER" &&
-                u.department === supervisorDept,
-            )
+            .filter((u) => u.role === "USER" && u.department === supervisorDept)
             .map((u) => u.id),
         );
         setVisibleUserIds(allowed);
@@ -185,6 +167,7 @@ function Approvals() {
             <Tab label="Time-off Requests" {...a11yProps(2)} />
             <Tab label="Admin Management" {...a11yProps(3)} />
             <Tab label="Intern Management" {...a11yProps(4)} />
+            {isAdmin && <Tab label="Edit Attendance" {...a11yProps(5)} />}
           </Tabs>
         </Box>
 
@@ -270,6 +253,17 @@ function Approvals() {
                 </>
               )}
             </div>
+          </Loader>
+        </CustomTabPanel>
+
+        {/* ---------- TAB 6 (NEW) ---------- */}
+        <CustomTabPanel value={value} index={5}>
+          <Loader loading={loading}>
+            <h1 className="admin__title">Edit Attendance</h1>
+            <p className="admin__description">
+              Create or modify attendance records for users.
+            </p>
+            <EditAttendanceAdmin />
           </Loader>
         </CustomTabPanel>
       </div>

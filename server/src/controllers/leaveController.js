@@ -1,6 +1,6 @@
 import { PrismaClient, LeaveStatus, LeaveCoverage } from "@prisma/client";
 import multer from "multer";
-import { uploadToFirebase } from "../utils/firebase/uploadToFirebase.js";
+import { uploadToS3 } from "../utils/s3/uploadToS3.js";
 
 const prisma = new PrismaClient();
 
@@ -41,10 +41,17 @@ const autoCreateAttendanceOnLeave = async (leave) => {
   while (date <= end) {
     const day = date.getDay();
     if (day !== 0 && day !== 6) {
+      const normalized = new Date(date.setHours(0, 0, 0, 0));
+
       await prisma.attendance.upsert({
-        where: { userId_date: { userId, date: new Date(date.setHours(0, 0, 0, 0)) } },
+        where: { userId_date: { userId, date: normalized } },
         update: { status: "ON_LEAVE", leaveId: leave.id },
-        create: { userId, date: new Date(date.setHours(0, 0, 0, 0)), status: "ON_LEAVE", leaveId: leave.id },
+        create: {
+          userId,
+          date: normalized,
+          status: "ON_LEAVE",
+          leaveId: leave.id,
+        },
       });
     }
     date.setDate(date.getDate() + 1);
@@ -53,11 +60,9 @@ const autoCreateAttendanceOnLeave = async (leave) => {
 
 // Remove ON_LEAVE attendance and update user's onLeave status
 const removeOnLeaveAttendance = async (leaveId, userId) => {
-
   await prisma.attendance.deleteMany({
     where: { leaveId, status: "ON_LEAVE" },
   });
-
 
   await updateUserOnLeaveStatus(userId);
 };
@@ -74,7 +79,7 @@ export const createLeave = async (req, res) => {
     }
 
     const attachmentUrl = req.file
-      ? await uploadToFirebase(req.file, "leave-attachments")
+      ? await uploadToS3(req.file, "leave-attachments")
       : null;
 
     const leave = await prisma.leave.create({
@@ -90,8 +95,6 @@ export const createLeave = async (req, res) => {
     });
 
     res.status(201).json(leave);
-    console.log("FILE:", req.file);
-    console.log("BODY:", req.body);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error creating leave" });
@@ -111,7 +114,9 @@ export const getLeaves = async (req, res) => {
     let leaves = await prisma.leave.findMany({
       where: filters,
       orderBy: { createdAt: "desc" },
-      include: { user: { select: { id: true, username: true, email: true } } },
+      include: {
+        user: { select: { id: true, username: true, email: true } },
+      },
     });
 
     leaves = leaves.map((leave) => ({
@@ -130,19 +135,26 @@ export const getLeaves = async (req, res) => {
 // Update leave status
 export const updateLeaveStatus = async (req, res) => {
   try {
-    if (req.user.role !== "ADMIN") return res.status(403).json({ message: "Access denied. Admin only." });
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Access denied. Admin only." });
+    }
 
     const { id } = req.params;
     const { status } = req.body;
     const upperStatus = status.toUpperCase();
 
-    if (!Object.values(LeaveStatus).includes(upperStatus)) return res.status(400).json({ message: "Invalid status" });
+    if (!Object.values(LeaveStatus).includes(upperStatus)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
 
-    const leave = await prisma.leave.update({ where: { id }, data: { status: upperStatus } });
+    const leave = await prisma.leave.update({
+      where: { id },
+      data: { status: upperStatus },
+    });
 
     if (upperStatus === "APPROVED") {
-      await autoCreateAttendanceOnLeave(leave); // still create attendance logs
-      await updateUserOnLeaveStatus(leave.userId); // set onLeave only if today is within leave period
+      await autoCreateAttendanceOnLeave(leave);
+      await updateUserOnLeaveStatus(leave.userId);
     } else if (upperStatus === "REJECTED") {
       await removeOnLeaveAttendance(leave.id, leave.userId);
     }
@@ -157,20 +169,26 @@ export const updateLeaveStatus = async (req, res) => {
 // Delete leave
 export const deleteLeave = async (req, res) => {
   try {
-    if (req.user.role !== "ADMIN") return res.status(403).json({ message: "Access denied. Admin only." });
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Access denied. Admin only." });
+    }
 
-    const leave = await prisma.leave.findUnique({ where: { id: req.params.id } });
-    if (!leave) return res.status(404).json({ message: "Leave not found" });
+    const leave = await prisma.leave.findUnique({
+      where: { id: req.params.id },
+    });
+
+    if (!leave) {
+      return res.status(404).json({ message: "Leave not found" });
+    }
 
     const userId = leave.userId;
 
-    // Remove ON_LEAVE attendance first
     await removeOnLeaveAttendance(leave.id, userId);
-
-    // Then delete the leave
     await prisma.leave.delete({ where: { id: leave.id } });
 
-    const updatedUser = await prisma.user.findUnique({ where: { id: userId } });
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: userId },
+    });
 
     res.json({ message: "Leave deleted successfully", user: updatedUser });
   } catch (error) {

@@ -3,6 +3,7 @@ import API from "../api/api";
 import "../styles/TimeAdjustmentTable.css";
 import { showToast } from "./Notification/toast";
 import { getAllStaffUsers } from "../api/auth";
+import { viewDocument } from "../api/getFile";
 
 <link
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
@@ -55,11 +56,7 @@ function TimeAdjustmentTable() {
         const users = await getAllStaffUsers();
         const allowed = new Set(
           (users || [])
-            .filter(
-              (u) =>
-                u.role === "USER" &&
-                u.department === supervisorDept,
-            )
+            .filter((u) => u.role === "USER" && u.department === supervisorDept)
             .map((u) => u.id),
         );
         setVisibleUserIds(allowed);
@@ -70,11 +67,10 @@ function TimeAdjustmentTable() {
     loadUsers();
   }, [isSupervisor, supervisorDept]);
 
-
   const handleUpdateStatus = async (id, status) => {
     if (
       !window.confirm(
-        `Are you sure you want to ${status.toLowerCase()} this request?`
+        `Are you sure you want to ${status.toLowerCase()} this request?`,
       )
     )
       return;
@@ -83,7 +79,7 @@ function TimeAdjustmentTable() {
       await API.put(`/time-adjustments/${id}/status`, { status });
 
       setAllRequests((prev) =>
-        prev.map((req) => (req.id === id ? { ...req, status } : req))
+        prev.map((req) => (req.id === id ? { ...req, status } : req)),
       );
 
       showToast({
@@ -138,24 +134,24 @@ function TimeAdjustmentTable() {
     visibleUserIds instanceof Set
       ? (allRequests || []).filter((r) => visibleUserIds.has(r.user?.id))
       : isSupervisor && supervisorDept
-      ? []
-      : allRequests || [];
+        ? []
+        : allRequests || [];
 
   const filteredRequests = scopedRequests.filter((req) => {
     const value =
       filterType === "id"
         ? String(req.id)
         : filterType === "type"
-        ? req.type
-        : filterType === "details"
-        ? req.details
-        : filterType === "status"
-        ? req.status
-        : // : filterType === "createdAt"
-        // ? req.createdAt
-        filterType === "user" || filterType === "username"
-        ? req.user?.username || ""
-        : "";
+          ? req.type
+          : filterType === "details"
+            ? req.details
+            : filterType === "status"
+              ? req.status
+              : // : filterType === "createdAt"
+                // ? req.createdAt
+                filterType === "user" || filterType === "username"
+                ? req.user?.username || ""
+                : "";
 
     return value.toLowerCase().includes(query.toLowerCase());
   });
@@ -237,7 +233,8 @@ function TimeAdjustmentTable() {
                           req.endTime && (
                             <div className="time-table__shift-info">
                               <small>
-                                {new Date(req.shiftDate).toLocaleDateString()} <br />
+                                {new Date(req.shiftDate).toLocaleDateString()}{" "}
+                                <br />
                                 {req.startTime} – {req.endTime}
                               </small>
                             </div>
@@ -267,13 +264,18 @@ function TimeAdjustmentTable() {
                     {/* Attachment Header */}
                     <td style={{ whiteSpace: "nowrap" }}>
                       {fullAttachmentUrl ? (
-                        <a
-                          href={fullAttachmentUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={() => viewDocument(fullAttachmentUrl)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "#007bff",
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                          }}
                         >
                           View / Download
-                        </a>
+                        </button>
                       ) : (
                         "No Attachment"
                       )}
@@ -281,7 +283,6 @@ function TimeAdjustmentTable() {
 
                     {/* Actions Header */}
                     <td className="time-table__actions">
-
                       <>
                         <span
                           className="material-symbols-outlined time-table__approve"
