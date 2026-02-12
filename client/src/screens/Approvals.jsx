@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -66,12 +66,7 @@ function Approvals() {
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
 
-  useEffect(() => {
-    const currentUser = JSON.parse(localStorage.getItem("user"));
-    const isSupervisor = currentUser?.role === "SUPERVISOR";
-    const supervisorDept = currentUser?.department;
-
-    const fetchLeaves = async () => {
+  const fetchLeaves = useCallback(async () => {
       try {
         setLoading(true);
         if (isSupervisor && supervisorDept && visibleUserIds === null) {
@@ -90,29 +85,11 @@ function Approvals() {
       } finally {
         setLoading(false);
       }
-    };
+    }, [isSupervisor, supervisorDept, visibleUserIds]);
 
+  useEffect(() => {
     fetchLeaves();
-  }, [visibleUserIds]);
-
-  const fetchLeaves = async () => {
-    try {
-      setLoading(true);
-      if (isSupervisor && supervisorDept && visibleUserIds === null) {
-        return;
-      }
-      const data = await getAllLeaves();
-      if (visibleUserIds instanceof Set) {
-        setLeaves((data || []).filter((l) => visibleUserIds.has(l.user?.id)));
-      } else {
-        setLeaves(data);
-      }
-    } catch (err) {
-      console.error("Error fetching leaves:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [fetchLeaves]);
 
   const handleStatusUpdate = async (id, status) => {
     await updateLeaveStatus(id, status);

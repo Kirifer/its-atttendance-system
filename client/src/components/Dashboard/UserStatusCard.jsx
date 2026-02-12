@@ -20,10 +20,6 @@ export default function UserStatusCard({ reload }) {
      Fetch login status
      =============================== */
   useEffect(() => {
-
-  const isAdminOrSupervisor =
-    user?.role === "ADMIN" || user?.role === "SUPERVISOR";
-    
     if (!isAdminOrSupervisor) return;
 
     setLoading(true);
@@ -31,7 +27,7 @@ export default function UserStatusCard({ reload }) {
       .then((data) => setUsers(data))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
-  }, [reload, isAdminOrSupervisor]);
+  }, [reload, isAdminOrSupervisor, user]);
 
   /* ===============================
      Load visible users for supervisor

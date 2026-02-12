@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import axios from "../api/api";
 import "../styles/AttendanceTable.css";
 import Box from "@mui/material/Box";
@@ -11,7 +11,7 @@ function EditAttendanceAdmin() {
   const [selectedUser, setSelectedUser] = useState("");
   const [date, setDate] = useState("");
   const [records, setRecords] = useState([]);
-  const [deletingId, setDeletingId] = useState(null);
+  const [setDeletingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
@@ -47,7 +47,7 @@ function EditAttendanceAdmin() {
     fetchUsers();
   }, [token]);
 
-  const loadAttendance = async () => {
+  const loadAttendance = useCallback(async () => {
     if (!selectedUser) return;
     try {
       const res = await axios.get(`/attendance/${selectedUser}`, {
@@ -57,11 +57,11 @@ function EditAttendanceAdmin() {
     } catch (err) {
       console.error("Failed loading attendance:", err);
     }
-  };
+  }, [selectedUser, token]);
 
   useEffect(() => {
     loadAttendance();
-  }, [selectedUser]);
+  }, [loadAttendance]);
 
   const handleChange = (e) => {
     setForm({

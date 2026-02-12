@@ -37,10 +37,9 @@ function UserRequests() {
   const [value, setValue] = useState(0);
   const [loading, setLoading] = useState(true);
   const handleChange = (_, newValue) => setValue(newValue);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-
     const fetchMyRequests = async () => {
       try {
         setLoading(true);
@@ -57,11 +56,9 @@ function UserRequests() {
     };
 
     fetchMyRequests();
-  }, []);
+  }, [user.id]);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-
     const fetchMyLeaves = async () => {
       try {
         setLoading(true);
@@ -76,7 +73,7 @@ function UserRequests() {
     };
 
     fetchMyLeaves();
-  }, []);
+  }, [user.id]);
 
   return (
     <DashboardLayout>
