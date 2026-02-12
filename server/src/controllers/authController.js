@@ -156,6 +156,12 @@ export const login = async (req, res) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(400).json({ message: "User does not exist!" });
 
+    if (user.isArchive) {
+      return res.status(403).json({
+        message: "This account has been archived by administrator.",
+      });
+    }
+
     // Block resigned admins from logging in
     if (user.resignedAt)
       return res.status(403).json({ message: "This admin has been resigned." });
@@ -472,7 +478,11 @@ export const getAllUsers = async (req, res) => {
     }
 
     const users = await prisma.user.findMany({
-      where: { role: "USER" }, // Only normal users
+      where: {
+        role: "USER",
+        isArchive: false,
+      },
+      // Only normal users
       select: { id: true, email: true, username: true },
       orderBy: { email: "asc" },
     });
@@ -492,7 +502,11 @@ export const getAllAdminUsers = async (req, res) => {
     }
 
     const admins = await prisma.user.findMany({
-      where: { role: "ADMIN" }, // Admin users
+      where: {
+        role: "ADMIN",
+        isArchive: false,
+      },
+      // Admin users
       select: { id: true, email: true, username: true, resignedAt: true },
       orderBy: { email: "asc" },
     });
@@ -511,12 +525,14 @@ export const getAllUsersWithRoles = async (req, res) => {
     }
 
     const users = await prisma.user.findMany({
+      // ✅ REMOVE isArchive filter so archive page can see archived users
       select: {
         id: true,
         username: true,
         email: true,
         role: true,
         resignedAt: true,
+        isArchive: true, // ⭐ VERY IMPORTANT
       },
       orderBy: { email: "asc" },
     });
@@ -527,3 +543,4 @@ export const getAllUsersWithRoles = async (req, res) => {
     res.status(500).json({ message: "Error fetching users" });
   }
 };
+

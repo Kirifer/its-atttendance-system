@@ -35,18 +35,19 @@ model User {
   reset_token        String?
   reset_token_expiry DateTime?
   onLeave            Boolean   @default(false) 
-  totalOJTHours      Float?     @default(0)
+  totalOJTHours      Float?    @default(0)
   remainingWorkHours Float?    @default(0)
   isApproved         Boolean   @default(false)
-  resignedAt  DateTime? 
-  leaves      Leave[]
-  attendance  Attendance[]
-  timeAdjustments TimeAdjustment[]
-  schedules   UserSchedule[]
-  otp_hash          String?
-  otp_expiry        DateTime?
-  reset_uuid        String?
-  reset_uuid_expiry DateTime?    
+  resignedAt         DateTime?
+  isArchive          Boolean   @default(false)
+  leaves             Leave[]
+  attendance         Attendance[]
+  timeAdjustments    TimeAdjustment[]
+  schedules          UserSchedule[]
+  otp_hash           String?
+  otp_expiry         DateTime?
+  reset_uuid         String?
+  reset_uuid_expiry  DateTime?    
 }
 
 enum LeaveStatus {
@@ -68,18 +69,18 @@ enum LeaveCoverage {
 } 
 
 model Leave {
-  id        String      @id @default(uuid())
-  userId    String
-  user      User        @relation(fields: [userId], references: [id])
-  startDate DateTime
-  endDate   DateTime
-  leaveType LeaveType
-  status    LeaveStatus @default(PENDING)
-  reason    String?
+  id         String      @id @default(uuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id])
+  startDate  DateTime
+  endDate    DateTime
+  leaveType  LeaveType
+  status     LeaveStatus @default(PENDING)
+  reason     String?
   attachment String? 
   coverage   LeaveCoverage @default(FULL_DAY)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 
   attendance Attendance[]
 
@@ -97,7 +98,7 @@ enum AttendanceStatus {
 model Attendance {
   id      String             @id @default(uuid())
   userId  String
-  user    User             @relation(fields: [userId], references: [id])
+  user    User               @relation(fields: [userId], references: [id])
   date    DateTime
   timeIn  DateTime?
   lunchOut DateTime?
@@ -105,13 +106,13 @@ model Attendance {
   breakOut DateTime?
   breakIn  DateTime?
   timeOut DateTime?
-  status  AttendanceStatus @default(PRESENT)
+  status  AttendanceStatus  @default(PRESENT)
 
-  tardinessMinutes        Int   @default(0)
-  lunchTardinessMinutes   Int   @default(0)
-  breakTardinessMinutes   Int @default(0)
-  straightWorkHours Float?
-  totalWorkHours Float? 
+  tardinessMinutes       Int   @default(0)
+  lunchTardinessMinutes  Int   @default(0)
+  breakTardinessMinutes  Int   @default(0)
+  straightWorkHours      Float?
+  totalWorkHours         Float? 
 
   leaveId String?
   leave   Leave?           @relation(fields: [leaveId], references: [id])

@@ -8,7 +8,11 @@ const prisma = new PrismaClient();
 export const getAdmins = async (req, res) => {
   try {
     const admins = await prisma.user.findMany({
-      where: { role: "ADMIN" },
+      where: {
+        role: "ADMIN",
+        isArchive: false,
+      },
+
       select: {
         id: true,
         username: true,
@@ -119,6 +123,8 @@ export const changeUserRole = async (req, res) => {
 export const getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
+      where: { isArchive: false },
+
       select: {
         id: true,
         username: true,
@@ -252,5 +258,51 @@ export const getTimesheetMeta = async (req, res) => {
     res.status(500).json({
       message: err.message || "Failed to fetch timesheet metadata",
     });
+  }
+};
+
+export const archiveUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (id === req.user.id) {
+      return res.status(400).json({ message: "You cannot archive yourself." });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    await prisma.user.update({
+      where: { id },
+      data: { isArchive: true },
+    });
+
+    res.json({ message: `${user.username} archived successfully.` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to archive user." });
+  }
+};
+
+export const unarchiveUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    await prisma.user.update({
+      where: { id },
+      data: { isArchive: false },
+    });
+
+    res.json({ message: `${user.username} unarchived successfully.` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to unarchive user." });
   }
 };
