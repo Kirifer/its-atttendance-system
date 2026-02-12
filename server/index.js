@@ -99,11 +99,9 @@ app.use(errorHandling);
 // ===============================
 // Server start
 // ===============================
-if (process.env.NODE_ENV !== "production") {
-  app.listen(port, () => {
+app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
     console.log("S3 bucket:", process.env.AWS_BUCKET_NAME || "NOT SET");
   });
-}
 
 export default app;
