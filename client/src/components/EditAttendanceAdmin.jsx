@@ -74,12 +74,13 @@ function EditAttendanceAdmin() {
     return `${date}T${timeValue}`;
   };
 
-  const extractTime = (value) => {
-    if (!value) return "";
-    const d = new Date(value);
-    return d.toISOString().substring(11, 16);
-  };
-
+const extractTime = (value) => {
+  if (!value) return "";
+  const d = new Date(value);
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
   const resetEditMode = () => {
     setEditingId(null);
     setDate("");
@@ -182,14 +183,18 @@ function EditAttendanceAdmin() {
     }
   };
 
-  const formatTime = (value) =>
-    value
-      ? new Date(value).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : "-";
+  const formatTime = (value) => {
+    if (!value) return "-";
 
+    const d = new Date(value);
+    const hours = d.getHours();
+    const minutes = d.getMinutes();
+
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const displayHour = hours % 12 || 12;
+
+    return `${String(displayHour).padStart(2, "0")}:${String(minutes).padStart(2, "0")} ${ampm}`;
+  };
   const formatDate = (value) =>
     value ? new Date(value).toLocaleDateString() : "-";
 
@@ -273,8 +278,8 @@ function EditAttendanceAdmin() {
               ? "Updating..."
               : "Saving..."
             : editingId
-            ? "Update Attendance"
-            : "Save Attendance"}
+              ? "Update Attendance"
+              : "Save Attendance"}
         </button>
 
         {editingId && (
