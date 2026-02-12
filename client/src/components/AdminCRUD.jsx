@@ -106,25 +106,6 @@ function AdminCRUD() {
     }
   };
 
-  const handleUnarchive = async (id, username) => {
-    if (!window.confirm(`Unarchive ${username}?`)) return;
-    try {
-      await API.put(`/admins/unarchive/${id}`);
-      fetchUsers();
-      showToast({
-        message: `${username} unarchived`,
-        type: "success",
-        color: "#fff",
-      });
-    } catch {
-      showToast({
-        message: "Failed to unarchive user",
-        type: "error",
-        color: "#fff",
-      });
-    }
-  };
-
   /* ================= MODAL ================= */
 
   const openEditModal = (user) => {
