@@ -71,16 +71,17 @@ function EditAttendanceAdmin() {
 
   const buildDateTime = (timeValue) => {
     if (!timeValue || !date) return null;
-    return `${date}T${timeValue}`;
+    const dateTimeString = `${date}T${timeValue}`;
+    const localDate = new Date(dateTimeString);
+    return localDate.toISOString(); 
   };
-
-const extractTime = (value) => {
-  if (!value) return "";
-  const d = new Date(value);
-  const hours = String(d.getHours()).padStart(2, '0');
-  const minutes = String(d.getMinutes()).padStart(2, '0');
-  return `${hours}:${minutes}`;
-};
+  const extractTime = (value) => {
+    if (!value) return "";
+    const d = new Date(value);
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
   const resetEditMode = () => {
     setEditingId(null);
     setDate("");
