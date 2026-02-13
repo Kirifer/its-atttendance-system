@@ -4,7 +4,10 @@ import { updateRemainingWorkHours } from "../utils/hoursOJT/updateRemainingWorkH
 
 const prisma = new PrismaClient();
 
-// get all admins
+
+// =========================
+// GET ADMINS
+// =========================
 export const getAdmins = async (req, res) => {
   try {
     const admins = await prisma.user.findMany({
@@ -12,7 +15,6 @@ export const getAdmins = async (req, res) => {
         role: "ADMIN",
         isArchive: false,
       },
-
       select: {
         id: true,
         username: true,
@@ -30,7 +32,10 @@ export const getAdmins = async (req, res) => {
   }
 };
 
-// resign admin
+
+// =========================
+// RESIGN USER (ADMIN / USER / SUPERVISOR)
+// =========================
 export const resignAdmin = async (req, res) => {
   try {
     const { id } = req.params;
@@ -39,9 +44,10 @@ export const resignAdmin = async (req, res) => {
       return res.status(400).json({ message: "Cannot resign yourself." });
     }
 
-    const admin = await prisma.user.findUnique({ where: { id } });
-    if (!admin || admin.role !== "ADMIN") {
-      return res.status(400).json({ message: "Admin not found." });
+    const user = await prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
     }
 
     await prisma.user.update({
@@ -49,14 +55,17 @@ export const resignAdmin = async (req, res) => {
       data: { resignedAt: new Date() },
     });
 
-    res.json({ message: `Admin ${admin.username} has been resigned.` });
+    res.json({ message: `${user.username} has been resigned.` });
   } catch (err) {
     console.error(err);
-    res.status(400).json({ message: "Error resigning admin!" });
+    res.status(400).json({ message: "Error resigning user!" });
   }
 };
 
-// reinstate admin
+
+// =========================
+// REINSTATE USER
+// =========================
 export const reinstateAdmin = async (req, res) => {
   try {
     const { id } = req.params;
@@ -65,9 +74,10 @@ export const reinstateAdmin = async (req, res) => {
       return res.status(400).json({ message: "Cannot reinstate yourself." });
     }
 
-    const admin = await prisma.user.findUnique({ where: { id } });
-    if (!admin || admin.role !== "ADMIN") {
-      return res.status(400).json({ message: "Admin not found." });
+    const user = await prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
     }
 
     await prisma.user.update({
@@ -75,14 +85,17 @@ export const reinstateAdmin = async (req, res) => {
       data: { resignedAt: null },
     });
 
-    res.json({ message: `Admin ${admin.username} has been reinstated.` });
+    res.json({ message: `${user.username} has been reinstated.` });
   } catch (err) {
     console.error(err);
-    res.status(400).json({ message: "Error reinstating admin!" });
+    res.status(400).json({ message: "Error reinstating user!" });
   }
 };
 
-// change role
+
+// =========================
+// CHANGE ROLE
+// =========================
 export const changeUserRole = async (req, res) => {
   try {
     const { id } = req.params;
@@ -119,12 +132,14 @@ export const changeUserRole = async (req, res) => {
   }
 };
 
-// get all users
+
+// =========================
+// GET ALL USERS
+// =========================
 export const getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       where: { isArchive: false },
-
       select: {
         id: true,
         username: true,
@@ -145,7 +160,10 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-// get OJT hours
+
+// =========================
+// GET OJT HOURS
+// =========================
 export const getOJTHours = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -179,7 +197,10 @@ export const getOJTHours = async (req, res) => {
   }
 };
 
-// update OJT hours
+
+// =========================
+// UPDATE OJT HOURS
+// =========================
 export const updateOJTHours = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -218,7 +239,10 @@ export const updateOJTHours = async (req, res) => {
   }
 };
 
-// update user info
+
+// =========================
+// UPDATE USER INFO
+// =========================
 export const updateUserInfo = async (req, res) => {
   try {
     const { id } = req.params;
@@ -245,7 +269,10 @@ export const updateUserInfo = async (req, res) => {
   }
 };
 
-// timesheet metadata
+
+// =========================
+// TIMESHEET META
+// =========================
 export const getTimesheetMeta = async (req, res) => {
   try {
     const internId = req.params.userId;
@@ -261,6 +288,10 @@ export const getTimesheetMeta = async (req, res) => {
   }
 };
 
+
+// =========================
+// ARCHIVE USER
+// =========================
 export const archiveUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -286,6 +317,10 @@ export const archiveUser = async (req, res) => {
   }
 };
 
+
+// =========================
+// UNARCHIVE USER
+// =========================
 export const unarchiveUser = async (req, res) => {
   try {
     const { id } = req.params;
