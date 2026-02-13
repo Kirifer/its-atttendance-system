@@ -102,8 +102,8 @@ export default function useExportPDF() {
 
     const didParseCell = (data) => {
       if (
-        data.row.index >= body.length - 2 &&
-        (data.column.index === 6 || data.column.index === 7)
+        data.row.index === body.length - 1 &&
+        (data.column.index === 5 || data.column.index === 6)
       ) {
         data.cell.styles.fontStyle = "bold";
       }
